@@ -197,7 +197,7 @@ function agg(c,m){
   return {client:c,month:m,reach:R,engagement:eng,views,profile_views:hasPV?pv:null,
     followers_growth:fg,followers_total:ft,er,
     profileVisitRate: (hasPV&&R)? pv/R : null,
-    followConv: (hasPV&&pv>0)? fg/pv : null,
+    followConv: (hasPV&&pv>0&&fg>0)? fg/pv : null,
     amplification: (R&&ft>0)? R/ft : null,
     viewFreq: (R&&views>0)? views/R : null,
     platforms:[...new Set(plats)],rows:rs};
@@ -268,8 +268,13 @@ function analyze(c,m){
   if(mom && Math.abs(mom.dev)>SPIKE){
     finds.push({tone:mom.dev>0?"good":"warn", html:`Reach ran <b>${pct(Math.abs(mom.dev),0)} ${mom.dev>0?"above":"below"}</b> its ${mom.months}-month baseline of ${fmt(mom.baseline)} — a real ${mom.dev>0?"spike":"dip"}, not month-to-month noise.`});
   }
-  if(cur.profileVisitRate!==null && cur.followConv!==null){
-    finds.push({tone:"", html:`<b>${pct(cur.profileVisitRate)}</b> of people reached went on to view the profile, and <b>${pct(cur.followConv)}</b> of those visitors followed — that's the funnel actually converting.`});
+  if(cur.profileVisitRate!==null){
+    if(cur.followConv!==null){
+      finds.push({tone:"", html:`<b>${pct(cur.profileVisitRate)}</b> of people reached went on to view the profile, and <b>${pct(cur.followConv)}</b> of those visitors followed — that's the funnel actually converting.`});
+    } else if(cur.followers_growth<0){
+      finds.push({tone:"warn", html:`<b>${pct(cur.profileVisitRate)}</b> of people reached viewed the profile, but the account still lost <b>${fmt(Math.abs(cur.followers_growth))}</b> followers on net. The top of the funnel is working; retention is the problem.`});
+      recs.push(`Audit why followers are leaving. Reach and profile visits are healthy, so the issue is what people find when they arrive — check bio, pinned content, and posting consistency.`);
+    }
   }
   if(cur.amplification!==null){
     const a=cur.amplification;
@@ -400,8 +405,8 @@ function render(){
       <div class="fstep"><div class="lab">Reached</div><div class="val">${fmt(cur.reach)}</div></div>
       <div class="farrow"><div class="rate">${pct(cur.profileVisitRate)}</div><div class="cap">visited profile</div></div>
       <div class="fstep"><div class="lab">Profile visits</div><div class="val">${fmt(cur.profile_views)}</div></div>
-      <div class="farrow"><div class="rate">${pct(cur.followConv)}</div><div class="cap">followed</div></div>
-      <div class="fstep"><div class="lab">New followers</div><div class="val">${cur.followers_growth>=0?"+":""}${fmt(cur.followers_growth)}</div></div>
+      <div class="farrow"><div class="rate ${cur.followers_growth<0?"neg":""}">${cur.followConv!==null?pct(cur.followConv):"—"}</div><div class="cap">${cur.followers_growth<0?"net loss":"followed"}</div></div>
+      <div class="fstep"><div class="lab">${cur.followers_growth<0?"Net followers":"New followers"}</div><div class="val ${cur.followers_growth<0?"neg":""}">${cur.followers_growth>=0?"+":""}${fmt(cur.followers_growth)}</div></div>
     </div>
     <div class="effgrid">
       <div class="eff"><div class="v">${cur.amplification?cur.amplification.toFixed(2)+"×":"—"}</div><div class="l">Amplification</div><div class="d">Reach ÷ followers. Above 1× means content travels past your own audience.</div></div>
