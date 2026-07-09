@@ -115,6 +115,7 @@
   <span class="brand"><img src="cno-logo.png" alt="CNO Creative Co"><small>Monthly Analytics Report</small></span>
   <label>Accounts CSV<input type="file" id="accFile" accept=".csv"></label>
   <label>Content CSV<input type="file" id="conFile" accept=".csv"></label>
+  <button id="demoBtn">Load demo</button>
   <button id="exportBtn">Export CSV</button>
   <div class="spacer"></div>
   <label>Client<select id="clientSel"></select></label>
@@ -122,7 +123,7 @@
   <button class="solid" id="printBtn">Print / PDF</button>
 </div>
 <div class="wrap"><div class="report" id="report">
-  <div class="empty">Load an <b>Accounts CSV</b> to generate a report.<br><span style="font-size:13px">Add a <b>Content CSV</b> to unlock content intelligence. See the schema in the repo README.</span></div>
+  <div class="empty">Load an <b>Accounts CSV</b>, or click <b>Load demo</b>, to generate a report.<br><span style="font-size:13px">Add a <b>Content CSV</b> to unlock content intelligence. See the schema in the repo README.</span></div>
 </div></div>
 
 <script>
@@ -536,6 +537,28 @@ document.getElementById("exportBtn").addEventListener("click",()=>{
 function loadFile(input,cb){ const f=input.files[0]; if(!f)return; const r=new FileReader(); r.onload=e=>cb(parseCSV(e.target.result)); r.readAsText(f); }
 document.getElementById("accFile").addEventListener("change",function(){ loadFile(this,rows=>{ACC=rows;refreshSelectors();}); });
 document.getElementById("conFile").addEventListener("change",function(){ loadFile(this,rows=>{CON=rows;render();}); });
+
+/* ---------- demo dataset — FICTIONAL. Contains no real client data. ---------- */
+const DEMO_ACC=`client,platform,month,followers_total,followers_growth,reach,engagement,views,profile_views,top_age_group,top_gender,top_countries,industry
+Example Brand,instagram,2026-03,2400,45,3100,410,9800,240,,,,example
+Example Brand,instagram,2026-04,2400,-8,1900,180,5200,150,,,,example
+Example Brand,instagram,2026-05,2400,22,2600,330,8100,205,,,,example
+Example Brand,instagram,2026-06,2400,61,4700,880,15400,390,25-34,F,United States|Canada|United Kingdom,example
+Example Brand,tiktok,2026-03,540,,,120,3400,,,,,example
+Example Brand,tiktok,2026-04,540,,,35,900,,,,,example
+Example Brand,tiktok,2026-05,540,,,0,0,,,,,example
+Example Brand,tiktok,2026-06,540,,,210,6100,,,,,example`;
+const DEMO_CON=`client,platform,month,date,post_type,engagement,reach,views,likes,comments,shares,follows,hashtag_count,caption_length,caption_snippet
+Example Brand,instagram,2026-06,2026-06-03,CAROUSEL,96,880,1900,74,7,13,2,5,410,"Three small habits that make a visible difference over a season."
+Example Brand,instagram,2026-06,2026-06-11,REEL,240,2600,7400,190,12,32,9,4,180,"The 30-second version of our most-asked question."
+Example Brand,instagram,2026-06,2026-06-19,CAROUSEL,64,540,1150,52,4,6,1,5,360,"What to look for on an ingredients label."
+Example Brand,instagram,2026-06,2026-06-27,IMAGE,38,300,610,34,2,1,0,3,150,"Behind the scenes at this month's workshop."
+Example Brand,tiktok,2026-06,2026-06-14,VIDEO,210,,6100,180,9,18,3,4,120,"Answering the question we get most."
+Example Brand,pinterest,2026-06,2026-06-08,IMAGE,0,,0,0,0,0,0,2,90,"Mood board for the summer collection."
+Example Brand,pinterest,2026-06,2026-06-22,IMAGE,0,,0,0,0,0,0,0,1,`;
+document.getElementById("demoBtn").addEventListener("click",()=>{
+  ACC=parseCSV(DEMO_ACC); CON=parseCSV(DEMO_CON); refreshSelectors();
+});
 
 </script>
 </body>
