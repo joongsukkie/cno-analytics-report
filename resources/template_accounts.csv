@@ -1,0 +1,9 @@
+client,platform,month,followers_total,followers_growth,reach,engagement,views,profile_views,top_age_group,top_gender,top_countries,industry
+Example Brand,instagram,2026-03,2400,45,3100,410,9800,240,,,,example
+Example Brand,instagram,2026-04,2400,-8,1900,180,5200,150,,,,example
+Example Brand,instagram,2026-05,2400,22,2600,330,8100,205,,,,example
+Example Brand,instagram,2026-06,2400,61,4700,880,15400,390,25-34,F,United States|Canada|United Kingdom,example
+Example Brand,tiktok,2026-03,540,,,120,3400,,,,,example
+Example Brand,tiktok,2026-04,540,,,35,900,,,,,example
+Example Brand,tiktok,2026-05,540,,,0,0,,,,,example
+Example Brand,tiktok,2026-06,540,,,210,6100,,,,,example

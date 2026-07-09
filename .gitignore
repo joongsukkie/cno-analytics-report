@@ -1,0 +1,23 @@
+# ---- REAL CLIENT DATA — never commit ----
+resources/sample_accounts.csv
+resources/sample_content.csv
+*_real.csv
+accounts.csv
+content.csv
+
+# ---- Internal working docs (client names, strategy, contacts) ----
+00_SYSTEM_OUTLINE.md
+02_INDUSTRY_BENCHMARKS.md
+03_OPEN_QUESTIONS.md
+04_RESEARCH_NOTES.md
+05_PROCESS_DOC.md
+
+# local dev helper, not needed for deployment
+serve.ps1
+
+# OS / editor noise
+Thumbs.db
+.DS_Store
+*.swp
+.vscode/
+.idea/

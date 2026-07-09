@@ -1,0 +1,8 @@
+client,platform,month,date,post_type,engagement,reach,views,likes,comments,shares,follows,hashtag_count,caption_length,caption_snippet
+Example Brand,instagram,2026-06,2026-06-03,CAROUSEL,96,880,1900,74,7,13,2,5,410,"Three small habits that make a visible difference over a season."
+Example Brand,instagram,2026-06,2026-06-11,REEL,240,2600,7400,190,12,32,9,4,180,"The 30-second version of our most-asked question."
+Example Brand,instagram,2026-06,2026-06-19,CAROUSEL,64,540,1150,52,4,6,1,5,360,"What to look for on an ingredients label."
+Example Brand,instagram,2026-06,2026-06-27,IMAGE,38,300,610,34,2,1,0,3,150,"Behind the scenes at this month's workshop."
+Example Brand,tiktok,2026-06,2026-06-14,VIDEO,210,,6100,180,9,18,3,4,120,"Answering the question we get most."
+Example Brand,pinterest,2026-06,2026-06-08,IMAGE,0,,0,0,0,0,0,2,90,"Mood board for the summer collection."
+Example Brand,pinterest,2026-06,2026-06-22,IMAGE,0,,0,0,0,0,0,0,1,
