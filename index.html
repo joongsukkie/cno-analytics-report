@@ -168,6 +168,7 @@ const pct = (n,d=1) => (n===null||n===undefined) ? "—" : (n*100).toFixed(d)+"%
 const sum = a => a.reduce((x,y)=>x+y,0);
 const median = a => { if(!a.length) return null; const s=a.slice().sort((x,y)=>x-y); const i=Math.floor(s.length/2); return s.length%2? s[i] : (s[i-1]+s[i])/2; };
 const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+const plural = (n,w) => n===1 ? w : w+"s";
 const PLAT={instagram:"Instagram",tiktok:"TikTok",linkedin:"LinkedIn",facebook:"Facebook",pinterest:"Pinterest",youtube:"YouTube",threads:"Threads"};
 const plat = s => PLAT[s]||cap(s);
 const FMT={CAROUSEL:"Carousel",REEL:"Reel",POST:"Post",IMAGE:"Image",VIDEO:"Video",STORY:"Story",SHORT:"Short",DOCUMENT:"Document",TEXT:"Text"};
@@ -235,6 +236,8 @@ function computeContent(rows){
   const medReach = median(reached.map(p=>p.reach));
   const topPost = posts.slice().sort((a,b)=>b.eng-a.eng)[0];
   const topFollow = posts.slice().sort((a,b)=>b.follows-a.follows)[0];
+  const topShare = posts.slice().sort((a,b)=>b.shares-a.shares)[0];
+  const topReach = posts.filter(p=>p.reach!==null).sort((a,b)=>b.reach-a.reach)[0]||null;
   const topEng = Math.max(...Object.values(byPlat).map(v=>v.eng));
   Object.keys(byPlat).forEach(k=>{
     const v=byPlat[k];
@@ -243,7 +246,7 @@ function computeContent(rows){
     v.low  = !v.dead && topEng>0 && v.eng>0 && v.eng < 0.02*topEng;
   });
   const hasVideo = posts.some(p=>VIDEO_FORMATS.indexOf(p.type)>=0);
-  return {posts,byPlat,byFmt,mix,medReach,topPost,topFollow,hasVideo,
+  return {posts,byPlat,byFmt,mix,medReach,topPost,topFollow,topShare,topReach,hasVideo,
           totalPosts:posts.length,totalShares:mix.shares,totalFollows:mix.follows};
 }
 
@@ -281,9 +284,10 @@ function analyze(c,m){
     finds.push({tone:a>=1?"good":"warn", html:`Content reached <b>${a.toFixed(2)}×</b> the size of the follower base, so it ${a>=1?"traveled beyond the existing audience":"mostly stayed inside the existing audience"}.`});
   }
   if(C){
-    // shares -> reach
-    if(C.medReach && C.topPost && C.topPost.reach && C.topPost.shares>0 && C.topPost.reach > 1.4*C.medReach){
-      finds.push({tone:"good", html:`The most-shared post (<b>${C.topPost.shares} shares</b>) reached <b>${(C.topPost.reach/C.medReach).toFixed(1)}×</b> the median post. Shares are the single biggest reach lever here.`});
+    // shares -> reach (only when the most-shared post genuinely out-reached the field)
+    var sharesDrive = C.medReach && C.topShare && C.topShare.shares>0 && C.topShare.reach!==null && C.topShare.reach > 1.4*C.medReach;
+    if(sharesDrive){
+      finds.push({tone:"good", html:`The most-shared post (<b>${C.topShare.shares} ${plural(C.topShare.shares,"share")}</b>) reached <b>${(C.topShare.reach/C.medReach).toFixed(1)}×</b> the median post. Shares are the single biggest reach lever here.`});
     }
     // follows concentration
     if(C.totalFollows>0 && C.topFollow && C.topFollow.follows>0 && C.topFollow.follows/C.totalFollows>=0.5){
@@ -301,12 +305,21 @@ function analyze(c,m){
         finds.push({tone:"warn", html:`<b>${plat(k)}</b>: ${v.posts} posts published for <b>zero</b> reach and zero engagement. That effort is not returning anything measurable.`});
         recs.push(`Pause or rethink ${plat(k)} — ${v.posts} posts produced no measurable reach or engagement. Redirect that time to the channels that convert.`);
       } else if(v.low && v.posts>=2){
-        finds.push({tone:"warn", html:`<b>${plat(k)}</b>: ${v.posts} posts earned only ${fmt(v.eng)} interaction${v.eng===1?"":"s"} — a negligible return next to the lead channel.`});
+        finds.push({tone:"warn", html:`<b>${plat(k)}</b>: ${v.posts} ${plural(v.posts,"post")} earned only ${fmt(v.eng)} ${plural(v.eng,"interaction")} — a negligible return next to the lead channel.`});
       }
     });
-    // shares rec
-    if(C.totalShares>0 && C.topPost){
-      recs.push(`Make more content in the vein of the top post — it earned ${C.topPost.shares} shares and drove the month's reach. Shareable, invite-style posts outperform informational ones.`);
+    // content rec — grounded in what the data actually shows
+    if(sharesDrive){
+      recs.push(`Lean into shareable content. The most-shared post reached ${(C.topShare.reach/C.medReach).toFixed(1)}× the median, so shares — not likes — are what move reach here.`);
+    } else if(C.topPost){
+      const bestFmt=Object.keys(C.byFmt).filter(k=>C.byFmt[k].er.length)
+        .sort((a,b)=>median(C.byFmt[b].er)-median(C.byFmt[a].er))[0];
+      let r=`Do more of what landed: the top post was a ${fmtName(C.topPost.type).toLowerCase()} with ${fmt(C.topPost.eng)} interactions.`;
+      if(bestFmt) r+=` By median engagement rate, ${fmtName(bestFmt).toLowerCase()}s are your strongest format at ${pct(median(C.byFmt[bestFmt].er))}.`;
+      recs.push(r);
+    }
+    if(C.topReach && C.topPost && C.topReach!==C.topPost){
+      recs.push(`Note the split between reach and engagement: the widest-reaching post (${fmtName(C.topReach.type).toLowerCase()}, ${fmt(C.topReach.reach)} reached) wasn't the most engaging one. Reach and resonance are being driven by different content.`);
     }
   }
   // dormant account-level platforms
@@ -329,7 +342,8 @@ function narrative(A,c,m){
   if(cur.er!==null && cur.engagement) S.push(`Engagement held at <b>${pct(cur.er)}</b> of the accounts reached, across ${fmt(cur.engagement)} interactions.`);
   if(cur.followers_growth>0) S.push(`The audience grew by <b>+${fmt(cur.followers_growth)}</b>.`);
   else if(cur.followers_growth<0) S.push(`The audience dipped by <b>${fmt(cur.followers_growth)}</b>.`);
-  if(A.C) S.push(`${A.C.totalPosts} posts went out across ${Object.keys(A.C.byPlat).length} platforms.`);
+  if(A.C){ const np=A.C.totalPosts, npl=Object.keys(A.C.byPlat).length;
+    S.push(`${np} ${plural(np,"post")} went out across ${npl} ${plural(npl,"platform")}.`); }
   return S.join(" ");
 }
 
