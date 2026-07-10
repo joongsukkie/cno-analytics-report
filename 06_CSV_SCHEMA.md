@@ -1,72 +1,46 @@
-# CSV Schema — the contract between Rella and the report generator
-### v1 · July 9, 2026
+# CSV input — how the report reads your data
+### v2 · one upload, any platform
 
-The report generator reads **one required CSV** (accounts) and **one optional CSV** (content). Column names are **exact, lowercase, snake_case**. Order doesn't matter; missing optional columns are handled gracefully (that section just doesn't render). This schema maps 1:1 to what the Rella connector returns, so the Claude→CSV export is a clean copy.
+The generator takes **one upload that accepts multiple files at once**. You no longer need two separate inputs — drop in whatever exports you have and the tool figures out what each file is.
 
----
+## What the tool detects automatically
 
-## File 1 — `accounts.csv` (REQUIRED)
-**Grain:** one row per **client × platform × month.** Multiple months = trend charts. Multiple platforms = platform breakdown.
+Every file is classified row-by-row into one of two **grains**:
 
-| Column | Required | Type | Notes |
-|--------|----------|------|-------|
-| `client` | ✅ | text | Exact client/space name, e.g. `Example Brand` |
-| `platform` | ✅ | text | one of: instagram, tiktok, linkedin, facebook, pinterest, youtube, threads |
-| `month` | ✅ | text | `YYYY-MM` (e.g. `2026-06`) |
-| `followers_total` | ✅ | int | **Live snapshot** from Rella (same across months) — used for "current followers," not the growth trend |
-| `followers_growth` | ✅ | int | Net follower change **in that month** — this drives the growth trend |
-| `reach` | ✅ | int | Unique accounts reached |
-| `engagement` | ✅ | int | Total interactions (Rella aggregate) |
-| `views` | rec. | int | Views / impressions volume |
-| `profile_views` | rec. | int | Profile visits |
-| `impressions` | opt. | int | If distinct from views |
-| `likes` | opt. | int | Usually blank at account level (see content.csv) |
-| `comments` | opt. | int | Usually blank at account level |
-| `shares` | opt. | int | Usually blank at account level |
-| `saves` | opt. | int | Not exposed by Rella aggregate — leave blank unless known |
-| `link_clicks` | opt. | int | Website/bio clicks if available |
-| `top_age_group` | opt. | text | e.g. `25-34` (demographics) |
-| `top_gender` | opt. | text | e.g. `F` |
-| `top_countries` | opt. | text | Pipe-separated, e.g. `United States|Canada|Nigeria` |
-| `industry` | opt. | text | For benchmark selection, e.g. `beauty` (else platform-default norm used) |
-| `goal` | opt. | text | `growth` / `engagement` / `reach` / `leads` — sets lead KPI emphasis (Phase 2) |
+| Grain | What it is | Powers | Detected when a row has… |
+|-------|-----------|--------|--------------------------|
+| **Account-level** | One row per account per period (a monthly/period snapshot) | Profile insights — followers, growth, profile visits, reach, the funnel | a `followers`/`profile visits` column and a `month` (or a date with no post fields) |
+| **Post-level** | One row per individual post | Content insights — engagement, views, shares, format analysis, top content | a `post type` or `caption`, plus per-post metrics and a `date` |
 
-**Engagement rate is NOT a column** — the generator computes it, so the math is identical every time:
-- ER (by reach) = `engagement ÷ reach` → headline resonance metric
-- ER (by followers) = `engagement ÷ followers_total` → used for the industry-benchmark comparison
+You can upload **either, both, or many files** (e.g. one account export + one post export per platform). They merge into one dataset, and the client/period selectors let you slice it.
 
----
+## Column names are normalized (multi-platform)
 
-## File 2 — `content.csv` (OPTIONAL — powers the "Top Content" section)
-**Grain:** one row per top post.
+You do **not** need to rename columns. The tool maps common header names from Rella, Instagram/Meta, TikTok, LinkedIn, and YouTube to a shared vocabulary. Examples it understands:
 
-| Column | Required | Type | Notes |
-|--------|----------|------|-------|
-| `client` | ✅ | text | Must match accounts.csv |
-| `platform` | ✅ | text | same set as above |
-| `month` | ✅ | text | `YYYY-MM` |
-| `date` | rec. | date | Post date (ISO) |
-| `post_type` | rec. | text | POST, REEL, CAROUSEL, STORY, VIDEO, SHORT, IMAGE, DOCUMENT, TEXT |
-| `engagement` | ✅ | int | Total interactions on the post |
-| `reach` | rec. | int | |
-| `views` | opt. | int | views or impressions |
-| `likes` `comments` `shares` `follows` | opt. | int | post-level splits |
-| `hashtag_count` | opt. | int | |
-| `caption_snippet` | opt. | text | Short snippet — **quote it** (contains commas/emojis) |
+- **reach** ← `reach`, `accounts reached`, `unique reach`
+- **views** ← `views`, `impressions`, `plays`, `video views`
+- **engagement** ← `engagement`, `interactions`, `total engagement`
+- **followers** ← `followers`, `subscribers`, `audience`, `fans`
+- **follower growth** ← `net followers`, `new followers`, `followers gained`
+- **profile visits** ← `profile visits`, `profile views`
+- **link clicks** ← `link clicks`, `website clicks`, `link taps`, `profile links taps`
+- **shares / saves / comments / likes / replies / reposts** ← their obvious variants
+- **date** ← `date`, `published`, `timestamp`, `post time`
+- **post type** ← `post type`, `media type`, `format`
+- plus `client`, `platform`, `caption`, `hashtags`, demographics (`gender`, `top countries`, `top cities`), etc.
 
----
+Unrecognized columns are ignored, not fatal. Missing metrics just hide their card — nothing breaks.
 
-## Rules
-- **UTF-8, comma-delimited.** Any field containing a comma, quote, or newline must be wrapped in double quotes (`"..."`), with internal quotes doubled (`""`). The generator's parser handles this.
-- **One export can hold many clients and many months** — the generator lets the user pick client + month in the UI. (Default workflow: one combined CSV for all clients each month, appended to history.)
-- **Blank ≠ zero.** Leave a cell empty if unknown; the generator hides missing metrics rather than showing `0`.
-- **Stable client/platform spelling** across months so trends link up.
+## Minimum to get a report
+- **Account-level file:** `client, platform, month` + at least one of `reach / followers / engagement`.
+- **Post-level file:** `client, platform, date, post_type` + any per-post metrics.
 
-## Example (accounts.csv)
-```
-client,platform,month,followers_total,followers_growth,reach,engagement,views,profile_views,top_age_group,top_gender,top_countries,industry
-Example Brand,instagram,2026-06,2400,61,4700,880,15400,390,25-34,F,United States|Canada,example
-Example Brand,tiktok,2026-06,540,,,210,6100,,,,,example
-```
+## A note on Rella's follower count
+Rella returns the **current** follower total regardless of the date range, so follower *trends* are computed from monthly **growth**, not by differencing the total. The tool handles this for you.
 
-Runnable templates live in `resources/template_accounts.csv` and `resources/template_content.csv`.
+## Templates
+Runnable examples: `resources/template_accounts.csv` and `resources/template_content.csv`.
+
+## Export
+The **Export data** button downloads your loaded data back out as normalized `accounts_normalized.csv` and `content_normalized.csv`.

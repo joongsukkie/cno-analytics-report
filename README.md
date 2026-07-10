@@ -8,36 +8,40 @@ A standalone, deterministic reporting tool for CNO Creative Co. Feed it a CSV of
 
 ## What it does
 
-Most social tools show you what happened. This one explains **what it means and what to do next.** It derives analysis the platforms don't give you:
+Most social tools show you what happened. This one explains **what it means and what to do next.**
 
-- **Audience funnel** — reach → profile visits → follows, with conversion rates at each step
-- **Efficiency ratios** — amplification (reach ÷ followers), view frequency, click-through and follow conversion
-- **Statistical anomaly detection** — flags spikes and dips against a rolling 3-month baseline, so you know what's a real signal vs. normal noise
-- **Content-format intelligence** — which formats actually earn reach and engagement (median, not averages skewed by outliers)
-- **Effort vs. return by platform** — posts published against what those posts actually earned; flags channels producing no measurable return
-- **Engagement mix** — likes vs. comments vs. shares vs. follows, because shares and follows compound while likes don't
-- **Deterministic narrative + recommendations** — plain-English summary written in CNO's brand voice, identical for identical input
+**Reads any export.** One upload accepts multiple files at once and normalizes column names across Rella, Instagram/Meta, TikTok, LinkedIn, and YouTube — no renaming required. It auto-detects account-level vs. post-level data. See [`06_CSV_SCHEMA.md`](06_CSV_SCHEMA.md).
+
+**Interactive, like a real dashboard.**
+- Pick any **time period inside the report** — a month, last 30/90 days, all time, or a custom date range — and everything recomputes vs. the previous comparable period. No re-uploading.
+- **Interactive charts** with hover tooltips and a current-vs-previous overlay, plus a sparkline on every metric card.
+- **Profile Insights** and **Content Insights** metric grids (followers, growth, profile visits, reach, engagement, ER, views, shares, saves, comments, likes, posts, amplification).
+
+**Analysis the platforms don't give you.**
+- **Audience funnel** — reach → profile visits → follows, with conversion at each step
+- **Efficiency ratios** — amplification (reach ÷ followers), view frequency, follow conversion
+- **Anomaly detection** — spikes/dips flagged against a rolling 3-month baseline (real signal vs. noise)
+- **Format intelligence** — which formats earn reach/engagement, by median (not outlier-skewed averages)
+- **Effort vs. return per platform** — posts published against what they actually earned; flags dead channels
+
+**Story-first and yours to shape.**
+- A headline plus **Working Now / Needs Attention / Best Next Move**, every claim grounded in the numbers
+- **Customize** panel: report goal (reorders/emphasizes KPIs), featured-KPI picker, section toggles, client display name — remembered across visits
+- **Every summary, finding, and recommendation is editable inline** and prints as edited
+- Deterministic: identical input always yields the identical report
 
 ## Usage
 
-Open `index.html` in any browser.
+Open `index.html` in any browser (or visit the deployed site with `#demo` to auto-load a sample).
 
-1. Click **Load sample** to see a fully worked example, or
-2. Load your own **Accounts CSV** (required) and **Content CSV** (optional)
-3. Pick a client and month
-4. **Export CSV** to download the underlying raw data
-5. **Print / PDF** for the client leave-behind
+1. **Upload CSV(s)** — drop in any account-level and/or post-level exports, or click **Load demo**
+2. Pick a **client** and **period** (month / last 30 / 90 / all / custom range)
+3. **Customize** the goal, featured KPIs, and sections; edit any text inline
+4. **Export data** to download normalized CSVs, or **Print / PDF** for the client leave-behind
 
-## Data format
+Templates: `resources/template_accounts.csv`, `resources/template_content.csv`.
 
-See [`06_CSV_SCHEMA.md`](06_CSV_SCHEMA.md) for the full contract.
-
-- `accounts.csv` — one row per **client × platform × month** (required)
-- `content.csv` — one row per **post** (optional; unlocks content intelligence)
-
-Sample files live in [`resources/`](resources/).
-
-> **Note:** `followers_total` from Rella is a live snapshot (identical across months), so follower *trends* are derived from `followers_growth`, not from differencing the total.
+> **Note:** Rella returns the *current* follower total for any date range, so follower *trends* come from monthly **growth**, not by differencing the total. The tool handles this.
 
 ## Architecture
 
