@@ -49,6 +49,7 @@
   .rhead .cli{font-family:var(--serif);font-size:36px;font-weight:500;line-height:1.06;letter-spacing:-.01em;margin-top:5px}
   .rhead .meta{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);margin-top:10px}
   .rhead .meta span{color:var(--terra);margin:0 6px}
+  .rhead .daterange{font-size:11px;color:var(--ink-soft);margin-top:4px;letter-spacing:.02em}
   section{padding:24px 34px;border-bottom:1px solid var(--sand)}
   section:last-of-type{border-bottom:none}
   .sec-label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--sage-deep);font-weight:500;margin-bottom:6px}
@@ -80,7 +81,8 @@
   .mcard .top .i{font-size:13px;color:var(--burnt)}
   .mcard .val{font-family:var(--serif);font-size:27px;font-weight:500;line-height:1.05;margin:5px 0 2px}
   .mcard .chg{font-size:11.5px}
-  .mcard .spark{margin-top:6px}
+  .mcard .cdesc{font-size:10.5px;color:var(--ink-soft);margin-top:4px;line-height:1.35}
+  .mcard .spark{margin-top:8px}
   .pos{color:var(--pos)} .neg{color:var(--neg)} .flat{color:var(--ink-soft)}
   /* charts */
   .chart{position:relative;width:100%;height:38px}
@@ -248,6 +250,7 @@ const ALIAS={};
   top_gender:["topgender","gender"],
   top_countries:["topcountries","countries","topcountry"],
   top_cities:["topcities","cities","city","topcity"],
+  posts:["posts","totalposts","postcount","postspublished","numposts"],
   industry:["industry","vertical","category"]
 };
 for(const canon in map){for(const a of map[canon]){ALIAS[a]=canon;}ALIAS[canon.replace(/_/g,"")]=canon;}})();
@@ -295,7 +298,7 @@ function classify(rows){
       periods.push({client:(r.client||"Unknown").trim(),platform:(r.platform||"instagram").toLowerCase().trim(),month:mon,
         followers_total:num(r.followers_total),followers_growth:num(r.followers_growth),
         reach:num(r.reach),views:num(r.views),engagement:num(r.engagement),
-        profile_views:num(r.profile_views),link_clicks:num(r.link_clicks),
+        profile_views:num(r.profile_views),link_clicks:num(r.link_clicks),posts:num(r.posts),
         top_age_group:r.top_age_group||"",top_gender:r.top_gender||"",top_countries:r.top_countries||"",top_cities:r.top_cities||"",industry:r.industry||""});
     }
   });
@@ -315,31 +318,35 @@ function windowMetrics(c,from,to){
   const postsIn=POSTS.filter(p=>p.client===c&&p.date&&ymd(p.date)>=fs&&ymd(p.date)<=ts);
   const mons=monthsInRange(from,to);
   const perIn=PERIODS.filter(p=>p.client===c&&mons.indexOf(p.month)>=0);
-  // content (post-derived)
-  const engagement=sum(postsIn.map(p=>p.engagement!==null?p.engagement:(p.likes+p.comments+p.shares+p.saves)));
-  const m={
-    engagement, views:sum(postsIn.map(p=>p.views)), likes:sum(postsIn.map(p=>p.likes)),
-    comments:sum(postsIn.map(p=>p.comments)), shares:sum(postsIn.map(p=>p.shares)),
-    saves:sum(postsIn.map(p=>p.saves)), follows:sum(postsIn.map(p=>p.follows)),
-    replies:sum(postsIn.map(p=>p.replies)), reposts:sum(postsIn.map(p=>p.reposts)),
-    posts:postsIn.length
-  };
-  // profile (account-level)
-  const perReach=sum(perIn.map(p=>p.reach));
-  m.reach = perReach>0 ? perReach : (sum(postsIn.map(p=>p.reach))||null);
-  m.profile_views = perIn.some(p=>p.profile_views!==null)? sum(perIn.map(p=>p.profile_views)) : null;
-  m.link_clicks = perIn.some(p=>p.link_clicks!==null)? sum(perIn.map(p=>p.link_clicks)) : null;
-  m.followers_growth = perIn.some(p=>p.followers_growth!==null)? sum(perIn.map(p=>p.followers_growth)) : null;
+  const has=(arr,k)=>arr.some(p=>p[k]!==null&&p[k]!==undefined);
+  const m={_posts:postsIn,_periods:perIn};
+  // ---- Headline metrics: account-level totals are authoritative (match the platform / Rella).
+  //      Post rows are only a fallback when no account-level data is present. ----
+  const perReach = has(perIn,"reach") ? sum(perIn.map(p=>p.reach)) : null;
+  const acctEng  = has(perIn,"engagement") ? sum(perIn.map(p=>p.engagement)) : null;
+  const acctViews= has(perIn,"views") ? sum(perIn.map(p=>p.views)) : null;
+  const postEng  = sum(postsIn.map(p=>p.engagement!==null?p.engagement:(p.likes+p.comments+p.shares+p.saves)));
+  m.reach       = perReach!==null ? perReach : (postsIn.some(p=>p.reach!==null)?sum(postsIn.map(p=>p.reach)):null);
+  m.engagement  = acctEng!==null ? acctEng : (postsIn.length?postEng:null);
+  m.views       = acctViews!==null ? acctViews : (postsIn.length?sum(postsIn.map(p=>p.views)):null);
+  m.profile_views= has(perIn,"profile_views") ? sum(perIn.map(p=>p.profile_views)) : null;
+  m.link_clicks = has(perIn,"link_clicks") ? sum(perIn.map(p=>p.link_clicks)) : null;
+  m.followers_growth = has(perIn,"followers_growth") ? sum(perIn.map(p=>p.followers_growth)) : null;
   const ftRows=perIn.filter(p=>p.followers_total!==null);
   if(ftRows.length){const latest={};ftRows.forEach(p=>{if(!latest[p.platform]||p.month>latest[p.platform].month)latest[p.platform]=p;});m.followers_total=sum(Object.values(latest).map(p=>p.followers_total));}else m.followers_total=null;
-  // derived
-  const denom = (perReach>0?perReach:(sum(postsIn.map(p=>p.reach))|| m.views));
-  m.er = denom>0 ? engagement/denom : null;
+  const acctPosts=has(perIn,"posts")?sum(perIn.map(p=>p.posts)):null;
+  m.posts = acctPosts!==null ? acctPosts : (postsIn.length||null);
+  // ---- Content-detail metrics come from post rows (account aggregates don't carry these) ----
+  if(postsIn.length){
+    m.likes=sum(postsIn.map(p=>p.likes)); m.comments=sum(postsIn.map(p=>p.comments));
+    m.shares=sum(postsIn.map(p=>p.shares)); m.saves=sum(postsIn.map(p=>p.saves)); m.follows=sum(postsIn.map(p=>p.follows));
+  } else { m.likes=m.comments=m.shares=m.saves=m.follows=null; }
+  // ---- Derived ----
+  m.er = (m.engagement!==null&&m.reach) ? m.engagement/m.reach : null;
   m.amplification = (m.reach&&m.followers_total)? m.reach/m.followers_total : null;
   m.profileVisitRate = (m.profile_views&&m.reach)? m.profile_views/m.reach : null;
   m.followConv = (m.profile_views&&m.followers_growth>0)? m.followers_growth/m.profile_views : null;
   m.viewFreq = (m.reach&&m.views)? m.views/m.reach : null;
-  m._posts=postsIn; m._periods=perIn;
   return m;
 }
 function prevRange(from,to){const len=daysBetween(from,to)+1;return{from:addDays(from,-len),to:addDays(from,-1)};}
@@ -369,28 +376,28 @@ function dailySeries(c,key,from,to){
 
 /* ==================== metric registry ==================== */
 const METRICS={
-  followers_total:{label:"Followers",group:"profile",fmt:fmtInt,icon:"users"},
-  followers_growth:{label:"Follower growth",group:"profile",fmt:fmtSigned,icon:"user-plus",signed:true},
-  profile_views:{label:"Profile visits",group:"profile",fmt:fmtInt,icon:"eye"},
-  reach:{label:"Accounts reached",group:"profile",fmt:fmtInt,icon:"radio"},
-  link_clicks:{label:"Link clicks",group:"profile",fmt:fmtInt,icon:"link"},
-  engagement:{label:"Engagement",group:"content",fmt:fmtInt,icon:"heart"},
-  er:{label:"Engagement rate",group:"content",fmt:v=>pct(v),icon:"activity"},
-  views:{label:"Views",group:"content",fmt:fmtInt,icon:"play"},
-  shares:{label:"Shares",group:"content",fmt:fmtInt,icon:"share"},
-  saves:{label:"Saves",group:"content",fmt:fmtInt,icon:"bookmark"},
-  comments:{label:"Comments",group:"content",fmt:fmtInt,icon:"message"},
-  likes:{label:"Likes",group:"content",fmt:fmtInt,icon:"thumb"},
-  follows:{label:"Follows from posts",group:"content",fmt:fmtInt,icon:"user-plus"},
-  posts:{label:"Posts",group:"content",fmt:fmtInt,icon:"grid"},
-  amplification:{label:"Amplification",group:"content",fmt:fmtX,icon:"trending"}
+  followers_total:{label:"Followers",group:"profile",fmt:fmtInt,icon:"users",desc:"Total audience size",snapshot:true},
+  followers_growth:{label:"Follower growth",group:"profile",fmt:fmtSigned,icon:"user-plus",signed:true,desc:"Followers gained minus lost"},
+  profile_views:{label:"Profile visits",group:"profile",fmt:fmtInt,icon:"eye",desc:"Times the profile was opened"},
+  reach:{label:"Accounts reached",group:"profile",fmt:fmtInt,icon:"radio",desc:"Unique accounts that saw the content"},
+  link_clicks:{label:"Link clicks",group:"profile",fmt:fmtInt,icon:"link",desc:"Taps on the profile link"},
+  engagement:{label:"Engagement",group:"content",fmt:fmtInt,icon:"heart",desc:"Likes, comments, shares & saves"},
+  er:{label:"Engagement rate",group:"content",fmt:v=>pct(v),icon:"activity",desc:"Engagement ÷ accounts reached"},
+  views:{label:"Views",group:"content",fmt:fmtInt,icon:"play",desc:"Total times content was viewed"},
+  shares:{label:"Shares",group:"content",fmt:fmtInt,icon:"share",desc:"Times content was shared onward"},
+  saves:{label:"Saves",group:"content",fmt:fmtInt,icon:"bookmark",desc:"Times content was bookmarked"},
+  comments:{label:"Comments",group:"content",fmt:fmtInt,icon:"message",desc:"Comments left on posts"},
+  likes:{label:"Likes",group:"content",fmt:fmtInt,icon:"thumb",desc:"Likes across posts"},
+  follows:{label:"Follows from posts",group:"content",fmt:fmtInt,icon:"user-plus",desc:"New follows credited to a post"},
+  posts:{label:"Posts",group:"content",fmt:fmtInt,icon:"grid",desc:"Posts published this period"},
+  amplification:{label:"Amplification",group:"content",fmt:fmtX,icon:"trending",desc:"Reach vs. follower count"}
 };
 const GOAL_HERO={
   growth:["followers_total","followers_growth","reach","profile_views"],
   engagement:["engagement","er","shares","saves"],
-  reach:["reach","views","amplification","posts"],
+  reach:["reach","views","engagement","posts"],
   conversion:["profile_views","link_clicks","followers_growth","er"],
-  balanced:["reach","engagement","er","followers_growth"]
+  balanced:["followers_total","engagement","er","views","followers_growth","posts"]
 };
 
 /* ==================== customization + edits ==================== */
@@ -556,6 +563,8 @@ function render(){
   const cur=windowMetrics(c,from,to);
   const pr=prevRange(from,to);
   const prev=windowMetrics(c,pr.from,pr.to);
+  const hasPrevData=!!(prev&&(prev.reach!==null||prev.engagement!==null||prev.followers_total!==null||prev.views!==null));
+  const dateSpan=`${MON[from.getUTCMonth()]} ${from.getUTCDate()} – ${MON[to.getUTCMonth()]} ${to.getUTCDate()}, ${to.getUTCFullYear()}`;
   const A=analyze(c,cur,prev,from,to);
   const goal=cget("goal","balanced");
   const nameShow=cget("name","")||c;
@@ -590,18 +599,13 @@ function render(){
   if(cur.reach!==null&&cur.profile_views!==null){
     const neg=cur.followers_growth<0;
     funnel=`<div class="funnel">
-      <div class="fstep"><div class="lab">Reached</div><div class="val">${fmtInt(cur.reach)}</div></div>
-      <div class="farrow"><div class="rate">${pct(cur.profileVisitRate)}</div><div class="cap">visited profile</div></div>
-      <div class="fstep"><div class="lab">Profile visits</div><div class="val">${fmtInt(cur.profile_views)}</div></div>
-      <div class="farrow"><div class="rate ${neg?"neg":""}">${cur.followConv!==null?pct(cur.followConv):"—"}</div><div class="cap">${neg?"net loss":"followed"}</div></div>
-      <div class="fstep"><div class="lab">${neg?"Net followers":"New followers"}</div><div class="val ${neg?"neg":""}">${fmtSigned(cur.followers_growth)}</div></div>
+      <div class="fstep"><div class="lab">Saw the content</div><div class="val">${fmtInt(cur.reach)}</div></div>
+      <div class="farrow"><div class="rate">${pct(cur.profileVisitRate)}</div><div class="cap">went to profile</div></div>
+      <div class="fstep"><div class="lab">Opened the profile</div><div class="val">${fmtInt(cur.profile_views)}</div></div>
+      <div class="farrow"><div class="rate ${neg?"neg":""}">${cur.followConv!==null?pct(cur.followConv):"—"}</div><div class="cap">${neg?"net loss":"then followed"}</div></div>
+      <div class="fstep"><div class="lab">${neg?"Net new followers":"New followers"}</div><div class="val ${neg?"neg":""}">${fmtSigned(cur.followers_growth)}</div></div>
     </div>
-    <div class="effgrid">
-      <div class="eff"><div class="v">${cur.amplification?fmtX(cur.amplification):"—"}</div><div class="l">Amplification</div><div class="d">Reach ÷ followers. Above 1× = content travels past your own audience.</div></div>
-      <div class="eff"><div class="v">${cur.viewFreq?cur.viewFreq.toFixed(1):"—"}</div><div class="l">Views per person</div><div class="d">How often the average reached person saw the content.</div></div>
-      <div class="eff"><div class="v">${pct(cur.profileVisitRate)}</div><div class="l">Reach → profile</div><div class="d">Share of reached accounts curious enough to click through.</div></div>
-      <div class="eff"><div class="v">${cur.followConv!==null?pct(cur.followConv):"—"}</div><div class="l">Profile → follow</div><div class="d">Share of profile visitors who converted to followers.</div></div>
-    </div>`;
+    <div class="note" style="font-size:13px;color:var(--ink);line-height:1.6">Read it left to right: of the <b>${fmtInt(cur.reach)}</b> accounts that saw the content, <b>${pct(cur.profileVisitRate)}</b> opened the profile, and <b>${cur.followConv!==null?pct(cur.followConv):"—"}</b> of those ${neg?"visitors still weren't enough to offset unfollows":"went on to follow"}.${cur.amplification?` The content reached <b>${fmtX(cur.amplification)}</b> as many accounts as there are followers${cur.amplification>=1?", so it spread well beyond the existing audience":", staying mostly within the existing audience"}.`:""}</div>`;
   }
 
   // format + effort + mix
@@ -634,6 +638,7 @@ function render(){
     <div class="kick">Analytics Report</div>
     <div class="cli">${nameShow}</div>
     <div class="meta">${label}<span>·</span>${platsUsed.map(plat).join(" · ")||"—"}</div>
+    <div class="daterange">${dateSpan}</div>
   </div>
 
   <section>
@@ -659,7 +664,7 @@ function render(){
     ${demo}
   </section>
 
-  <section><div class="sec-label">Headline KPIs</div><div class="sec-sub">Against the previous ${daysBetween(from,to)+1>45?"period":"comparable period"}. Hover any chart for detail.</div><div class="cardgrid">${heroCards}</div></section>
+  <section><div class="sec-label">Headline numbers</div><div class="sec-sub">Totals for ${dateSpan}. ${hasPrevData?"“vs prior” compares to the previous period of equal length.":"This is the earliest period in the data, so there’s nothing earlier to compare against yet."} Each card says what it measures.</div><div class="cardgrid">${heroCards}</div></section>
 
   ${showSec("trends")&&trendCharts?`<section><div class="sec-label">Trends over time</div><div class="chartrow">${trendCharts}</div></section>`:""}
 
@@ -683,12 +688,13 @@ function render(){
   wireEdits();
 }
 function metricCard(c,key,cur,prev,hero){
-  const M=METRICS[key];const v=cur[key];const pv=prev[key];
+  const M=METRICS[key];const v=cur[key];const pv=prev?prev[key]:null;
   let chgHtml="",cls="flat";
-  if(key==="followers_growth"||M.signed){const d=(v||0)-(pv||0);if(pv!==null&&pv!==undefined){cls=d>=0?"pos":"neg";chgHtml=(d>=0?"↑ +":"↓ ")+fmtInt(Math.abs(d))+" vs prev";}}
-  else{const ch=chg(v,pv);if(ch!==null){cls=ch>=0?"pos":"neg";chgHtml=(ch>=0?"↑ ":"↓ ")+pct(Math.abs(ch),0)+" vs prev";}else chgHtml="—";}
-  const spark=key==="posts"||key==="amplification"?"":chartHolder(monthlySeries(c,key),{fmt:M.fmt});
-  return `<div class="mcard ${hero?"hero":""}"><div class="top">${ico(M.icon)} ${M.label}</div><div class="val">${M.fmt(v)}</div><div class="chg ${cls}">${chgHtml}</div>${spark?`<div class="spark">${spark}</div>`:""}</div>`;
+  if(M.snapshot){/* cumulative snapshot — period-over-period change isn't meaningful */}
+  else if(M.signed){const d=(v||0)-(pv||0);if(pv!==null&&pv!==undefined){cls=d>=0?"pos":"neg";chgHtml=(d>=0?"↑ +":"↓ ")+fmtInt(Math.abs(d))+" vs prior";}}
+  else{const ch=chg(v,pv);if(ch!==null){if(Math.abs(ch)<0.005){cls="flat";chgHtml="≈ no change";}else{cls=ch>=0?"pos":"neg";chgHtml=(ch>=0?"↑ ":"↓ ")+pct(Math.abs(ch),0)+" vs prior";}}}
+  const spark=(key==="posts"||key==="amplification")?"":chartHolder(monthlySeries(c,key),{fmt:M.fmt});
+  return `<div class="mcard ${hero?"hero":""}"><div class="top">${ico(M.icon)} ${M.label}</div><div class="val">${M.fmt(v)}</div>${chgHtml?`<div class="chg ${cls}">${chgHtml}</div>`:""}<div class="cdesc">${M.desc||""}</div>${spark?`<div class="spark">${spark}</div>`:""}</div>`;
 }
 
 /* ==================== period control ==================== */
