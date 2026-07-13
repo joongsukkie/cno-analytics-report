@@ -139,6 +139,15 @@
   ol.recs{margin:0;padding-left:20px} ol.recs li{font-size:14px;line-height:1.6;margin-bottom:8px} ol.recs li::marker{color:var(--burnt)}
   .note{font-size:11px;color:var(--ink-soft);margin-top:9px}
   .dtitle{font-size:12px;font-weight:500;margin-bottom:6px;color:var(--ink)}
+  .wdbars{display:flex;align-items:flex-end;gap:9px;height:100px;padding:4px 0 0}
+  .wdcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px}
+  .wdval{font-size:10px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  .wdbar{width:64%;border-radius:5px 5px 0 0;min-height:3px}
+  .wdlab{font-size:10.5px;color:var(--ink-soft)}
+  .insight{background:var(--sand-2);border:1px solid var(--sand);border-radius:11px;padding:12px 15px;font-size:13.5px;line-height:1.6;margin-top:14px}
+  .insight b{font-weight:500;color:var(--burnt-deep)}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:660px){.twocol{grid-template-columns:1fr}}
   .datawrap{overflow:auto;max-height:360px;border:1px solid var(--sand);border-radius:10px}
   .dtable{width:100%;border-collapse:collapse;font-size:11.5px;min-width:640px}
   .dtable th,.dtable td{padding:6px 10px;border-bottom:1px solid var(--sand);white-space:nowrap;text-align:left}
@@ -607,6 +616,36 @@ function headline(c,cur,prev,A){
   return `${p1}, ${comp}.`;
 }
 
+/* ==================== deeper analytics ==================== */
+const DOW=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+function postEng(p){return p.engagement!==null?p.engagement:(p.likes+p.comments+p.shares+p.saves);}
+function weekdayStats(posts){
+  const by=Array.from({length:7},()=>[]);
+  posts.forEach(p=>{by[(p.date.getUTCDay()+6)%7].push(postEng(p));});
+  const rows=by.map((a,i)=>({day:DOW[i],count:a.length,med:a.length?median(a):0}));
+  const active=rows.filter(r=>r.count>0);
+  const best=active.slice().sort((a,b)=>b.med-a.med)[0]||null;
+  const rest=active.filter(r=>best&&r.day!==best.day).flatMap(r=>Array(r.count).fill(r.med));
+  return {rows,best,active,restMed:rest.length?median(rest):null};
+}
+function bucketStats(posts,field,buckets){
+  return buckets.map(b=>{
+    const inb=posts.filter(p=>b.test(p[field]));
+    const eng=inb.map(postEng), reach=inb.filter(p=>p.reach!==null&&p.reach>0).map(p=>p.reach);
+    return {name:b.name,count:inb.length,medEng:inb.length?median(eng):null,medReach:reach.length?median(reach):null};
+  }).filter(b=>b.count>0);
+}
+function bestBucket(bs){return bs.filter(b=>b.medEng!==null&&b.count>=2).slice().sort((a,b)=>b.medEng-a.medEng)[0]||null;}
+function consistency(posts){
+  const r=posts.filter(p=>p.reach!==null&&p.reach>0).map(p=>p.reach);
+  if(r.length<3)return null;
+  const med=median(r), max=Math.max(...r), min=Math.min(...r);
+  const above=r.filter(v=>v>med).length;
+  const top=posts.filter(p=>p.reach!==null).slice().sort((a,b)=>b.reach-a.reach)[0];
+  const topShare=sum(r)>0?max/sum(r):0;
+  return {med,max,min,mult:med>0?max/med:null,aboveMedPct:above/r.length,topShare,top,n:r.length};
+}
+
 /* ==================== render ==================== */
 let CURRENT={client:null,from:null,to:null,label:""};
 function render(){
@@ -672,6 +711,39 @@ function render(){
     effortHtml=`<table><thead><tr><th>Platform</th><th class="num">Posts</th><th class="num">Engagement</th><th class="num">Median reach</th><th class="num">Shares</th><th class="num">Follows</th><th></th></tr></thead><tbody>${Object.keys(A.C.byPlat).sort((a,b)=>A.C.byPlat[b].eng-A.C.byPlat[a].eng).map(k=>{const v=A.C.byPlat[k];const tag=v.dead?'<span class="tag none">No return</span>':v.low?'<span class="tag low">Low return</span>':'<span class="tag strong">Working</span>';return `<tr><td class="plat">${plat(k)}</td><td class="num">${v.posts}</td><td class="num">${fmtInt(v.eng)}</td><td class="num">${v.medReach!==null?fmtInt(v.medReach):"—"}</td><td class="num">${fmtInt(v.shares)}</td><td class="num">${fmtInt(v.follows)}</td><td>${tag}</td></tr>`;}).join("")}</tbody></table><div class="note">Effort = posts published; return = what they earned. Post reach isn't additive, so median reach per post is shown.</div>`;
   }
 
+  // best day to post
+  let bestDayHtml="";
+  if(A.C&&cur._posts.length>=4){
+    const wd=weekdayStats(cur._posts); const max=Math.max(1,...wd.rows.map(r=>r.med));
+    bestDayHtml=`<div class="wdbars">${wd.rows.map(r=>{const h=Math.round((r.med/max)*78);const best=wd.best&&r.day===wd.best.day;return `<div class="wdcol"><div class="wdval">${r.count?fmtInt(r.med):""}</div><div class="wdbar" style="height:${r.count?Math.max(3,h):3}px;background:${best?"var(--burnt)":"var(--terra)"};opacity:${r.count?1:.2}" title="${r.day}: ${r.count} ${plural(r.count,"post")}"></div><div class="wdlab">${r.day}</div></div>`;}).join("")}</div>`;
+    if(wd.best&&wd.restMed!==null&&wd.restMed>0){const mult=wd.best.med/wd.restMed;bestDayHtml+=`<div class="insight">Posting on <b>${wd.best.day}</b> lands the most engagement — a median of <b>${fmtInt(wd.best.med)}</b> per post${mult>=1.25?`, about <b>${mult.toFixed(1)}×</b> other days`:""}. Bars show median engagement per post by weekday.</div>`;}
+    else if(wd.best){bestDayHtml+=`<div class="insight">So far <b>${wd.best.day}</b> posts lead. Bars show median engagement per post by weekday — the pattern sharpens as more posts come in.</div>`;}
+  }
+  // what makes posts work
+  let deepHtml="";
+  if(A.C&&cur._posts.length>=4){
+    const capB=bucketStats(cur._posts,"len",[{name:"Short (<150)",test:v=>v<150},{name:"Medium (150–500)",test:v=>v>=150&&v<=500},{name:"Long (>500)",test:v=>v>500}]);
+    const tagB=bucketStats(cur._posts,"tags",[{name:"None",test:v=>v===0},{name:"1–3",test:v=>v>=1&&v<=3},{name:"4–6",test:v=>v>=4&&v<=6},{name:"7+",test:v=>v>=7}]);
+    const tbl=(rows,head)=>`<table><thead><tr><th>${head}</th><th class="num">Posts</th><th class="num">Median eng.</th><th class="num">Median reach</th></tr></thead><tbody>${rows.map(b=>`<tr><td class="plat">${b.name}</td><td class="num">${b.count}</td><td class="num">${b.medEng!==null?fmtInt(b.medEng):"—"}</td><td class="num">${b.medReach!==null?fmtInt(b.medReach):"—"}</td></tr>`).join("")}</tbody></table>`;
+    const cb=bestBucket(capB),tb=bestBucket(tagB); let take="";
+    if(cb)take+=`<b>${cb.name}</b> captions perform best (median ${fmtInt(cb.medEng)} engagements). `;
+    if(tb)take+=`Posts with <b>${tb.name==="None"?"no":tb.name}</b> hashtags lead. `;
+    deepHtml=`<div class="twocol"><div><div class="dtitle">By caption length</div>${tbl(capB,"Length")}</div><div><div class="dtitle">By hashtag count</div>${tbl(tagB,"Hashtags")}</div></div>${take?`<div class="insight">${take}Directional at this volume — the pattern firms up with more posts.</div>`:""}`;
+  }
+  // consistency
+  let consHtml="";
+  if(A.C){const cs=consistency(cur._posts); if(cs){
+    consHtml=`<div class="cardgrid"><div class="mcard"><div class="top">${ico("radio")} Typical post</div><div class="val">${fmtInt(cs.med)}</div><div class="cdesc">median reach per post</div></div><div class="mcard"><div class="top">${ico("trending")} Best post</div><div class="val">${fmtInt(cs.max)}</div><div class="cdesc">${cs.mult?cs.mult.toFixed(1)+"× the typical post":""}</div></div><div class="mcard"><div class="top">${ico("activity")} Above typical</div><div class="val">${pct(cs.aboveMedPct,0)}</div><div class="cdesc">of posts beat the median</div></div></div>`;
+    consHtml+=`<div class="insight">${cs.topShare>0.4?`Reach is <b>hit-driven</b> — the single best post drove ${pct(cs.topShare,0)} of all reach this period. Great for a spike, risky to depend on.`:`Reach is <b>fairly even</b> across posts — no single post carried the period, a sign of dependable content.`}</div>`;
+  }}
+  // every metric, month by month
+  let matrixHtml="";
+  {const mons=monthsFor(c);
+    if(mons.length){const wm=mons.map(mo=>{const f=new Date(mo+"-01T00:00:00Z"),t=new Date(Date.UTC(f.getUTCFullYear(),f.getUTCMonth()+1,0));return windowMetrics(c,f,t);});
+      const rowsK=["reach","views","engagement","er","profile_views","followers_growth","followers_total","posts","shares","saves","comments","likes"].filter(k=>wm.some(w=>w[k]!==null&&w[k]!==undefined));
+      matrixHtml=`<div class="datawrap"><table class="dtable"><thead><tr><th>Metric</th>${mons.map(mo=>`<th class="num">${mShort(mo)} '${mo.split("-")[0].slice(2)}</th>`).join("")}</tr></thead><tbody>${rowsK.map(k=>`<tr><td>${METRICS[k].label}</td>${wm.map(w=>`<td class="num">${w[k]===null||w[k]===undefined?"—":METRICS[k].fmt(w[k])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+    }}
+
   // demographics
   let demo="";
   const dr=cur._periods.find(p=>p.top_gender||p.top_age_group||p.top_countries||p.top_cities);
@@ -732,9 +804,17 @@ function render(){
 
   ${showSec("effort")&&effortHtml?`<section><div class="sec-label">Effort vs. return by platform</div>${effortHtml}</section>`:""}
 
+  ${showSec("bestday")&&bestDayHtml?`<section><div class="sec-label">Best day to post</div><div class="sec-sub">Median engagement per post, by day of the week.</div>${bestDayHtml}</section>`:""}
+
+  ${showSec("content_deep")&&deepHtml?`<section><div class="sec-label">What makes your posts work</div><div class="sec-sub">How caption length and hashtag count relate to performance.</div>${deepHtml}</section>`:""}
+
+  ${showSec("consistency")&&consHtml?`<section><div class="sec-label">Consistency check</div><div class="sec-sub">Is reach steady, or riding on one viral post?</div>${consHtml}</section>`:""}
+
   ${showSec("content_list")?`<section><div class="sec-label">Content that resonated</div>${contentList}</section>`:""}
 
   <section><div class="sec-label">Recommendations</div><ol class="recs">${[A.best,...A.watch.slice(0,2).map(w=>({t:w.t,d:w.d}))].map((r,i)=>`<li>${ed("rec"+i,"<b>"+r.t+".</b> "+r.d.replace(/<[^>]+>/g,""))}</li>`).join("")}</ol></section>
+
+  ${showSec("matrix")&&matrixHtml?`<section><div class="sec-label">Every metric, month by month</div><div class="sec-sub">The full history in one table. Scroll sideways for more months.</div>${matrixHtml}</section>`:""}
 
   ${showSec("data")?`<section><div class="sec-label">Full data</div><div class="sec-sub">Every number behind this report, straight from the source. Scroll to see all columns and rows.</div>${rawDataTables(c)}</section>`:""}
 
@@ -783,7 +863,7 @@ function buildCustomUI(){
   $("nameOverride").value=cget("name","");
   const heroSel=cget("hero",null)||GOAL_HERO[cget("goal","balanced")];
   $("heroChecks").innerHTML=Object.keys(METRICS).map(k=>`<label class="chk"><input type="checkbox" data-hero="${k}" ${heroSel.indexOf(k)>=0?"checked":""}>${METRICS[k].label}</label>`).join("");
-  const secs=[["trends","Trends over time"],["profile","Profile insights"],["content","Content insights"],["funnel","Audience funnel"],["format","Format analysis"],["effort","Effort vs. return"],["content_list","Top content"],["data","Full data table"]];
+  const secs=[["trends","Trends over time"],["profile","Profile insights"],["content","Content insights"],["funnel","Reach → followers"],["format","Format analysis"],["effort","Effort vs. return"],["bestday","Best day to post"],["content_deep","What makes posts work"],["consistency","Consistency check"],["content_list","Top content"],["matrix","Metrics matrix"],["data","Full data table"]];
   $("sectionChecks").innerHTML=secs.map(([k,l])=>`<label class="chk"><input type="checkbox" data-sec="${k}" ${cget("sec_"+k,true)!==false?"checked":""}>${l}</label>`).join("");
 }
 function wireCustom(){
