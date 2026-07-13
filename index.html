@@ -102,6 +102,9 @@
   .fstep{flex:1;min-width:118px;border:1px solid var(--sand);border-radius:13px;padding:13px 15px;background:var(--sand-2)}
   .fstep .lab{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
   .fstep .val{font-family:var(--serif);font-size:24px;font-weight:500;margin-top:4px}
+  .fstep .fsub{font-size:10px;color:var(--ink-soft);margin-top:4px;letter-spacing:.02em}
+  .fstep.outcome{background:var(--cream);border-color:var(--terra-soft)}
+  .fdiv{width:1px;background:var(--sand);align-self:stretch;margin:4px 16px;flex:none}
   .farrow{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 10px;min-width:84px}
   .farrow .rate{font-size:14px;font-weight:500;color:var(--burnt)}
   .farrow .cap{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-top:2px}
@@ -646,18 +649,19 @@ function render(){
     return `<div class="chartcard"><h5>${METRICS[k].label}</h5><div class="cap">${isGrain?("By "+grainWord+", within this period"):"By month"}</div>${chartHolder(pts,{big:true,fmt:METRICS[k].fmt})}</div>`;
   }).join("");
 
-  // funnel
+  // funnel — reach → profile (a real conversion) + followers shown as the period's outcome
   let funnel="";
   if(cur.reach!==null&&cur.profile_views!==null){
     const neg=cur.followers_growth<0;
+    const oneIn=cur.profileVisitRate>0?Math.round(1/cur.profileVisitRate):null;
     funnel=`<div class="funnel">
-      <div class="fstep"><div class="lab">Saw the content</div><div class="val">${fmtInt(cur.reach)}</div></div>
-      <div class="farrow"><div class="rate">${pct(cur.profileVisitRate)}</div><div class="cap">went to profile</div></div>
-      <div class="fstep"><div class="lab">Opened the profile</div><div class="val">${fmtInt(cur.profile_views)}</div></div>
-      <div class="farrow"><div class="rate ${neg?"neg":""}">${cur.followConv!==null?pct(cur.followConv):"—"}</div><div class="cap">${neg?"net loss":"then followed"}</div></div>
-      <div class="fstep"><div class="lab">${neg?"Net new followers":"New followers"}</div><div class="val ${neg?"neg":""}">${fmtSigned(cur.followers_growth)}</div></div>
+      <div class="fstep"><div class="lab">Saw the content</div><div class="val">${fmtInt(cur.reach)}</div><div class="fsub">accounts reached</div></div>
+      <div class="farrow"><div class="rate">${pct(cur.profileVisitRate)}</div><div class="cap">opened the profile</div></div>
+      <div class="fstep"><div class="lab">Looked closer</div><div class="val">${fmtInt(cur.profile_views)}</div><div class="fsub">opened the profile</div></div>
+      <div class="fdiv"></div>
+      <div class="fstep outcome"><div class="lab">${neg?"Followers lost":"Followers gained"}</div><div class="val ${neg?"neg":"pos"}">${fmtSigned(cur.followers_growth)}</div><div class="fsub">net change this period</div></div>
     </div>
-    <div class="note" style="font-size:13px;color:var(--ink);line-height:1.6">Read it left to right: of the <b>${fmtInt(cur.reach)}</b> accounts that saw the content, <b>${pct(cur.profileVisitRate)}</b> opened the profile, and <b>${cur.followConv!==null?pct(cur.followConv):"—"}</b> of those ${neg?"visitors still weren't enough to offset unfollows":"went on to follow"}.${cur.amplification?` The content reached <b>${fmtX(cur.amplification)}</b> as many accounts as there are followers${cur.amplification>=1?", so it spread well beyond the existing audience":", staying mostly within the existing audience"}.`:""}</div>`;
+    <div class="note" style="font-size:13.5px;color:var(--ink);line-height:1.65">Of the <b>${fmtInt(cur.reach)}</b> accounts that saw the content, <b>${fmtInt(cur.profile_views)}</b>${oneIn?` — about 1 in ${oneIn} (${pct(cur.profileVisitRate)})`:""} were interested enough to open the profile. Over the same period the account ${neg?`lost <b>${fmtInt(Math.abs(cur.followers_growth))}</b> followers on net`:`gained <b>${fmtInt(cur.followers_growth)}</b> followers on net`}${neg?" — worth watching, since attention was healthy but didn’t translate into a bigger audience":""}.</div>`;
   }
 
   // format + effort + mix
@@ -724,7 +728,7 @@ function render(){
 
   ${showSec("content")&&contentGrid?`<section><div class="sec-label">Content insights</div><div class="sec-sub">How the posts themselves performed.</div><div class="cardgrid">${contentGrid}</div></section>`:""}
 
-  ${showSec("funnel")&&funnel?`<section><div class="sec-label">Audience funnel &amp; efficiency</div>${funnel}</section>`:""}
+  ${showSec("funnel")&&funnel?`<section><div class="sec-label">From reach to new followers</div><div class="sec-sub">How many saw the content, how many looked closer, and how the audience changed.</div>${funnel}</section>`:""}
 
   ${showSec("format")&&fmtTable?`<section><div class="sec-label">What format is working</div>${fmtTable}<div style="margin-top:18px"><div class="sec-label" style="margin-bottom:8px">Engagement mix</div>${mixHtml}</div></section>`:""}
 
