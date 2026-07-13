@@ -135,6 +135,12 @@
   .pill{display:inline-block;font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:20px;background:var(--cream);color:var(--burnt-deep);margin-right:6px;border:1px solid var(--sand)}
   ol.recs{margin:0;padding-left:20px} ol.recs li{font-size:14px;line-height:1.6;margin-bottom:8px} ol.recs li::marker{color:var(--burnt)}
   .note{font-size:11px;color:var(--ink-soft);margin-top:9px}
+  .dtitle{font-size:12px;font-weight:500;margin-bottom:6px;color:var(--ink)}
+  .datawrap{overflow:auto;max-height:360px;border:1px solid var(--sand);border-radius:10px}
+  .dtable{width:100%;border-collapse:collapse;font-size:11.5px;min-width:640px}
+  .dtable th,.dtable td{padding:6px 10px;border-bottom:1px solid var(--sand);white-space:nowrap;text-align:left}
+  .dtable th{background:var(--sand-2);color:var(--ink-soft);text-transform:uppercase;font-size:9px;letter-spacing:.05em;position:sticky;top:0}
+  .dtable tbody tr:hover{background:var(--sand-2)}
   .foot{padding:15px 34px;font-size:11px;color:var(--ink-soft);display:flex;justify-content:space-between;align-items:center;gap:10px}
   .foot img{height:18px;opacity:.75}
   .empty{padding:64px 34px;text-align:center;color:var(--ink-soft);font-size:15px;line-height:1.7}
@@ -151,8 +157,10 @@
   <label class="fld">Period<select id="periodSel"></select></label>
   <label class="fld" id="fromWrap" style="display:none">From<input type="date" id="fromDate"></label>
   <label class="fld" id="toWrap" style="display:none">To<input type="date" id="toDate"></label>
+  <label class="fld">Chart detail<select id="grainSel"><option value="day">Daily</option><option value="week">Weekly</option><option value="month">Monthly</option></select></label>
   <div class="spacer"></div>
   <button class="btn" id="custBtn">Customize</button>
+  <button class="btn" id="shareBtn">Share link</button>
   <button class="btn" id="exportBtn">Export data</button>
   <button class="btn solid" id="printBtn">Print / PDF</button>
 </div>
@@ -272,6 +280,41 @@ function parseCSV(text){
 function toCSV(rows){if(!rows.length)return"";const heads=[...new Set(rows.flatMap(r=>Object.keys(r)))];const esc=v=>{v=(v===undefined||v===null)?"":String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};return heads.join(",")+"\n"+rows.map(r=>heads.map(h=>esc(r[h])).join(",")).join("\n");}
 function download(name,text){const b=new Blob([text],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);}
 
+/* ---- data bundle + shareable link (gzip in the URL, no server needed) ---- */
+function buildBundle(){
+  const acc=toCSV(PERIODS.map(p=>({client:p.client,platform:p.platform,month:p.month,followers_total:p.followers_total,followers_growth:p.followers_growth,reach:p.reach,views:p.views,engagement:p.engagement,profile_views:p.profile_views,link_clicks:p.link_clicks,posts:p.posts,top_age_group:p.top_age_group,top_gender:p.top_gender,top_countries:p.top_countries,top_cities:p.top_cities})));
+  const con=toCSV(POSTS.map(p=>({client:p.client,platform:p.platform,date:ymd(p.date),post_type:p.type,engagement:p.engagement,reach:p.reach,views:p.views,likes:p.likes,comments:p.comments,shares:p.shares,saves:p.saves,follows:p.follows,hashtag_count:p.tags,caption_length:p.len,caption_snippet:p.snippet})));
+  return {acc,con};
+}
+function doExport(){if(!POSTS.length&&!PERIODS.length){alert("Load data first.");return;}const {acc,con}=buildBundle();if(PERIODS.length)download("accounts_normalized.csv",acc);if(POSTS.length)setTimeout(()=>download("content_normalized.csv",con),300);}
+async function gzB64(str){const cs=new CompressionStream("gzip");const stream=new Blob([str]).stream().pipeThrough(cs);const buf=new Uint8Array(await new Response(stream).arrayBuffer());let bin="";for(let i=0;i<buf.length;i++)bin+=String.fromCharCode(buf[i]);return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
+async function gunzB64(b64){b64=b64.replace(/-/g,"+").replace(/_/g,"/");while(b64.length%4)b64+="=";const bin=atob(b64);const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);const ds=new DecompressionStream("gzip");const stream=new Blob([bytes]).stream().pipeThrough(ds);return await new Response(stream).text();}
+async function makeShareLink(){
+  if(!POSTS.length&&!PERIODS.length){alert("Load data first, then create a share link.");return;}
+  const {acc,con}=buildBundle();
+  let b64;try{b64=await gzB64(JSON.stringify({acc,con,cust:CUSTOM}));}catch(e){alert("This browser can't build a share link (compression unsupported). Use Export data instead.");return;}
+  const url=location.origin+location.pathname+"#data="+b64;
+  try{await navigator.clipboard.writeText(url);}catch(e){}
+  if(url.length>16000){alert("Share link copied to clipboard.\n\nHeads up: it's long ("+url.length.toLocaleString()+" characters) because of how much data is loaded. It works, but if a chat app trims it, narrow to one client first, then share.");}
+  else{alert("Interactive share link copied to clipboard ✓\n\nAnyone who opens it sees this exact report — live, interactive charts and all — with no data upload needed.");}
+}
+function rawDataTables(c){
+  const per=PERIODS.filter(p=>p.client===c);
+  const pos=POSTS.filter(p=>p.client===c&&p.date).slice().sort((a,b)=>a.date-b.date);
+  const cell=v=>(v===null||v===undefined||v==="")?"—":v;
+  let out="";
+  if(per.length){
+    const cols=["month","platform","followers_total","followers_growth","reach","views","engagement","profile_views","link_clicks","posts"];
+    out+=`<div class="dtitle">Account data · ${per.length} ${plural(per.length,"row")}</div><div class="datawrap"><table class="dtable"><thead><tr>${cols.map(x=>`<th>${x.replace(/_/g," ")}</th>`).join("")}</tr></thead><tbody>${per.map(r=>`<tr>${cols.map(x=>`<td>${cell(r[x])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+  }
+  if(pos.length){
+    const cols=[["date","date"],["platform","platform"],["post_type","type"],["engagement","engagement"],["reach","reach"],["views","views"],["likes","likes"],["comments","comments"],["shares","shares"],["saves","saves"],["follows","follows"],["hashtags","tags"],["caption","snippet"]];
+    out+=`<div class="dtitle" style="margin-top:16px">Post data · ${pos.length} ${plural(pos.length,"row")}</div><div class="datawrap"><table class="dtable"><thead><tr>${cols.map(x=>`<th>${x[0]}</th>`).join("")}</tr></thead><tbody>${pos.map(p=>{const disp={date:ymd(p.date),platform:plat(p.platform),type:fmtName(p.type),snippet:(p.snippet||"").slice(0,64)};return `<tr>${cols.map(x=>`<td>${cell(disp[x[1]]!==undefined?disp[x[1]]:p[x[1]])}</td>`).join("")}</tr>`;}).join("")}</tbody></table></div>`;
+  }
+  if(!out)out='<div class="note">No data loaded for this client.</div>';
+  return out+`<div style="margin-top:12px"><button class="btn" onclick="doExport()">Download as CSV</button></div>`;
+}
+
 /* ==================== ingest ==================== */
 let POSTS=[], PERIODS=[];
 function classify(rows){
@@ -360,19 +403,28 @@ function monthlySeries(c,key){
     return {label:mShort(mo), full:mLabel(mo), value:w[key]};
   });
 }
-/* daily series within window (content metric), with previous-window overlay */
-function dailySeries(c,key,from,to){
-  const len=daysBetween(from,to)+1; const pr=prevRange(from,to);
-  const cur=[],pts=[];
-  for(let i=0;i<len;i++){
-    const d=addDays(from,i), pd=addDays(pr.from,i);
-    const dayPosts=POSTS.filter(p=>p.client===c&&p.date&&ymd(p.date)===ymd(d));
-    const pdayPosts=POSTS.filter(p=>p.client===c&&p.date&&ymd(p.date)===ymd(pd));
-    const valOf=arr=>{if(key==="engagement")return sum(arr.map(p=>p.engagement!==null?p.engagement:(p.likes+p.comments+p.shares+p.saves)));return sum(arr.map(p=>p[key]||0));};
-    pts.push({label:(d.getUTCMonth()+1)+"/"+d.getUTCDate(), full:MON[d.getUTCMonth()]+" "+d.getUTCDate(), value:valOf(dayPosts), prev:valOf(pdayPosts)});
-  }
-  return pts;
+/* ---- granularity buckets (day/week/month) from post-level rows ---- */
+const CONTENT_TREND=new Set(["engagement","views","shares","saves","comments","likes","follows","posts"]);
+function valueOfPost(p,key){if(key==="engagement")return p.engagement!==null?p.engagement:(p.likes+p.comments+p.shares+p.saves);if(key==="posts")return 1;return p[key]||0;}
+function bucketStart(d,grain){if(grain==="month")return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),1));if(grain==="week"){const x=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));x.setUTCDate(x.getUTCDate()-((x.getUTCDay()+6)%7));return x;}return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));}
+function bucketNext(d,grain){const x=new Date(d);if(grain==="month")x.setUTCMonth(x.getUTCMonth()+1);else if(grain==="week")x.setUTCDate(x.getUTCDate()+7);else x.setUTCDate(x.getUTCDate()+1);return x;}
+function bLabel(d,grain){if(grain==="month")return mShort(ym(d));return (d.getUTCMonth()+1)+"/"+d.getUTCDate();}
+function bFull(d,grain){if(grain==="month")return mLabel(ym(d));if(grain==="week")return "Week of "+MON[d.getUTCMonth()]+" "+d.getUTCDate();return MON[d.getUTCMonth()]+" "+d.getUTCDate();}
+function contentSeries(c,key,from,to,grain){
+  const fs=ymd(from),ts=ymd(to);
+  const posts=POSTS.filter(p=>p.client===c&&p.date&&ymd(p.date)>=fs&&ymd(p.date)<=ts);
+  const map={}; posts.forEach(p=>{const b=ymd(bucketStart(p.date,grain));map[b]=(map[b]||0)+valueOfPost(p,key);});
+  const out=[]; let d=bucketStart(from,grain); const end=bucketStart(to,grain); let g=0;
+  while(d<=end&&g++<500){const b=ymd(d);out.push({label:bLabel(d,grain),full:bFull(d,grain),value:map[b]||0});d=bucketNext(d,grain);}
+  return out;
 }
+/* content metrics honor the chosen grain (from post rows); profile/derived stay monthly (connector granularity) */
+function seriesFor(c,key,from,to){
+  const grain=cget("grain","week");
+  if(grain!=="month"&&CONTENT_TREND.has(key)&&POSTS.some(p=>p.client===c&&p.date))return contentSeries(c,key,from,to,grain);
+  return monthlySeries(c,key);
+}
+function grainAvail(c){return POSTS.some(p=>p.client===c&&p.date);}
 
 /* ==================== metric registry ==================== */
 const METRICS={
@@ -583,15 +635,15 @@ function render(){
   const profileGrid=profileKeys.map(k=>metricCard(c,k,cur,prev,false)).join("");
   const contentGrid=contentKeys.map(k=>metricCard(c,k,cur,prev,false)).join("");
 
-  // trend charts (goal-driven, daily if short window+posts else monthly)
-  const winDays=daysBetween(from,to)+1;
-  const postDays=new Set(cur._posts.map(p=>ymd(p.date))).size;
-  const useDaily=winDays<=45&&postDays>=3;
-  const trendKeys=hero.filter(k=>METRICS[k].group==="content"||k==="reach").slice(0,2);
+  // trend charts — honor the chosen grain for content metrics
+  const grain=cget("grain","week");
+  const grainWord={day:"day",week:"week",month:"month"}[grain];
+  const trendKeys=hero.filter(k=>CONTENT_TREND.has(k)).slice(0,3);
   if(!trendKeys.length)trendKeys.push("engagement");
   const trendCharts=trendKeys.map(k=>{
-    const pts=useDaily&&METRICS[k].group==="content"?dailySeries(c,k,from,to):monthlySeries(c,k);
-    return `<div class="chartcard"><h5>${METRICS[k].label}</h5><div class="cap">${useDaily&&METRICS[k].group==="content"?"Daily, this period vs. the one before":"By month"}</div>${chartHolder(pts,{big:true,fmt:METRICS[k].fmt})}${(useDaily&&METRICS[k].group==="content")?'<div class="legend"><span><i style="background:var(--burnt)"></i>This period</span><span><i style="background:var(--prev)"></i>Previous</span></div>':""}</div>`;
+    const pts=seriesFor(c,k,from,to);
+    const isGrain=grain!=="month"&&CONTENT_TREND.has(k)&&grainAvail(c);
+    return `<div class="chartcard"><h5>${METRICS[k].label}</h5><div class="cap">${isGrain?("By "+grainWord+", within this period"):"By month"}</div>${chartHolder(pts,{big:true,fmt:METRICS[k].fmt})}</div>`;
   }).join("");
 
   // funnel
@@ -682,6 +734,8 @@ function render(){
 
   <section><div class="sec-label">Recommendations</div><ol class="recs">${[A.best,...A.watch.slice(0,2).map(w=>({t:w.t,d:w.d}))].map((r,i)=>`<li>${ed("rec"+i,"<b>"+r.t+".</b> "+r.d.replace(/<[^>]+>/g,""))}</li>`).join("")}</ol></section>
 
+  ${showSec("data")?`<section><div class="sec-label">Full data</div><div class="sec-sub">Every number behind this report, straight from the source. Scroll to see all columns and rows.</div>${rawDataTables(c)}</section>`:""}
+
   <div class="foot"><span>Prepared by CNO Creative Co · engagement rate = interactions ÷ reach · edit any text inline</span><img src="cno-logo.png" alt=""></div>`;
 
   mountCharts();
@@ -693,7 +747,7 @@ function metricCard(c,key,cur,prev,hero){
   if(M.snapshot){/* cumulative snapshot — period-over-period change isn't meaningful */}
   else if(M.signed){const d=(v||0)-(pv||0);if(pv!==null&&pv!==undefined){cls=d>=0?"pos":"neg";chgHtml=(d>=0?"↑ +":"↓ ")+fmtInt(Math.abs(d))+" vs prior";}}
   else{const ch=chg(v,pv);if(ch!==null){if(Math.abs(ch)<0.005){cls="flat";chgHtml="≈ no change";}else{cls=ch>=0?"pos":"neg";chgHtml=(ch>=0?"↑ ":"↓ ")+pct(Math.abs(ch),0)+" vs prior";}}}
-  const spark=(key==="posts"||key==="amplification")?"":chartHolder(monthlySeries(c,key),{fmt:M.fmt});
+  const spark=(key==="amplification")?"":chartHolder(seriesFor(c,key,CURRENT.from,CURRENT.to),{fmt:M.fmt});
   return `<div class="mcard ${hero?"hero":""}"><div class="top">${ico(M.icon)} ${M.label}</div><div class="val">${M.fmt(v)}</div>${chgHtml?`<div class="chg ${cls}">${chgHtml}</div>`:""}<div class="cdesc">${M.desc||""}</div>${spark?`<div class="spark">${spark}</div>`:""}</div>`;
 }
 
@@ -722,11 +776,12 @@ function onPeriodChange(){const cust=$("periodSel").value==="custom";$("fromWrap
 
 /* ==================== customize UI ==================== */
 function buildCustomUI(){
+  if($("grainSel"))$("grainSel").value=cget("grain","week");
   $("goalSel").value=cget("goal","balanced");
   $("nameOverride").value=cget("name","");
   const heroSel=cget("hero",null)||GOAL_HERO[cget("goal","balanced")];
   $("heroChecks").innerHTML=Object.keys(METRICS).map(k=>`<label class="chk"><input type="checkbox" data-hero="${k}" ${heroSel.indexOf(k)>=0?"checked":""}>${METRICS[k].label}</label>`).join("");
-  const secs=[["trends","Trends over time"],["profile","Profile insights"],["content","Content insights"],["funnel","Audience funnel"],["format","Format analysis"],["effort","Effort vs. return"],["content_list","Top content"]];
+  const secs=[["trends","Trends over time"],["profile","Profile insights"],["content","Content insights"],["funnel","Audience funnel"],["format","Format analysis"],["effort","Effort vs. return"],["content_list","Top content"],["data","Full data table"]];
   $("sectionChecks").innerHTML=secs.map(([k,l])=>`<label class="chk"><input type="checkbox" data-sec="${k}" ${cget("sec_"+k,true)!==false?"checked":""}>${l}</label>`).join("");
 }
 function wireCustom(){
@@ -748,11 +803,13 @@ function wireEdits(){
 function refreshAll(){const cs=clients();$("clientSel").innerHTML=cs.map(c=>`<option>${c}</option>`).join("");refreshPeriods();}
 $("clientSel").addEventListener("change",refreshPeriods);
 $("periodSel").addEventListener("change",onPeriodChange);
+$("grainSel").addEventListener("change",e=>{CUSTOM.grain=e.target.value;saveCustom();render();});
 $("fromDate").addEventListener("change",render);
 $("toDate").addEventListener("change",render);
 $("printBtn").addEventListener("click",()=>window.print());
 $("custBtn").addEventListener("click",()=>$("custPanel").classList.toggle("open"));
-$("exportBtn").addEventListener("click",()=>{if(!POSTS.length&&!PERIODS.length){alert("Load data first.");return;}if(PERIODS.length)download("accounts_normalized.csv",toCSV(PERIODS.map(p=>({...p}))));if(POSTS.length)setTimeout(()=>download("content_normalized.csv",toCSV(POSTS.map(p=>({client:p.client,platform:p.platform,date:ymd(p.date),post_type:p.type,engagement:p.engagement,reach:p.reach,views:p.views,likes:p.likes,comments:p.comments,shares:p.shares,saves:p.saves,follows:p.follows,hashtag_count:p.tags,caption_length:p.len,caption_snippet:p.snippet})))),300);});
+$("exportBtn").addEventListener("click",doExport);
+$("shareBtn").addEventListener("click",makeShareLink);
 $("fileIn").addEventListener("change",function(){const files=[...this.files];if(!files.length)return;let done=0;files.forEach(f=>{const r=new FileReader();r.onload=e=>{ingest(e.target.result);done++;if(done===files.length){refreshAll();}};r.readAsText(f);});this.value="";});
 $("demoBtn").addEventListener("click",()=>{resetData();ingest(DEMO_ACC);ingest(DEMO_CON);refreshAll();});
 
@@ -778,7 +835,14 @@ Example Brand,tiktok,2026-05,2026-05-22,VIDEO,35,,900,30,3,2,0,1,4,110,"A slower
 Example Brand,tiktok,2026-04,2026-04-09,VIDEO,120,,3400,100,8,10,0,2,4,120,"Quick tip that surprised people."`;
 
 buildCustomUI();wireCustom();
-if(location.hash==="#demo"){document.getElementById("demoBtn").click();}
+(async function(){
+  const h=location.hash;
+  if(h.indexOf("#data=")===0){
+    try{const j=await gunzB64(h.slice(6));const d=JSON.parse(j);resetData();if(d.acc)ingest(d.acc);if(d.con)ingest(d.con);if(d.cust){CUSTOM=d.cust;saveCustom();buildCustomUI();}refreshAll();return;}
+    catch(e){console.warn("share link decode failed",e);}
+  }
+  if(h==="#demo"){document.getElementById("demoBtn").click();}
+})();
 </script>
 </body>
 </html>
