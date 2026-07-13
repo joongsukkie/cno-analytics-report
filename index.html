@@ -654,14 +654,12 @@ function render(){
   if(cur.reach!==null&&cur.profile_views!==null){
     const neg=cur.followers_growth<0;
     const oneIn=cur.profileVisitRate>0?Math.round(1/cur.profileVisitRate):null;
-    funnel=`<div class="funnel">
-      <div class="fstep"><div class="lab">Saw the content</div><div class="val">${fmtInt(cur.reach)}</div><div class="fsub">accounts reached</div></div>
-      <div class="farrow"><div class="rate">${pct(cur.profileVisitRate)}</div><div class="cap">opened the profile</div></div>
-      <div class="fstep"><div class="lab">Looked closer</div><div class="val">${fmtInt(cur.profile_views)}</div><div class="fsub">opened the profile</div></div>
-      <div class="fdiv"></div>
-      <div class="fstep outcome"><div class="lab">${neg?"Followers lost":"Followers gained"}</div><div class="val ${neg?"neg":"pos"}">${fmtSigned(cur.followers_growth)}</div><div class="fsub">net change this period</div></div>
+    funnel=`<div class="cardgrid">
+      <div class="mcard"><div class="top">${ico("radio")} Saw the content</div><div class="val">${fmtInt(cur.reach)}</div><div class="cdesc">accounts that saw a post this period</div></div>
+      <div class="mcard"><div class="top">${ico("eye")} Opened the profile</div><div class="val">${fmtInt(cur.profile_views)}</div><div class="cdesc">${pct(cur.profileVisitRate)} of the ${fmtInt(cur.reach)} who saw it${oneIn?`, about 1 in ${oneIn}`:""}</div></div>
+      <div class="mcard"><div class="top">${ico("user-plus")} ${neg?"Followers lost":"Followers gained"}</div><div class="val ${neg?"neg":"pos"}">${fmtSigned(cur.followers_growth)}</div><div class="cdesc">the account’s net change this period</div></div>
     </div>
-    <div class="note" style="font-size:13.5px;color:var(--ink);line-height:1.65">Of the <b>${fmtInt(cur.reach)}</b> accounts that saw the content, <b>${fmtInt(cur.profile_views)}</b>${oneIn?` — about 1 in ${oneIn} (${pct(cur.profileVisitRate)})`:""} were interested enough to open the profile. Over the same period the account ${neg?`lost <b>${fmtInt(Math.abs(cur.followers_growth))}</b> followers on net`:`gained <b>${fmtInt(cur.followers_growth)}</b> followers on net`}${neg?" — worth watching, since attention was healthy but didn’t translate into a bigger audience":""}.</div>`;
+    <div class="note" style="font-size:13.5px;color:var(--ink);line-height:1.7;margin-top:14px"><b>${fmtInt(cur.reach)}</b> accounts saw the content. <b>${fmtInt(cur.profile_views)}</b> of them${oneIn?` — about 1 in ${oneIn} —`:""} were interested enough to open the profile, and the account ${neg?`ended the period with <b>${fmtInt(Math.abs(cur.followers_growth))}</b> fewer followers`:`ended with <b>${fmtInt(cur.followers_growth)}</b> more followers than it started`}.</div>`;
   }
 
   // format + effort + mix
