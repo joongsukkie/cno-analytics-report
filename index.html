@@ -185,15 +185,17 @@
   .lseal:hover{transform:translate(-50%,-50%) scale(1.07)}
   .envScene.open .flap{transform:rotateX(-179deg);z-index:2}
   .envScene.open .lseal{animation:lSealAway .8s cubic-bezier(.5,0,.7,.4) both;pointer-events:none}
-  .letterCard{position:absolute;left:5%;right:5%;top:10%;bottom:8%;background:var(--cream);border:1px solid var(--sand);border-radius:8px;z-index:1;transform:translateY(10%);opacity:0;transition:transform 1.1s .5s cubic-bezier(.22,1,.36,1),opacity .8s .5s,box-shadow 1.1s .5s;overflow:auto;padding:30px 30px 24px;text-align:center}
-  .envScene.open .letterCard{transform:translateY(-17%) scale(1.07);opacity:1;z-index:9;box-shadow:0 34px 70px rgba(80,50,20,.28)}
-  .letterCard img.lsm{height:56px;margin:0 auto 12px;display:block}
-  .letterCard h2{font-family:var(--serif);font-weight:500;font-size:21px;margin:0 0 12px;letter-spacing:-.01em}
-  .letterCard .lbody{font-size:13.5px;line-height:1.8;text-align:left;color:var(--ink)}
-  .letterCard .lsign{font-family:var(--serif);font-size:15px;margin-top:14px;text-align:left;font-style:italic;color:var(--burnt-deep)}
-  .letterCard .lopen{margin-top:18px;font-family:var(--sans);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:11px 22px;border-radius:8px;border:none;background:var(--burnt);color:#fff;cursor:pointer;opacity:0;transition:opacity .5s 1.6s}
-  .envScene.open .lopen{opacity:1}
+  .letterCard{position:fixed;left:50%;top:50%;width:min(660px,94vw);max-height:90vh;background:#fffdf6;border:1px solid var(--sand);border-radius:12px;z-index:1;transform:translate(-50%,calc(-50% + 120px)) scale(.94);opacity:0;transition:transform 1.05s .45s cubic-bezier(.2,1,.32,1),opacity .8s .45s,box-shadow 1.05s .45s;overflow-y:auto;padding:46px 52px 40px;text-align:center}
+  #letterOverlay.opened .letterCard{transform:translate(-50%,-50%) scale(1);opacity:1;z-index:12;box-shadow:0 44px 100px rgba(80,50,20,.34)}
+  .letterCard img.lsm{height:66px;margin:0 auto 20px;display:block}
+  .letterCard h2{font-family:var(--serif);font-weight:500;font-size:28px;margin:0 0 20px;letter-spacing:-.01em}
+  .letterCard .lbody{font-size:16.5px;line-height:1.95;text-align:left;color:var(--ink)}
+  .letterCard .lbody b{font-weight:500;color:var(--burnt-deep)}
+  .letterCard .lsign{font-family:var(--serif);font-size:19px;margin-top:22px;text-align:left;font-style:italic;color:var(--burnt-deep)}
+  .letterCard .lopen{margin-top:28px;font-family:var(--sans);font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:14px 30px;border-radius:9px;border:none;background:var(--burnt);color:#fff;cursor:pointer;opacity:0;transition:opacity .55s 1.5s,background .15s}
+  #letterOverlay.opened .lopen{opacity:1}
   .letterCard .lopen:hover{background:var(--burnt-deep)}
+  @media(max-width:560px){.letterCard{padding:34px 26px 30px}.letterCard h2{font-size:24px}.letterCard .lbody{font-size:15.5px;line-height:1.85}}
   #letterOverlay.done{animation:lOut .55s both}
   @keyframes lDrop{from{transform:translateY(-115vh) rotate(-5deg)}60%{transform:translateY(2.5%) rotate(.8deg)}to{transform:translateY(0) rotate(0)}}
   @keyframes lSealAway{50%{transform:translate(-50%,-58%) scale(1.12) rotate(8deg);opacity:1}100%{transform:translate(-50%,-190%) scale(.45) rotate(24deg);opacity:0}}
@@ -207,11 +209,11 @@
   <div class="hint">Click the seal to open</div>
   <button class="skip" id="letterSkip">Skip to report →</button>
   <div class="envScene" id="envScene">
-    <div class="letterCard" id="letterCard"></div>
     <div class="envelope"></div>
     <div class="flap"></div>
     <img class="lseal" id="lseal" src="cno-seal.png" alt="CNO wax seal — click to open">
   </div>
+  <div class="letterCard" id="letterCard"></div>
 </div>
 <div class="toolbar">
   <span class="brand"><img src="cno-logo.png" alt="CNO Creative Co"><small>Analytics Report</small></span>
@@ -1087,8 +1089,8 @@ function maybeShowLetter(force){
   $("lopenBtn").addEventListener("click",closeLetter);
   wireEdits();
 }
-function closeLetter(){const ov=$("letterOverlay");ov.classList.add("done");setTimeout(()=>{ov.hidden=true;ov.classList.remove("done");$("envScene").classList.remove("open");},600);}
-$("lseal").addEventListener("click",()=>$("envScene").classList.add("open"));
+function closeLetter(){const ov=$("letterOverlay");ov.classList.add("done");setTimeout(()=>{ov.hidden=true;ov.classList.remove("done","opened");$("envScene").classList.remove("open");},600);}
+$("lseal").addEventListener("click",()=>{$("envScene").classList.add("open");$("letterOverlay").classList.add("opened");});
 $("letterSkip").addEventListener("click",closeLetter);
 
 /* ---- drag & drop CSVs anywhere on the page ---- */
