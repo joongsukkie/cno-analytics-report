@@ -157,10 +157,62 @@
   .foot img{height:18px;opacity:.75}
   .empty{padding:64px 34px;text-align:center;color:var(--ink-soft);font-size:15px;line-height:1.7}
   @media(max-width:660px){.storycols,.chartrow{grid-template-columns:1fr}}
-  @media print{.toolbar,.panel{display:none!important} body{background:#fff} .wrap{margin:0;max-width:none;padding:0} .report{box-shadow:none;border-radius:0;border:none} section{break-inside:avoid} .ed[contenteditable]{background:none!important;box-shadow:none!important}}
+  /* platform chips */
+  .chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding-top:2px}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;letter-spacing:.03em;text-transform:none;padding:4px 10px;border-radius:20px;border:1px solid var(--sand);background:#fff;color:var(--ink-soft);cursor:pointer;user-select:none}
+  .chip.on{background:var(--cream);border-color:var(--terra);color:var(--burnt-deep);font-weight:500}
+  .chip input{display:none}
+  /* drag & drop */
+  body.dragging .report{outline:2px dashed var(--terra);outline-offset:-8px}
+  .drophint{font-size:12px;color:var(--ink-soft);margin-top:10px}
+  /* audience */
+  .audgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .audcard{border:1px solid var(--sand);border-radius:13px;padding:15px 17px;background:var(--sand-2)}
+  .audcard h5{margin:0 0 10px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:7px}
+  .audrow{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid var(--sand)}
+  .audrow:last-child{border-bottom:none}
+  .audrow .k{color:var(--ink-soft)}
+  /* letter overlay */
+  #letterOverlay{position:fixed;inset:0;background:var(--cream);z-index:100;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  #letterOverlay[hidden]{display:none}
+  #letterOverlay .hint{position:absolute;top:8%;width:100%;text-align:center;font-size:11.5px;letter-spacing:.24em;color:var(--burnt);text-transform:uppercase;animation:lFade .9s .9s both}
+  #letterOverlay .skip{position:absolute;top:18px;right:24px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);cursor:pointer;background:none;border:none;font-family:var(--sans)}
+  .envScene{position:relative;width:min(500px,88vw);aspect-ratio:5/4;perspective:1100px;animation:lDrop 1.15s cubic-bezier(.22,1.15,.36,1) both}
+  .envelope{position:absolute;left:0;right:0;bottom:4%;height:74%;background:#f6eeda;border:1px solid #e5c9b4;z-index:3}
+  .envelope::before{content:"";position:absolute;inset:0;background:linear-gradient(to bottom right,transparent 49.6%,#e5c9b4 49.6%,#e5c9b4 50.4%,transparent 50.4%) left/50% 100% no-repeat,linear-gradient(to bottom left,transparent 49.6%,#e5c9b4 49.6%,#e5c9b4 50.4%,transparent 50.4%) right/50% 100% no-repeat}
+  .flap{position:absolute;left:0;right:0;top:0;height:56%;transform-origin:top;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.6,0,.3,1);z-index:5;clip-path:polygon(0 0,100% 0,50% 100%);background:#f2e7cd;border-bottom:1px solid #e5c9b4}
+  .lseal{position:absolute;left:50%;top:56%;transform:translate(-50%,-50%);width:104px;cursor:pointer;z-index:7;transition:transform .3s;filter:drop-shadow(0 8px 16px rgba(80,45,15,.28))}
+  .lseal:hover{transform:translate(-50%,-50%) scale(1.07)}
+  .envScene.open .flap{transform:rotateX(-179deg);z-index:2}
+  .envScene.open .lseal{animation:lSealAway .8s cubic-bezier(.5,0,.7,.4) both;pointer-events:none}
+  .letterCard{position:absolute;left:5%;right:5%;top:10%;bottom:8%;background:var(--cream);border:1px solid var(--sand);border-radius:8px;z-index:1;transform:translateY(10%);opacity:0;transition:transform 1.1s .5s cubic-bezier(.22,1,.36,1),opacity .8s .5s,box-shadow 1.1s .5s;overflow:auto;padding:30px 30px 24px;text-align:center}
+  .envScene.open .letterCard{transform:translateY(-17%) scale(1.07);opacity:1;z-index:9;box-shadow:0 34px 70px rgba(80,50,20,.28)}
+  .letterCard img.lsm{height:56px;margin:0 auto 12px;display:block}
+  .letterCard h2{font-family:var(--serif);font-weight:500;font-size:21px;margin:0 0 12px;letter-spacing:-.01em}
+  .letterCard .lbody{font-size:13.5px;line-height:1.8;text-align:left;color:var(--ink)}
+  .letterCard .lsign{font-family:var(--serif);font-size:15px;margin-top:14px;text-align:left;font-style:italic;color:var(--burnt-deep)}
+  .letterCard .lopen{margin-top:18px;font-family:var(--sans);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:11px 22px;border-radius:8px;border:none;background:var(--burnt);color:#fff;cursor:pointer;opacity:0;transition:opacity .5s 1.6s}
+  .envScene.open .lopen{opacity:1}
+  .letterCard .lopen:hover{background:var(--burnt-deep)}
+  #letterOverlay.done{animation:lOut .55s both}
+  @keyframes lDrop{from{transform:translateY(-115vh) rotate(-5deg)}60%{transform:translateY(2.5%) rotate(.8deg)}to{transform:translateY(0) rotate(0)}}
+  @keyframes lSealAway{50%{transform:translate(-50%,-58%) scale(1.12) rotate(8deg);opacity:1}100%{transform:translate(-50%,-190%) scale(.45) rotate(24deg);opacity:0}}
+  @keyframes lFade{from{opacity:0}to{opacity:1}}
+  @keyframes lOut{to{opacity:0;visibility:hidden}}
+  @media print{.toolbar,.panel,#letterOverlay{display:none!important} body{background:#fff} .wrap{margin:0;max-width:none;padding:0} .report{box-shadow:none;border-radius:0;border:none} section{break-inside:avoid} .ed[contenteditable]{background:none!important;box-shadow:none!important}}
 </style>
 </head>
 <body>
+<div id="letterOverlay" hidden>
+  <div class="hint">Click the seal to open</div>
+  <button class="skip" id="letterSkip">Skip to report →</button>
+  <div class="envScene" id="envScene">
+    <div class="letterCard" id="letterCard"></div>
+    <div class="envelope"></div>
+    <div class="flap"></div>
+    <img class="lseal" id="lseal" src="cno-seal.png" alt="CNO wax seal — click to open">
+  </div>
+</div>
 <div class="toolbar">
   <span class="brand"><img src="cno-logo.png" alt="CNO Creative Co"><small>Analytics Report</small></span>
   <label class="btn file">Upload CSV(s)<input type="file" id="fileIn" accept=".csv" multiple></label>
@@ -170,6 +222,7 @@
   <label class="fld" id="fromWrap" style="display:none">From<input type="date" id="fromDate"></label>
   <label class="fld" id="toWrap" style="display:none">To<input type="date" id="toDate"></label>
   <label class="fld">Chart detail<select id="grainSel"><option value="day">Daily</option><option value="week">Weekly</option><option value="month">Monthly</option></select></label>
+  <span class="fld">Platforms<span class="chips" id="platChips"></span></span>
   <div class="spacer"></div>
   <button class="btn" id="custBtn">Customize</button>
   <button class="btn" id="shareBtn">Share link</button>
@@ -191,6 +244,7 @@
       </select>
       <div class="lab" style="margin-top:14px">Client display name</div>
       <input type="text" id="nameOverride" placeholder="(use data value)">
+      <label class="chk" style="margin-top:12px"><input type="checkbox" id="letterTog">Letter opening on shared links</label>
     </div>
     <div class="col">
       <div class="lab">Featured KPIs (hero row)</div>
@@ -208,7 +262,7 @@
 </div>
 
 <div class="wrap"><div class="report" id="report">
-  <div class="empty">Upload one or more CSVs (from Rella, Instagram, TikTok, LinkedIn, YouTube, or Meta), or click <b>Load demo</b>.<br><span style="font-size:13px">Drop in account-level and/or post-level exports — the tool detects and normalizes each automatically.</span></div>
+  <div class="empty">Upload one or more CSVs (from Rella, Instagram, TikTok, LinkedIn, YouTube, or Meta), or click <b>Load demo</b>.<br><span style="font-size:13px">Select multiple files at once, or just <b>drag &amp; drop them anywhere on this page</b> — account-level and post-level exports are detected and normalized automatically.</span></div>
 </div></div>
 
 <script>
@@ -271,6 +325,10 @@ const ALIAS={};
   top_countries:["topcountries","countries","topcountry"],
   top_cities:["topcities","cities","city","topcity"],
   posts:["posts","totalposts","postcount","postspublished","numposts"],
+  campaign:["campaign","campaigntag","campaignname","series"],
+  pillar:["pillar","contentpillar","theme","topic","bucket"],
+  dms:["dms","dmvolume","directmessages","dmcount","messagesreceived","inbounddms"],
+  spend:["spend","adspend","amountspent","cost","budgetspent","totalspend"],
   industry:["industry","vertical","category"]
 };
 for(const canon in map){for(const a of map[canon]){ALIAS[a]=canon;}ALIAS[canon.replace(/_/g,"")]=canon;}})();
@@ -301,14 +359,27 @@ function buildBundle(){
 function doExport(){if(!POSTS.length&&!PERIODS.length){alert("Load data first.");return;}const {acc,con}=buildBundle();if(PERIODS.length)download("accounts_normalized.csv",acc);if(POSTS.length)setTimeout(()=>download("content_normalized.csv",con),300);}
 async function gzB64(str){const cs=new CompressionStream("gzip");const stream=new Blob([str]).stream().pipeThrough(cs);const buf=new Uint8Array(await new Response(stream).arrayBuffer());let bin="";for(let i=0;i<buf.length;i++)bin+=String.fromCharCode(buf[i]);return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
 async function gunzB64(b64){b64=b64.replace(/-/g,"+").replace(/_/g,"/");while(b64.length%4)b64+="=";const bin=atob(b64);const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);const ds=new DecompressionStream("gzip");const stream=new Blob([bytes]).stream().pipeThrough(ds);return await new Response(stream).text();}
+/* ---- optional password protection (AES-GCM, key derived from the password; nothing stored anywhere) ---- */
+function b64uBytes(buf){let bin="";const b=new Uint8Array(buf);for(let i=0;i<b.length;i++)bin+=String.fromCharCode(b[i]);return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
+function unb64uBytes(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";const bin=atob(s);const b=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i);return b;}
+async function pwKey(pw,salt){const km=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:150000,hash:"SHA-256"},km,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);}
+async function encryptStr(str,pw){const salt=crypto.getRandomValues(new Uint8Array(16));const iv=crypto.getRandomValues(new Uint8Array(12));const key=await pwKey(pw,salt);const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,new TextEncoder().encode(str));return b64uBytes(salt)+"."+b64uBytes(iv)+"."+b64uBytes(ct);}
+async function decryptStr(payload,pw){const parts=payload.split(".");const key=await pwKey(pw,unb64uBytes(parts[0]));const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:unb64uBytes(parts[1])},key,unb64uBytes(parts[2]));return new TextDecoder().decode(pt);}
 async function makeShareLink(){
   if(!POSTS.length&&!PERIODS.length){alert("Load data first, then create a share link.");return;}
   const {acc,con}=buildBundle();
   let b64;try{b64=await gzB64(JSON.stringify({acc,con,cust:CUSTOM}));}catch(e){alert("This browser can't build a share link (compression unsupported). Use Export data instead.");return;}
-  const url=location.origin+location.pathname+"#data="+b64;
+  const pw=prompt("Optional password for this link.\n\nLeave blank for an open link, or set a password so only people you give it to can open the report (each client gets their own link + password).","");
+  if(pw===null)return;
+  let url;
+  if(pw.trim()){
+    try{url=location.origin+location.pathname+"#edata="+await encryptStr(b64,pw.trim());}
+    catch(e){alert("Password protection isn't available in this browser — link not created.");return;}
+  }else{url=location.origin+location.pathname+"#data="+b64;}
   try{await navigator.clipboard.writeText(url);}catch(e){}
-  if(url.length>16000){alert("Share link copied to clipboard.\n\nHeads up: it's long ("+url.length.toLocaleString()+" characters) because of how much data is loaded. It works, but if a chat app trims it, narrow to one client first, then share.");}
-  else{alert("Interactive share link copied to clipboard ✓\n\nAnyone who opens it sees this exact report — live, interactive charts and all — with no data upload needed.");}
+  const lockNote=pw.trim()?"🔒 Password-protected — it only opens with the password you set. Share the password separately.\n\n":"";
+  if(url.length>16000){alert("Share link copied to clipboard.\n\n"+lockNote+"Heads up: it's long ("+url.length.toLocaleString()+" characters). If a chat app trims it, narrow to one client first, then share.");}
+  else{alert("Interactive share link copied to clipboard ✓\n\n"+lockNote+"Anyone who opens it sees this exact report — live, interactive charts and all — no upload needed.");}
 }
 function rawDataTables(c){
   const per=PERIODS.filter(p=>p.client===c);
@@ -346,7 +417,8 @@ function classify(rows){
         likes:num(r.likes)||0, comments:num(r.comments)||0, shares:num(r.shares)||0,
         saves:num(r.saves)||0, follows:num(r.follows)||0, replies:num(r.replies)||0, reposts:num(r.reposts)||0,
         tags:num(r.hashtag_count)||0, len:num(r.caption_length)||(r.caption_snippet?String(r.caption_snippet).length:0),
-        snippet:r.caption_snippet||"", watch:num(r.watch_time)||0});
+        snippet:r.caption_snippet||"", watch:num(r.watch_time)||0,
+        campaign:(r.campaign||"").trim(), pillar:(r.pillar||"").trim(), spend:num(r.spend)});
     } else {
       const mon = r.month ? String(r.month).slice(0,7) : (hasDate?ym(parseDate(r.date)):null);
       if(!mon) return;
@@ -354,6 +426,7 @@ function classify(rows){
         followers_total:num(r.followers_total),followers_growth:num(r.followers_growth),
         reach:num(r.reach),views:num(r.views),engagement:num(r.engagement),
         profile_views:num(r.profile_views),link_clicks:num(r.link_clicks),posts:num(r.posts),
+        dms:num(r.dms),spend:num(r.spend),
         top_age_group:r.top_age_group||"",top_gender:r.top_gender||"",top_countries:r.top_countries||"",top_cities:r.top_cities||"",industry:r.industry||""});
     }
   });
@@ -364,15 +437,21 @@ function resetData(){POSTS=[];PERIODS=[];}
 
 /* ==================== data model ==================== */
 function clients(){return [...new Set([...POSTS.map(p=>p.client),...PERIODS.map(p=>p.client)])].sort();}
+/* ---- platform selection: report is scoped to checked platforms (default: the busiest one) ---- */
+let PLATSEL={};
+function platsFor(c){return [...new Set([...POSTS.filter(p=>p.client===c).map(p=>p.platform),...PERIODS.filter(p=>p.client===c).map(p=>p.platform)])].sort();}
+function defaultPlat(c){const n={};POSTS.filter(p=>p.client===c).forEach(p=>n[p.platform]=(n[p.platform]||0)+1);PERIODS.filter(p=>p.client===c).forEach(p=>n[p.platform]=(n[p.platform]||0)+1);return Object.keys(n).sort((a,b)=>n[b]-n[a])[0]||null;}
+function selectedPlats(c){let s=PLATSEL[c];if(!s||!s.size){const d=defaultPlat(c);s=new Set(d?[d]:platsFor(c));PLATSEL[c]=s;}return s;}
+function platOK(c,p){return selectedPlats(c).has(p.platform);}
 function monthsFor(c){return [...new Set([...POSTS.filter(p=>p.client===c).map(p=>p.month),...PERIODS.filter(p=>p.client===c).map(p=>p.month)])].sort();}
 function extentFor(c){const ds=POSTS.filter(p=>p.client===c&&p.date).map(p=>p.date);if(!ds.length){const ms=monthsFor(c);if(!ms.length)return null;return{from:new Date(ms[0]+"-01T00:00:00Z"),to:new Date(ms[ms.length-1]+"-28T00:00:00Z")};}return{from:new Date(Math.min(...ds)),to:new Date(Math.max(...ds))};}
 function monthsInRange(from,to){const set=[];let d=new Date(Date.UTC(from.getUTCFullYear(),from.getUTCMonth(),1));const end=new Date(Date.UTC(to.getUTCFullYear(),to.getUTCMonth(),1));while(d<=end){set.push(ym(d));d=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,1));}return set;}
 
 function windowMetrics(c,from,to){
   const fs=ymd(from),ts=ymd(to);
-  const postsIn=POSTS.filter(p=>p.client===c&&p.date&&ymd(p.date)>=fs&&ymd(p.date)<=ts);
+  const postsIn=POSTS.filter(p=>p.client===c&&platOK(c,p)&&p.date&&ymd(p.date)>=fs&&ymd(p.date)<=ts);
   const mons=monthsInRange(from,to);
-  const perIn=PERIODS.filter(p=>p.client===c&&mons.indexOf(p.month)>=0);
+  const perIn=PERIODS.filter(p=>p.client===c&&platOK(c,p)&&mons.indexOf(p.month)>=0);
   const has=(arr,k)=>arr.some(p=>p[k]!==null&&p[k]!==undefined);
   const m={_posts:postsIn,_periods:perIn};
   // ---- Headline metrics: account-level totals are authoritative (match the platform / Rella).
@@ -386,6 +465,8 @@ function windowMetrics(c,from,to){
   m.views       = acctViews!==null ? acctViews : (postsIn.length?sum(postsIn.map(p=>p.views)):null);
   m.profile_views= has(perIn,"profile_views") ? sum(perIn.map(p=>p.profile_views)) : null;
   m.link_clicks = has(perIn,"link_clicks") ? sum(perIn.map(p=>p.link_clicks)) : null;
+  m.dms = has(perIn,"dms") ? sum(perIn.map(p=>p.dms)) : null;
+  m.spend = (has(perIn,"spend")||postsIn.some(p=>p.spend!==null)) ? sum(perIn.map(p=>p.spend))+sum(postsIn.map(p=>p.spend)) : null;
   m.followers_growth = has(perIn,"followers_growth") ? sum(perIn.map(p=>p.followers_growth)) : null;
   const ftRows=perIn.filter(p=>p.followers_total!==null);
   if(ftRows.length){const latest={};ftRows.forEach(p=>{if(!latest[p.platform]||p.month>latest[p.platform].month)latest[p.platform]=p;});m.followers_total=sum(Object.values(latest).map(p=>p.followers_total));}else m.followers_total=null;
@@ -424,7 +505,7 @@ function bLabel(d,grain){if(grain==="month")return mShort(ym(d));return (d.getUT
 function bFull(d,grain){if(grain==="month")return mLabel(ym(d));if(grain==="week")return "Week of "+MON[d.getUTCMonth()]+" "+d.getUTCDate();return MON[d.getUTCMonth()]+" "+d.getUTCDate();}
 function contentSeries(c,key,from,to,grain){
   const fs=ymd(from),ts=ymd(to);
-  const posts=POSTS.filter(p=>p.client===c&&p.date&&ymd(p.date)>=fs&&ymd(p.date)<=ts);
+  const posts=POSTS.filter(p=>p.client===c&&platOK(c,p)&&p.date&&ymd(p.date)>=fs&&ymd(p.date)<=ts);
   const map={}; posts.forEach(p=>{const b=ymd(bucketStart(p.date,grain));map[b]=(map[b]||0)+valueOfPost(p,key);});
   const out=[]; let d=bucketStart(from,grain); const end=bucketStart(to,grain); let g=0;
   while(d<=end&&g++<500){const b=ymd(d);out.push({label:bLabel(d,grain),full:bFull(d,grain),value:map[b]||0});d=bucketNext(d,grain);}
@@ -444,7 +525,8 @@ const METRICS={
   followers_growth:{label:"Follower growth",group:"profile",fmt:fmtSigned,icon:"user-plus",signed:true,desc:"Followers gained minus lost"},
   profile_views:{label:"Profile visits",group:"profile",fmt:fmtInt,icon:"eye",desc:"Times the profile was opened"},
   reach:{label:"Accounts reached",group:"profile",fmt:fmtInt,icon:"radio",desc:"Unique accounts that saw the content"},
-  link_clicks:{label:"Link clicks",group:"profile",fmt:fmtInt,icon:"link",desc:"Taps on the profile link"},
+  link_clicks:{label:"Website clicks",group:"profile",fmt:fmtInt,icon:"link",desc:"Clicks through to the website / link"},
+  dms:{label:"DMs received",group:"profile",fmt:fmtInt,icon:"message",desc:"Direct messages received"},
   engagement:{label:"Engagement",group:"content",fmt:fmtInt,icon:"heart",desc:"Likes, comments, shares & saves"},
   er:{label:"Engagement rate",group:"content",fmt:v=>pct(v),icon:"activity",desc:"Engagement ÷ accounts reached"},
   views:{label:"Views",group:"content",fmt:fmtInt,icon:"play",desc:"Total times content was viewed"},
@@ -662,7 +744,9 @@ function render(){
   const A=analyze(c,cur,prev,from,to);
   const goal=cget("goal","balanced");
   const nameShow=cget("name","")||c;
-  const platsUsed=[...new Set([...cur._posts.map(p=>p.platform),...cur._periods.map(p=>p.platform)])];
+  const platsUsed=[...selectedPlats(c)];
+  CTX=c+"|"+label+"|"+platsUsed.join("+");
+  const multiPlat=platsUsed.length>1;
   const showSec=k=>cget("sec_"+k,true)!==false;
 
   // hero KPIs
@@ -672,7 +756,7 @@ function render(){
   const heroCards=hero.map(k=>metricCard(c,k,cur,prev,true)).join("");
 
   // profile + content grids
-  const profileKeys=["followers_total","followers_growth","profile_views","reach","link_clicks"].filter(k=>cur[k]!==null&&cur[k]!==undefined&&hero.indexOf(k)<0);
+  const profileKeys=["followers_total","followers_growth","profile_views","reach","link_clicks","dms"].filter(k=>cur[k]!==null&&cur[k]!==undefined&&hero.indexOf(k)<0);
   const contentKeys=["engagement","er","views","shares","saves","comments","likes","follows","posts","amplification"].filter(k=>cur[k]!==null&&cur[k]!==undefined&&hero.indexOf(k)<0);
   const profileGrid=profileKeys.map(k=>metricCard(c,k,cur,prev,false)).join("");
   const contentGrid=contentKeys.map(k=>metricCard(c,k,cur,prev,false)).join("");
@@ -693,10 +777,12 @@ function render(){
   if(cur.reach!==null&&cur.profile_views!==null){
     const neg=cur.followers_growth<0;
     const oneIn=cur.profileVisitRate>0?Math.round(1/cur.profileVisitRate):null;
+    const fchg=(v,pv)=>{const ch=chg(v,pv);return ch===null?"":`<div class="chg ${ch>=0?"pos":"neg"}">${ch>=0?"↑ ":"↓ "}${pct(Math.abs(ch),0)} vs prior</div>`;};
+    const gchg=(v,pv)=>{if(pv===null||pv===undefined)return "";const d=(v||0)-(pv||0);return `<div class="chg ${d>=0?"pos":"neg"}">${d>=0?"↑ +":"↓ "}${fmtInt(Math.abs(d))} vs prior</div>`;};
     funnel=`<div class="cardgrid">
-      <div class="mcard"><div class="top">${ico("radio")} Saw the content</div><div class="val">${fmtInt(cur.reach)}</div><div class="cdesc">accounts that saw a post this period</div></div>
-      <div class="mcard"><div class="top">${ico("eye")} Opened the profile</div><div class="val">${fmtInt(cur.profile_views)}</div><div class="cdesc">${pct(cur.profileVisitRate)} of the ${fmtInt(cur.reach)} who saw it${oneIn?`, about 1 in ${oneIn}`:""}</div></div>
-      <div class="mcard"><div class="top">${ico("user-plus")} ${neg?"Followers lost":"Followers gained"}</div><div class="val ${neg?"neg":"pos"}">${fmtSigned(cur.followers_growth)}</div><div class="cdesc">the account’s net change this period</div></div>
+      <div class="mcard"><div class="top">${ico("radio")} Saw the content</div><div class="val">${fmtInt(cur.reach)}</div>${fchg(cur.reach,prev.reach)}<div class="cdesc">accounts that saw a post this period</div></div>
+      <div class="mcard"><div class="top">${ico("eye")} Opened the profile</div><div class="val">${fmtInt(cur.profile_views)}</div>${fchg(cur.profile_views,prev.profile_views)}<div class="cdesc">${pct(cur.profileVisitRate)} of the ${fmtInt(cur.reach)} who saw it${oneIn?`, about 1 in ${oneIn}`:""}</div></div>
+      <div class="mcard"><div class="top">${ico("user-plus")} ${neg?"Followers lost":"Followers gained"}</div><div class="val ${neg?"neg":"pos"}">${fmtSigned(cur.followers_growth)}</div>${gchg(cur.followers_growth,prev.followers_growth)}<div class="cdesc">the account’s net change this period</div></div>
     </div>
     <div class="note" style="font-size:13.5px;color:var(--ink);line-height:1.7;margin-top:14px"><b>${fmtInt(cur.reach)}</b> accounts saw the content. <b>${fmtInt(cur.profile_views)}</b> of them${oneIn?` — about 1 in ${oneIn} —`:""} were interested enough to open the profile, and the account ${neg?`ended the period with <b>${fmtInt(Math.abs(cur.followers_growth))}</b> fewer followers`:`ended with <b>${fmtInt(cur.followers_growth)}</b> more followers than it started`}.</div>`;
   }
@@ -716,8 +802,8 @@ function render(){
   if(A.C&&cur._posts.length>=4){
     const wd=weekdayStats(cur._posts); const max=Math.max(1,...wd.rows.map(r=>r.med));
     bestDayHtml=`<div class="wdbars">${wd.rows.map(r=>{const h=Math.round((r.med/max)*78);const best=wd.best&&r.day===wd.best.day;return `<div class="wdcol"><div class="wdval">${r.count?fmtInt(r.med):""}</div><div class="wdbar" style="height:${r.count?Math.max(3,h):3}px;background:${best?"var(--burnt)":"var(--terra)"};opacity:${r.count?1:.2}" title="${r.day}: ${r.count} ${plural(r.count,"post")}"></div><div class="wdlab">${r.day}</div></div>`;}).join("")}</div>`;
-    if(wd.best&&wd.restMed!==null&&wd.restMed>0){const mult=wd.best.med/wd.restMed;bestDayHtml+=`<div class="insight">Posting on <b>${wd.best.day}</b> lands the most engagement — a median of <b>${fmtInt(wd.best.med)}</b> per post${mult>=1.25?`, about <b>${mult.toFixed(1)}×</b> other days`:""}. Bars show median engagement per post by weekday.</div>`;}
-    else if(wd.best){bestDayHtml+=`<div class="insight">So far <b>${wd.best.day}</b> posts lead. Bars show median engagement per post by weekday — the pattern sharpens as more posts come in.</div>`;}
+    if(wd.best&&wd.restMed!==null&&wd.restMed>0){const mult=wd.best.med/wd.restMed;bestDayHtml+=`<div class="insight">${ed("bestday_i",`Posting on <b>${wd.best.day}</b> lands the most engagement — a median of <b>${fmtInt(wd.best.med)}</b> per post${mult>=1.25?`, about <b>${mult.toFixed(1)}×</b> other days`:""}. Bars show median engagement per post by weekday.`)}</div>`;}
+    else if(wd.best){bestDayHtml+=`<div class="insight">${ed("bestday_i",`So far <b>${wd.best.day}</b> posts lead. Bars show median engagement per post by weekday — the pattern sharpens as more posts come in.`)}</div>`;}
   }
   // what makes posts work
   let deepHtml="";
@@ -728,13 +814,13 @@ function render(){
     const cb=bestBucket(capB),tb=bestBucket(tagB); let take="";
     if(cb)take+=`<b>${cb.name}</b> captions perform best (median ${fmtInt(cb.medEng)} engagements). `;
     if(tb)take+=`Posts with <b>${tb.name==="None"?"no":tb.name}</b> hashtags lead. `;
-    deepHtml=`<div class="twocol"><div><div class="dtitle">By caption length</div>${tbl(capB,"Length")}</div><div><div class="dtitle">By hashtag count</div>${tbl(tagB,"Hashtags")}</div></div>${take?`<div class="insight">${take}Directional at this volume — the pattern firms up with more posts.</div>`:""}`;
+    deepHtml=`<div class="twocol"><div><div class="dtitle">By caption length (characters)</div>${tbl(capB,"Length")}</div><div><div class="dtitle">By hashtag count</div>${tbl(tagB,"Hashtags")}</div></div>${take?`<div class="insight">${ed("deep_i",take+"Directional at this volume — the pattern firms up with more posts.")}</div>`:""}`;
   }
   // consistency
   let consHtml="";
   if(A.C){const cs=consistency(cur._posts); if(cs){
     consHtml=`<div class="cardgrid"><div class="mcard"><div class="top">${ico("radio")} Typical post</div><div class="val">${fmtInt(cs.med)}</div><div class="cdesc">median reach per post</div></div><div class="mcard"><div class="top">${ico("trending")} Best post</div><div class="val">${fmtInt(cs.max)}</div><div class="cdesc">${cs.mult?cs.mult.toFixed(1)+"× the typical post":""}</div></div><div class="mcard"><div class="top">${ico("activity")} Above typical</div><div class="val">${pct(cs.aboveMedPct,0)}</div><div class="cdesc">of posts beat the median</div></div></div>`;
-    consHtml+=`<div class="insight">${cs.topShare>0.4?`Reach is <b>hit-driven</b> — the single best post drove ${pct(cs.topShare,0)} of all reach this period. Great for a spike, risky to depend on.`:`Reach is <b>fairly even</b> across posts — no single post carried the period, a sign of dependable content.`}</div>`;
+    consHtml+=`<div class="insight">${ed("cons_i",cs.topShare>0.4?`Reach is <b>hit-driven</b> — the single best post drove ${pct(cs.topShare,0)} of all reach this period. Great for a spike, risky to depend on.`:`Reach is <b>fairly even</b> across posts — no single post carried the period, a sign of dependable content.`)}</div>`;
   }}
   // every metric, month by month
   let matrixHtml="";
@@ -744,15 +830,59 @@ function render(){
       matrixHtml=`<div class="datawrap"><table class="dtable"><thead><tr><th>Metric</th>${mons.map(mo=>`<th class="num">${mShort(mo)} '${mo.split("-")[0].slice(2)}</th>`).join("")}</tr></thead><tbody>${rowsK.map(k=>`<tr><td>${METRICS[k].label}</td>${wm.map(w=>`<td class="num">${w[k]===null||w[k]===undefined?"—":METRICS[k].fmt(w[k])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
     }}
 
-  // demographics
+  // audience — one card per platform, everything the data carries
+  let audHtml="";
+  {const byP={};cur._periods.forEach(p=>{if(p.top_gender||p.top_age_group||p.top_countries||p.top_cities){if(!byP[p.platform]||p.month>byP[p.platform].month)byP[p.platform]=p;}});
+    const cards=Object.keys(byP).map(k=>{const d=byP[k];
+      const g=d.top_gender==="F"?"Mostly women":d.top_gender==="M"?"Mostly men":d.top_gender==="U"?"Mixed":d.top_gender;
+      const rows=[["Who",g],["Age group",d.top_age_group],["Top countries",(d.top_countries||"").split("|").slice(0,3).join(", ")],["Top cities",(d.top_cities||"").split("|").slice(0,3).join(", ")]].filter(r=>r[1]);
+      return `<div class="audcard"><h5>${ico("users")} ${plat(k)} audience</h5>${rows.map(r=>`<div class="audrow"><span class="k">${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div>`;
+    }).join("");
+    if(cards)audHtml=`<div class="audgrid">${cards}</div><div class="note">This is what the connected export carries. Native platform exports (Meta Business Suite, TikTok, LinkedIn) include full gender/age/location splits — upload one and this section expands automatically.</div>`;
+  }
+  // campaigns & content pillars
+  function groupPosts(field,eid){
+    const withF=cur._posts.filter(p=>p[field]);
+    if(withF.length<2)return "";
+    const by={};withF.forEach(p=>{(by[p[field]]=by[p[field]]||[]).push(p);});
+    if(Object.keys(by).length<1)return "";
+    const rows=Object.keys(by).map(k=>{const arr=by[k];const eng=arr.map(postEng);const reach=arr.filter(p=>p.reach!==null&&p.reach>0).map(p=>p.reach);
+      return {name:k,count:arr.length,medEng:median(eng),medReach:reach.length?median(reach):null,shares:sum(arr.map(p=>p.shares)),follows:sum(arr.map(p=>p.follows))};})
+      .sort((a,b)=>b.medEng-a.medEng);
+    const untag=cur._posts.length-withF.length;
+    let html=`<table><thead><tr><th>${field==="campaign"?"Campaign":"Pillar"}</th><th class="num">Posts</th><th class="num">Median eng.</th><th class="num">Median reach</th><th class="num">Shares</th><th class="num">Follows</th></tr></thead><tbody>${rows.map(r=>`<tr><td class="plat">${r.name}</td><td class="num">${r.count}</td><td class="num">${fmtInt(r.medEng)}</td><td class="num">${r.medReach!==null?fmtInt(r.medReach):"—"}</td><td class="num">${fmtInt(r.shares)}</td><td class="num">${fmtInt(r.follows)}</td></tr>`).join("")}</tbody></table>`;
+    if(rows.length>=2){const top=rows[0],second=rows[1];const mult=second.medEng>0?(top.medEng/second.medEng):null;
+      html+=`<div class="insight">${ed(eid,`<b>${top.name}</b> is the strongest ${field==="campaign"?"campaign":"pillar"} — median <b>${fmtInt(top.medEng)}</b> engagements per post${mult&&mult>=1.2?`, ${mult.toFixed(1)}× ${second.name}`:""}. ${field==="campaign"?"Compare what this one did differently (offer, format, timing) before planning the next.":"Weight next month's calendar toward it, and give the weakest pillar a new angle before cutting it."}`)}</div>`;}
+    if(untag>0)html+=`<div class="note">${untag} ${plural(untag,"post")} in this period ${untag===1?"has":"have"} no ${field} tag — add a “${field}” column to the post CSV to include them.</div>`;
+    return html;
+  }
+  const campHtml=groupPosts("campaign","camp_i");
+  const pillHtml=groupPosts("pillar","pill_i");
+  // paid performance
+  let paidHtml="";
+  if(cur.spend!==null&&cur.spend>0){
+    const cpm=cur.views?cur.spend/cur.views*1000:null;
+    const cpc=cur.link_clicks?cur.spend/cur.link_clicks:null;
+    const cpf=(cur.followers_growth&&cur.followers_growth>0)?cur.spend/cur.followers_growth:null;
+    paidHtml=`<div class="cardgrid">
+      <div class="mcard"><div class="top">${ico("trending")} Spend</div><div class="val">$${fmtInt(cur.spend)}</div><div class="cdesc">boosted posts + ads this period</div></div>
+      ${cpm!==null?`<div class="mcard"><div class="top">${ico("play")} Cost per 1k views</div><div class="val">$${cpm.toFixed(2)}</div><div class="cdesc">spend ÷ views × 1,000</div></div>`:""}
+      ${cpc!==null?`<div class="mcard"><div class="top">${ico("link")} Cost per click</div><div class="val">$${cpc.toFixed(2)}</div><div class="cdesc">spend ÷ website clicks</div></div>`:""}
+      ${cpf!==null?`<div class="mcard"><div class="top">${ico("user-plus")} Cost per follower</div><div class="val">$${cpf.toFixed(2)}</div><div class="cdesc">spend ÷ net new followers</div></div>`:""}
+    </div>
+    <div class="note">Organic and paid are blended in the totals above when spend ran this period. For boosted-post and dark-ad detail (per-ad results, audiences, placements), export from Ads Manager and upload it here — the columns are recognized automatically.</div>`;
+  }
   let demo="";
-  const dr=cur._periods.find(p=>p.top_gender||p.top_age_group||p.top_countries||p.top_cities);
-  if(dr){const bits=[dr.top_gender==="F"?"Women":dr.top_gender==="M"?"Men":dr.top_gender==="U"?"Mixed":dr.top_gender,dr.top_age_group,(dr.top_countries||"").split("|").slice(0,3).join(", ")].filter(Boolean);
-    demo=`<div class="note" style="font-size:13px;color:var(--ink)">Top audience — ${bits.join(" · ")}${dr.top_cities?` · ${dr.top_cities.split("|").slice(0,2).join(", ")}`:""}</div>`;}
 
   // top content
   const con=cur._posts.slice().map(p=>({...p,_e:p.engagement!==null?p.engagement:(p.likes+p.comments+p.shares+p.saves)})).sort((a,b)=>b._e-a._e).slice(0,5);
   const contentList=con.length?con.map(p=>{const er=(p.reach&&p.reach>0)?p._e/p.reach:null;const s=(p.snippet||"(no caption)").slice(0,72);return `<div class="content-row"><span><span class="pill">${plat(p.platform)}</span><span class="pill">${fmtName(p.type)}</span>${s}${(p.snippet||"").length>72?"…":""}</span><span class="meta">${p.reach?fmtInt(p.reach)+" reach · ":""}${fmtInt(p._e)} eng${er!==null?" · "+pct(er):""}</span></div>`;}).join(""):'<div class="note">No post-level data in this period.</div>';
+
+  // continuity: recall the previous report's recommended move for this client
+  let followup="";
+  try{const lm=JSON.parse(localStorage.getItem(LSK+"_lastmove")||"{}");const pm2=lm[c];
+    if(pm2&&pm2.label!==label){followup=`<div class="note" style="margin-top:12px;font-size:12.5px">${ed("followup",`Carrying the thread: in the <b>${pm2.label}</b> report the recommended move was “${pm2.t}” — the findings below show how this period responded.`)}</div>`;}
+  }catch(e){}
 
   // wins/watch (top 3 each) with editable text
   const winHtml=A.wins.slice(0,3).map((w,i)=>`<div class="ins win"><div class="t">${ed("win_t"+i,w.t)}</div><div class="d">${ed("win_d"+i,w.d)}</div></div>`).join("")||'<div class="note">Not enough signal yet.</div>';
@@ -760,7 +890,7 @@ function render(){
 
   $("report").innerHTML=`
   <div class="rhead">
-    <img class="rlogo" src="cno-logo.png" alt="CNO Creative Co">
+    <img class="rlogo" src="cno-seal.png" alt="CNO Creative Co" style="height:64px">
     <div class="kick">Analytics Report</div>
     <div class="cli">${nameShow}</div>
     <div class="meta">${label}<span>·</span>${platsUsed.map(plat).join(" · ")||"—"}</div>
@@ -770,6 +900,7 @@ function render(){
   <section>
     <div class="sec-label">The story this period</div>
     <div class="headline">${edBlock("headline",headline(c,cur,prev,A))}</div>
+    ${followup}
     <div class="storycols">
       <div class="storycol">
         <h4><span class="ic" style="background:#eaeee2;color:var(--sage-deep)">${ico("trending")}</span>Working now</h4>
@@ -787,10 +918,11 @@ function render(){
       <div class="t">${ed("best_t",A.best.t)}</div>
       <div class="d">${ed("best_d",A.best.d)}</div>
     </div>
-    ${demo}
   </section>
 
-  <section><div class="sec-label">Headline numbers</div><div class="sec-sub">Totals for ${dateSpan}. ${hasPrevData?"“vs prior” compares to the previous period of equal length.":"This is the earliest period in the data, so there’s nothing earlier to compare against yet."} Each card says what it measures.</div><div class="cardgrid">${heroCards}</div></section>
+  <section><div class="sec-label">Headline numbers</div><div class="sec-sub">${multiPlat?`Combined across ${platsUsed.map(plat).join(" + ")} — uncheck platforms above to see one at a time. `:`${plat(platsUsed[0]||"")} only. `}Totals for ${dateSpan}. ${hasPrevData?"“vs prior” compares to the previous period of equal length.":"This is the earliest period in the data, so there’s nothing earlier to compare against yet."}</div><div class="cardgrid">${heroCards}</div></section>
+
+  ${showSec("audience")&&audHtml?`<section><div class="sec-label">Audience</div><div class="sec-sub">Who's actually watching, per platform.</div>${audHtml}</section>`:""}
 
   ${showSec("trends")&&trendCharts?`<section><div class="sec-label">Trends over time</div><div class="chartrow">${trendCharts}</div></section>`:""}
 
@@ -803,6 +935,12 @@ function render(){
   ${showSec("format")&&fmtTable?`<section><div class="sec-label">What format is working</div>${fmtTable}<div style="margin-top:18px"><div class="sec-label" style="margin-bottom:8px">Engagement mix</div>${mixHtml}</div></section>`:""}
 
   ${showSec("effort")&&effortHtml?`<section><div class="sec-label">Effort vs. return by platform</div>${effortHtml}</section>`:""}
+
+  ${showSec("campaigns")&&campHtml?`<section><div class="sec-label">Campaign comparison</div><div class="sec-sub">Tagged campaigns, side by side — medians so one viral post doesn't skew it.</div>${campHtml}</section>`:""}
+
+  ${showSec("pillars")&&pillHtml?`<section><div class="sec-label">Content pillars</div><div class="sec-sub">Which of the content themes you've committed to is actually landing.</div>${pillHtml}</section>`:""}
+
+  ${showSec("paid")&&paidHtml?`<section><div class="sec-label">Paid performance</div><div class="sec-sub">What the ad spend bought this period.</div>${paidHtml}</section>`:""}
 
   ${showSec("bestday")&&bestDayHtml?`<section><div class="sec-label">Best day to post</div><div class="sec-sub">Median engagement per post, by day of the week.</div>${bestDayHtml}</section>`:""}
 
@@ -822,6 +960,7 @@ function render(){
 
   mountCharts();
   wireEdits();
+  try{const lm=JSON.parse(localStorage.getItem(LSK+"_lastmove")||"{}");lm[c]={label,t:A.best.t};localStorage.setItem(LSK+"_lastmove",JSON.stringify(lm));}catch(e){}
 }
 function metricCard(c,key,cur,prev,hero){
   const M=METRICS[key];const v=cur[key];const pv=prev?prev[key]:null;
@@ -845,11 +984,24 @@ function currentRange(c){
   return{from:f,to:t,label:mLabel(sel)};
 }
 function labelFor(f,t){const sameMon=ym(f)===ym(t);if(sameMon)return mLabel(ym(f));return `${MON[f.getUTCMonth()]} ${f.getUTCDate()} – ${MON[t.getUTCMonth()]} ${t.getUTCDate()}, ${t.getUTCFullYear()}`;}
+function buildPlatChips(){
+  const c=$("clientSel").value;if(!c){$("platChips").innerHTML="";return;}
+  const all=platsFor(c), sel=selectedPlats(c);
+  $("platChips").innerHTML=all.map(p=>`<label class="chip ${sel.has(p)?"on":""}"><input type="checkbox" data-plat="${p}" ${sel.has(p)?"checked":""}>${plat(p)}</label>`).join("");
+}
+$("platChips").addEventListener("change",e=>{
+  if(!e.target.dataset.plat)return;
+  const c=$("clientSel").value;
+  const chosen=new Set([...document.querySelectorAll("#platChips input:checked")].map(i=>i.dataset.plat));
+  if(!chosen.size){buildPlatChips();return;} /* keep at least one */
+  PLATSEL[c]=chosen;buildPlatChips();render();
+});
 function refreshPeriods(){
   const c=$("clientSel").value;const ms=monthsFor(c);const sel=$("periodSel");
   let opts=ms.map(m=>`<option value="${m}">${mLabel(m)}</option>`).reverse().join("");
   opts+=`<option value="last30">Last 30 days</option><option value="last90">Last 90 days</option><option value="all">All time</option><option value="custom">Custom range…</option>`;
   sel.innerHTML=opts;if(ms.length)sel.value=ms[ms.length-1];
+  buildPlatChips();
   onPeriodChange();
 }
 function onPeriodChange(){const cust=$("periodSel").value==="custom";$("fromWrap").style.display=cust?"":"none";$("toWrap").style.display=cust?"":"none";
@@ -861,14 +1013,16 @@ function buildCustomUI(){
   if($("grainSel"))$("grainSel").value=cget("grain","week");
   $("goalSel").value=cget("goal","balanced");
   $("nameOverride").value=cget("name","");
+  if($("letterTog"))$("letterTog").checked=cget("letter",true)!==false;
   const heroSel=cget("hero",null)||GOAL_HERO[cget("goal","balanced")];
   $("heroChecks").innerHTML=Object.keys(METRICS).map(k=>`<label class="chk"><input type="checkbox" data-hero="${k}" ${heroSel.indexOf(k)>=0?"checked":""}>${METRICS[k].label}</label>`).join("");
-  const secs=[["trends","Trends over time"],["profile","Profile insights"],["content","Content insights"],["funnel","Reach → followers"],["format","Format analysis"],["effort","Effort vs. return"],["bestday","Best day to post"],["content_deep","What makes posts work"],["consistency","Consistency check"],["content_list","Top content"],["matrix","Metrics matrix"],["data","Full data table"]];
+  const secs=[["audience","Audience"],["trends","Trends over time"],["profile","Profile insights"],["content","Content insights"],["funnel","Reach → followers"],["format","Format analysis"],["effort","Effort vs. return"],["campaigns","Campaign comparison"],["pillars","Content pillars"],["paid","Paid performance"],["bestday","Best day to post"],["content_deep","What makes posts work"],["consistency","Consistency check"],["content_list","Top content"],["matrix","Metrics matrix"],["data","Full data table"]];
   $("sectionChecks").innerHTML=secs.map(([k,l])=>`<label class="chk"><input type="checkbox" data-sec="${k}" ${cget("sec_"+k,true)!==false?"checked":""}>${l}</label>`).join("");
 }
 function wireCustom(){
   $("goalSel").addEventListener("change",e=>{CUSTOM.goal=e.target.value;CUSTOM.hero=null;saveCustom();buildCustomUI();render();});
   $("nameOverride").addEventListener("input",e=>{CUSTOM.name=e.target.value;saveCustom();render();});
+  $("letterTog").addEventListener("change",e=>{CUSTOM.letter=e.target.checked;saveCustom();});
   $("heroChecks").addEventListener("change",e=>{if(!e.target.dataset.hero)return;const chosen=[...document.querySelectorAll("#heroChecks input:checked")].map(i=>i.dataset.hero);CUSTOM.hero=chosen;saveCustom();render();});
   $("sectionChecks").addEventListener("change",e=>{if(!e.target.dataset.sec)return;CUSTOM["sec_"+e.target.dataset.sec]=e.target.checked;saveCustom();render();});
   $("resetCustBtn").addEventListener("click",()=>{CUSTOM={};saveCustom();buildCustomUI();render();});
@@ -876,7 +1030,7 @@ function wireCustom(){
 }
 /* ==================== editable text ==================== */
 function wireEdits(){
-  document.querySelectorAll("#report .ed").forEach(el=>{
+  document.querySelectorAll("#report .ed, #letterCard .ed").forEach(el=>{
     el.addEventListener("blur",()=>{const eid=el.dataset.eid;const key=ekey(eid);EDITS[key]=el.innerHTML;el.classList.add("edited");saveEdits();});
   });
 }
@@ -896,34 +1050,73 @@ $("fileIn").addEventListener("change",function(){const files=[...this.files];if(
 $("demoBtn").addEventListener("click",()=>{resetData();ingest(DEMO_ACC);ingest(DEMO_CON);refreshAll();});
 
 /* ==================== demo (fictional) ==================== */
-const DEMO_ACC=`client,platform,month,followers_total,followers_growth,reach,engagement,views,profile_views,top_age_group,top_gender,top_countries
-Example Brand,instagram,2026-04,2400,-8,1900,180,5200,150,,,
-Example Brand,instagram,2026-05,2400,22,2600,330,8100,205,,,
-Example Brand,instagram,2026-06,2400,61,4700,880,15400,390,25-34,F,United States|Canada|United Kingdom
-Example Brand,tiktok,2026-04,540,3,,120,3400,,,,
-Example Brand,tiktok,2026-05,540,7,,35,900,,,,
-Example Brand,tiktok,2026-06,540,40,,210,6100,,,,`;
-const DEMO_CON=`client,platform,month,date,post_type,engagement,reach,views,likes,comments,shares,saves,follows,hashtag_count,caption_length,caption_snippet
-Example Brand,instagram,2026-04,2026-04-05,CAROUSEL,58,720,1400,48,4,4,2,1,5,410,"Small habits that compound over a season."
-Example Brand,instagram,2026-04,2026-04-18,IMAGE,40,480,900,36,2,1,1,0,3,150,"A quiet studio afternoon."
-Example Brand,instagram,2026-05,2026-05-03,CAROUSEL,96,880,1900,74,7,9,4,2,5,410,"Three small habits that make a visible difference."
-Example Brand,instagram,2026-05,2026-05-20,REEL,150,2100,5200,120,8,18,10,5,4,180,"The 30-second version of our most-asked question."
-Example Brand,instagram,2026-06,2026-06-03,CAROUSEL,120,980,2100,92,9,14,3,2,5,420,"What to look for on an ingredients label."
-Example Brand,instagram,2026-06,2026-06-11,REEL,300,2600,7400,230,14,38,14,9,4,180,"We answered the question we get most — fast."
-Example Brand,instagram,2026-06,2026-06-19,CAROUSEL,140,1100,2600,110,10,15,4,3,5,360,"Behind the scenes of a launch week."
-Example Brand,instagram,2026-06,2026-06-27,IMAGE,52,340,700,46,3,2,1,0,3,150,"Golden hour at the workshop."
-Example Brand,tiktok,2026-06,2026-06-14,VIDEO,210,,6100,180,9,18,0,3,4,120,"Answering the question we get most."
-Example Brand,tiktok,2026-05,2026-05-22,VIDEO,35,,900,30,3,2,0,1,4,110,"A slower one this week."
-Example Brand,tiktok,2026-04,2026-04-09,VIDEO,120,,3400,100,8,10,0,2,4,120,"Quick tip that surprised people."`;
+const DEMO_ACC=`client,platform,month,followers_total,followers_growth,reach,engagement,views,profile_views,link_clicks,dms,spend,top_age_group,top_gender,top_countries,top_cities
+Example Brand,instagram,2026-04,2400,-8,1900,180,5200,150,22,9,,,,,
+Example Brand,instagram,2026-05,2400,22,2600,330,8100,205,31,14,,,,,
+Example Brand,instagram,2026-06,2400,61,4700,880,15400,390,58,26,45,25-34,F,United States|Canada|United Kingdom,Portland|Seattle
+Example Brand,tiktok,2026-04,540,3,,120,3400,,,,,,,,
+Example Brand,tiktok,2026-05,540,7,,35,900,,,,,,,,
+Example Brand,tiktok,2026-06,540,40,,210,6100,,,,,18-24,F,United States|Canada,`;
+const DEMO_CON=`client,platform,month,date,post_type,engagement,reach,views,likes,comments,shares,saves,follows,hashtag_count,caption_length,caption_snippet,campaign,pillar
+Example Brand,instagram,2026-04,2026-04-05,CAROUSEL,58,720,1400,48,4,4,2,1,5,410,"Small habits that compound over a season.",,Education
+Example Brand,instagram,2026-04,2026-04-18,IMAGE,40,480,900,36,2,1,1,0,3,150,"A quiet studio afternoon.",,Behind the scenes
+Example Brand,instagram,2026-05,2026-05-03,CAROUSEL,96,880,1900,74,7,9,4,2,5,410,"Three small habits that make a visible difference.",,Education
+Example Brand,instagram,2026-05,2026-05-20,REEL,150,2100,5200,120,8,18,10,5,4,180,"The 30-second version of our most-asked question.",,Education
+Example Brand,instagram,2026-06,2026-06-03,CAROUSEL,120,980,2100,92,9,14,3,2,5,420,"What to look for on an ingredients label.",Summer Launch,Education
+Example Brand,instagram,2026-06,2026-06-11,REEL,300,2600,7400,230,14,38,14,9,4,180,"We answered the question we get most — fast.",Summer Launch,Education
+Example Brand,instagram,2026-06,2026-06-19,CAROUSEL,140,1100,2600,110,10,15,4,3,5,360,"Behind the scenes of a launch week.",Summer Launch,Behind the scenes
+Example Brand,instagram,2026-06,2026-06-27,IMAGE,52,340,700,46,3,2,1,0,3,150,"Golden hour at the workshop.",,Community
+Example Brand,tiktok,2026-06,2026-06-14,VIDEO,210,,6100,180,9,18,0,3,4,120,"Answering the question we get most.",Summer Launch,Education
+Example Brand,tiktok,2026-05,2026-05-22,VIDEO,35,,900,30,3,2,0,1,4,110,"A slower one this week.",,Community
+Example Brand,tiktok,2026-04,2026-04-09,VIDEO,120,,3400,100,8,10,0,2,4,120,"Quick tip that surprised people.",,Education`;
+
+/* ---- the letter: envelope + wax seal opening for shared reports ---- */
+let LETTER_SHOWN=false;
+function maybeShowLetter(force){
+  if(LETTER_SHOWN)return;
+  if(!force&&cget("letter",true)===false)return;
+  if(!clients().length)return;
+  LETTER_SHOWN=true;
+  const c=$("clientSel").value, nameShow=cget("name","")||c;
+  const headEl=document.querySelector("#report .headline");
+  const head=headEl?headEl.textContent.trim():"";
+  const bmEl=document.querySelector("#report .bestmove .t");
+  const body=ed("letter_body",`Hello — here's the ${CURRENT.label||"latest"} report for <b>${nameShow}</b>, sealed and delivered.<br><br>${head?head+" ":""}Inside is the full story: what's working, what needs attention${bmEl?`, and why the next move is “${bmEl.textContent.trim()}”`:""}. Every chart is live — hover and explore.<br><br>With care,`);
+  $("letterCard").innerHTML=`<img class="lsm" src="cno-seal.png" alt=""><h2>A note before your report</h2><div class="lbody">${body}</div><div class="lsign">— CNO Creative Co</div><button class="lopen" id="lopenBtn">Open the full report</button>`;
+  const ov=$("letterOverlay");ov.hidden=false;
+  $("lopenBtn").addEventListener("click",closeLetter);
+  wireEdits();
+}
+function closeLetter(){const ov=$("letterOverlay");ov.classList.add("done");setTimeout(()=>{ov.hidden=true;ov.classList.remove("done");$("envScene").classList.remove("open");},600);}
+$("lseal").addEventListener("click",()=>$("envScene").classList.add("open"));
+$("letterSkip").addEventListener("click",closeLetter);
+
+/* ---- drag & drop CSVs anywhere on the page ---- */
+document.addEventListener("dragover",e=>{e.preventDefault();document.body.classList.add("dragging");});
+document.addEventListener("dragleave",e=>{if(!e.relatedTarget)document.body.classList.remove("dragging");});
+document.addEventListener("drop",e=>{e.preventDefault();document.body.classList.remove("dragging");
+  const files=[...e.dataTransfer.files].filter(f=>/\.csv$/i.test(f.name));if(!files.length)return;
+  let done=0;files.forEach(f=>{const r=new FileReader();r.onload=ev=>{ingest(ev.target.result);done++;if(done===files.length)refreshAll();};r.readAsText(f);});});
 
 buildCustomUI();wireCustom();
 (async function(){
   const h=location.hash;
+  async function loadBundle(j){const d=JSON.parse(j);resetData();if(d.acc)ingest(d.acc);if(d.con)ingest(d.con);if(d.cust){CUSTOM=d.cust;saveCustom();buildCustomUI();}refreshAll();maybeShowLetter(false);}
+  if(h.indexOf("#edata=")===0){
+    const payload=h.slice(7);
+    for(let i=0;i<3;i++){
+      const pw=prompt("This report is password-protected.\n\nEnter the password:");
+      if(pw===null)break;
+      try{const b64=await decryptStr(payload,pw.trim());await loadBundle(await gunzB64(b64));return;}
+      catch(e){alert("That password didn't work."+(i<2?" Try again.":""));}
+    }
+    return;
+  }
   if(h.indexOf("#data=")===0){
-    try{const j=await gunzB64(h.slice(6));const d=JSON.parse(j);resetData();if(d.acc)ingest(d.acc);if(d.con)ingest(d.con);if(d.cust){CUSTOM=d.cust;saveCustom();buildCustomUI();}refreshAll();return;}
+    try{await loadBundle(await gunzB64(h.slice(6)));return;}
     catch(e){console.warn("share link decode failed",e);}
   }
-  if(h==="#demo"){document.getElementById("demoBtn").click();}
+  if(h==="#demo"||h==="#letter"){document.getElementById("demoBtn").click();maybeShowLetter(h==="#letter");}
 })();
 </script>
 </body>
