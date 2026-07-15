@@ -21,7 +21,7 @@
   .toolbar .brand{display:flex;flex-direction:column;align-items:flex-start;gap:5px;margin-right:6px;line-height:1}
   .toolbar .brand img{height:24px;width:auto;flex:none}
   .toolbar .brand small{font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--burnt);font-weight:500}
-  .toolbar label.fld{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:flex;flex-direction:column;gap:3px}
+  .toolbar .fld{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:flex;flex-direction:column;gap:3px}
   .toolbar select,.toolbar input[type=date]{font-family:var(--sans);font-size:13px;padding:5px 7px;border-radius:7px;border:1px solid var(--sand);background:#fff;color:var(--ink)}
   .btn{font-family:var(--sans);font-size:11px;letter-spacing:.07em;text-transform:uppercase;padding:7px 13px;border-radius:7px;border:1px solid var(--terra);background:#fff;color:var(--burnt);cursor:pointer;transition:.15s;font-weight:500}
   .btn:hover{background:var(--cream)}
@@ -41,21 +41,30 @@
   .panel .chk input{accent-color:var(--burnt)}
   .panel select,.panel input[type=text]{font-family:var(--sans);font-size:13px;padding:6px 8px;border-radius:7px;border:1px solid var(--sand);background:#fff;color:var(--ink);width:100%}
   .wrap{max-width:900px;margin:24px auto;padding:0 18px 80px}
-  .report{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 6px 30px rgba(60,40,20,.07);border:1px solid var(--sand)}
-  /* header */
-  .rhead{padding:30px 34px 22px;border-bottom:1px solid var(--sand);text-align:center}
-  .rhead img.rlogo{height:40px;width:auto;margin-bottom:14px}
-  .rhead .kick{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--burnt);font-weight:500}
-  .rhead .cli{font-family:var(--serif);font-size:36px;font-weight:500;line-height:1.06;letter-spacing:-.01em;margin-top:5px}
-  .rhead .meta{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);margin-top:10px}
-  .rhead .meta span{color:var(--terra);margin:0 6px}
-  .rhead .daterange{font-size:11px;color:var(--ink-soft);margin-top:4px;letter-spacing:.02em}
-  section{padding:24px 34px;border-bottom:1px solid var(--sand)}
+  .report{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(60,40,20,.08);border:1px solid var(--sand)}
+  /* editorial accents */
+  .ac{font-family:var(--serif);font-style:italic;color:var(--burnt);font-weight:400}
+  .corners{position:relative}
+  .corners::before,.corners::after{content:"";position:absolute;width:20px;height:20px;border:1.5px solid var(--terra);pointer-events:none}
+  .corners::before{top:16px;left:16px;border-right:none;border-bottom:none}
+  .corners::after{bottom:16px;right:16px;border-left:none;border-top:none}
+  /* header — editorial cover */
+  .rhead{padding:52px 40px 40px;border-bottom:1px solid var(--sand);text-align:center;background:linear-gradient(180deg,var(--cream),var(--card));position:relative}
+  .rhead::before,.rhead::after{content:"";position:absolute;top:20px;width:22px;height:22px;border:1.5px solid var(--terra);pointer-events:none}
+  .rhead::before{left:20px;border-right:none;border-bottom:none}
+  .rhead::after{right:20px;border-left:none;border-bottom:none}
+  .rhead img.rlogo{height:60px;width:auto;margin-bottom:22px}
+  .rhead .kick{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--burnt);font-weight:500}
+  .rhead .cli{font-family:var(--serif);font-size:50px;font-weight:400;line-height:1.02;letter-spacing:-.015em;margin-top:12px}
+  .rhead .meta{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:16px}
+  .rhead .meta span{color:var(--terra);margin:0 8px}
+  .rhead .daterange{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ink-soft);margin-top:8px;letter-spacing:0}
+  section{padding:34px 40px;border-bottom:1px solid var(--sand)}
   section:last-of-type{border-bottom:none}
-  .sec-label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--sage-deep);font-weight:500;margin-bottom:6px}
-  .sec-sub{font-size:12px;color:var(--ink-soft);margin-bottom:16px}
+  .sec-label{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--burnt);font-weight:500;margin-bottom:7px}
+  .sec-sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:20px;max-width:70ch}
   /* story */
-  .headline{font-family:var(--serif);font-size:22px;line-height:1.4;font-weight:400;margin:2px 0 18px;letter-spacing:-.01em}
+  .headline{font-family:var(--serif);font-size:29px;line-height:1.34;font-weight:400;margin:4px 0 24px;letter-spacing:-.012em;max-width:34ch}
   .storycols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
   .storycol h4{display:flex;align-items:center;gap:8px;margin:0 0 4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:500}
   .storycol h4 .ic{width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:13px}
@@ -74,12 +83,12 @@
   .ed[contenteditable=true]:focus{background:rgba(160,95,52,.09);box-shadow:0 0 0 2px var(--terra-soft)}
   .ed.edited{border-bottom:1px dashed var(--terra)}
   /* metric cards */
-  .cardgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:13px}
-  .mcard{border:1px solid var(--sand);border-radius:13px;padding:13px 15px 10px;background:var(--sand-2)}
+  .cardgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:14px}
+  .mcard{border:1px solid var(--sand);border-radius:14px;padding:16px 17px 13px;background:var(--sand-2)}
   .mcard.hero{background:var(--cream);border-color:var(--terra-soft)}
-  .mcard .top{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+  .mcard .top{display:flex;align-items:center;gap:6px;font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-soft)}
   .mcard .top .i{font-size:13px;color:var(--burnt)}
-  .mcard .val{font-family:var(--serif);font-size:27px;font-weight:500;line-height:1.05;margin:5px 0 2px}
+  .mcard .val{font-family:var(--serif);font-size:32px;font-weight:400;line-height:1.02;margin:8px 0 3px;letter-spacing:-.01em}
   .mcard .chg{font-size:11.5px}
   .mcard .cdesc{font-size:10.5px;color:var(--ink-soft);margin-top:4px;line-height:1.35}
   .mcard .spark{margin-top:8px}
@@ -698,7 +707,7 @@ function headline(c,cur,prev,A){
   else if(A.watch.length) comp="though a few patterns need attention before next cycle";
   else comp="and the fundamentals are pointing the right way";
   const p1=cap(parts[0]);
-  return `${p1}, ${comp}.`;
+  return `${p1}, <span class="ac">${comp}</span>.`;
 }
 
 /* ==================== deeper analytics ==================== */
@@ -959,7 +968,7 @@ function render(){
 
   ${showSec("data")?`<section><div class="sec-label">Full data</div><div class="sec-sub">Every number behind this report, straight from the source. Scroll to see all columns and rows.</div>${rawDataTables(c)}</section>`:""}
 
-  <div class="foot"><span>Prepared by CNO Creative Co · engagement rate = interactions ÷ reach · edit any text inline</span><img src="cno-logo.png" alt=""></div>`;
+  <div class="foot"><span>Prepared by <b>CNO Creative Co</b> &nbsp;·&nbsp; <span class="ac" style="font-size:14px">Hand it over. We'll handle it.</span></span><img src="cno-logo.png" alt=""></div>`;
 
   mountCharts();
   wireEdits();
