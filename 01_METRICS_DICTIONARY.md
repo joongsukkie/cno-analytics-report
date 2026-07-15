@@ -33,11 +33,15 @@ Engagement rate is the headline metric, but it has multiple valid formulas. **We
 
 2. **ER by Followers**
    `(Total Engagements ÷ Followers) × 100`
-   → Best for cross-account benchmarking (most industry benchmark tables use this). Use for the "vs. industry" comparison.
+   → Used by benchmark publishers such as Rival IQ for some public competitive datasets.
 
 3. **ER by Impressions**
    `(Total Engagements ÷ Impressions) × 100`
-   → Best for paid/boosted content analysis.
+   → Best for paid/boosted analysis and for benchmark sources that explicitly use impressions.
+
+4. **ER by Views**
+   `(Total Engagements ÷ Views) × 100`
+   → Used when a platform or benchmark source has replaced impressions with views. Instagram’s definitions changed in 2025, so the report keeps views and impressions separate.
 
 > ⚠️ **Consistency rule:** always compare like-for-like. Client's ER-by-followers vs. an industry benchmark that's *also* by-followers. Never mix formulas within one comparison.
 
@@ -86,6 +90,24 @@ Engagement rate is the headline metric, but it has multiple valid formulas. **We
 | **Benchmark index** | Client value ÷ Industry norm | >1.0 = beating industry; <1.0 = below |
 | **Share of engagement** | Engagements from a platform ÷ total across platforms | Where the audience actually lives |
 | **Cost-free ROI proxy** | Link clicks / leads / DMs tied to social | True ROI *only if client shares outcome data* |
+| **Profile-to-click rate** | Website clicks ÷ profile visits | Whether profile interest turns into off-platform action |
+| **Reach-to-lead rate** | Qualified leads ÷ reach | Directional top-of-funnel business efficiency |
+| **Lead-to-booking rate** | New bookings ÷ qualified leads | Sales/booking conversion quality |
+| **Event attendance rate** | Attendees ÷ registrations | Whether event interest became attendance |
+| **ROAS** | Attributed revenue ÷ paid spend | Paid-media return when attribution data is available |
+
+## Client-goal and business metrics
+
+These are not always available from a social platform. They can be added to the same upload from a CRM, scheduling system, event platform, ecommerce report, or carefully maintained attribution sheet.
+
+| Goal | Metrics |
+|------|---------|
+| **Build brand authority** | Reach, impressions/views, follower growth rate, profile visits, saves |
+| **Grow the right audience** | Website clicks, meaningful comments, comment replies, DMs, qualified leads |
+| **Position for what’s next** | Event announcement reach, event-content engagement, registrations, attendees, post-event leads/bookings |
+| **Drive business growth** | New bookings, membership sign-ups, retail orders, attributed revenue, conversions |
+
+“Meaningful comments” is a human-tagged count of substantive questions, stories, referrals, or purchase-intent conversations. It should not be inferred automatically from comment volume.
 
 ---
 

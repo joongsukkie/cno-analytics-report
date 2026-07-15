@@ -9,7 +9,7 @@ Every file is classified row-by-row into one of two **grains**:
 
 | Grain | What it is | Powers | Detected when a row has… |
 |-------|-----------|--------|--------------------------|
-| **Account-level** | One row per account per period (a monthly/period snapshot) | Profile insights — followers, growth, profile visits, reach, the funnel | a `followers`/`profile visits` column and a `month` (or a date with no post fields) |
+| **Account-level** | One row per account per month **or day** | Profile insights, daily/weekly trends, paid metrics, audience, and business outcomes | a `followers`/`profile visits` column and a month/date with no populated post fields |
 | **Post-level** | One row per individual post | Content insights — engagement, views, shares, format analysis, top content | a `post type` or `caption`, plus per-post metrics and a `date` |
 
 You can upload **either, both, or many files** (e.g. one account export + one post export per platform). They merge into one dataset, and the client/period selectors let you slice it.
@@ -19,7 +19,8 @@ You can upload **either, both, or many files** (e.g. one account export + one po
 You do **not** need to rename columns. The tool maps common header names from Rella, Instagram/Meta, TikTok, LinkedIn, and YouTube to a shared vocabulary. Examples it understands:
 
 - **reach** ← `reach`, `accounts reached`, `unique reach`
-- **views** ← `views`, `impressions`, `plays`, `video views`
+- **impressions** ← `impressions`, `impression count` (times displayed)
+- **views** ← `views`, `plays`, `video views` (content/video consumption; never silently merged with impressions)
 - **engagement** ← `engagement`, `interactions`, `total engagement`
 - **followers** ← `followers`, `subscribers`, `audience`, `fans`
 - **follower growth** ← `net followers`, `new followers`, `followers gained`
@@ -29,6 +30,10 @@ You do **not** need to rename columns. The tool maps common header names from Re
 - **date** ← `date`, `published`, `timestamp`, `post time`
 - **post type** ← `post type`, `media type`, `format`
 - plus `client`, `platform`, `caption`, `hashtags`, demographics (`gender`, `top countries`, `top cities`), etc.
+
+The goal scorecard also recognizes `meaningful comments`, `comment replies`, `DMs`, `leads`, `bookings`, `membership signups`, `retail sales`, `revenue`, `event reach`, `event engagement`, `event registrations`, `event attendees`, `conversions`, `spend`, `paid reach`, `paid impressions`, `organic reach`, and `organic impressions`.
+
+Use an optional `record_type` column (`account_daily`, `account_monthly`, or `post`) when account and post rows live in the same CSV. This removes any ambiguity.
 
 Unrecognized columns are ignored, not fatal. Missing metrics just hide their card — nothing breaks.
 
@@ -40,7 +45,7 @@ Unrecognized columns are ignored, not fatal. Missing metrics just hide their car
 Rella returns the **current** follower total regardless of the date range, so follower *trends* are computed from monthly **growth**, not by differencing the total. The tool handles this for you.
 
 ## Templates
-Runnable examples: `resources/template_accounts.csv` and `resources/template_content.csv`.
+Runnable examples: `resources/template_accounts.csv` and `resources/template_content.csv`. Use `resources/native_platform_comprehensive_test.csv` to exercise a combined Instagram + TikTok + LinkedIn file with daily totals, post detail, campaign/pillar tags, paid data, audience fields, and business outcomes.
 
 ## Export
 The **Export data** button downloads your loaded data back out as normalized `accounts_normalized.csv` and `content_normalized.csv`.
