@@ -16,26 +16,20 @@
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:var(--sans);color:var(--ink);background:var(--page);line-height:1.55;font-weight:400}
-  /* website-matched navigation + report controls */
-  .sitebar{height:88px;background:var(--cream);border-top:3px solid var(--ink);border-bottom:1px solid rgba(153,97,55,.12);display:grid;grid-template-columns:190px 1fr 190px;align-items:center;padding:0 max(28px,calc((100vw - 1180px)/2));position:sticky;top:0;z-index:30}
-  .sitebar .brand img{display:block;width:126px;height:auto}
-  .sitebar nav{display:flex;justify-content:center;align-items:center;gap:40px;height:100%}
-  .sitebar nav button{height:100%;border:0;border-bottom:2px solid transparent;background:none;color:#8b8177;font-family:var(--sans);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;padding:0 2px;transition:.18s}
-  .sitebar nav button:hover,.sitebar nav button.active{color:var(--ink);border-bottom-color:var(--burnt)}
-  .handover{justify-self:end;position:relative;overflow:hidden;background:var(--burnt);color:#fff;padding:12px 24px;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:.18s}
-  .handover:hover{background:var(--burnt-deep)}
-  .handover input{position:absolute;inset:0;opacity:0;cursor:pointer}
-  .toolbar{background:#fff;color:var(--ink);padding:12px 24px;display:flex;flex-wrap:nowrap;gap:9px;align-items:center;border-bottom:1px solid var(--sand);position:sticky;top:88px;z-index:25;box-shadow:0 8px 24px rgba(42,31,18,.045)}
+  /* quiet seal masthead + aligned report controls */
+  .sitebar{height:80px;background:var(--cream);border-top:3px solid var(--ink);border-bottom:1px solid rgba(153,97,55,.12);display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:30}
+  .sitebar .stamp{display:block;line-height:0}.sitebar .stamp img{display:block;width:56px;height:56px;object-fit:contain}
+  .toolbar{background:#fff;color:var(--ink);padding:12px 24px;display:flex;flex-wrap:nowrap;gap:10px;align-items:flex-end;border-bottom:1px solid var(--sand);position:sticky;top:80px;z-index:25;box-shadow:0 8px 24px rgba(42,31,18,.045)}
   .toolbar .fld{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:flex;flex-direction:column;gap:3px}
-  .toolbar select,.toolbar input[type=date]{font-family:var(--sans);font-size:13px;padding:5px 7px;border-radius:7px;border:1px solid var(--sand);background:#fff;color:var(--ink)}
+  .toolbar select,.toolbar input[type=date]{font-family:var(--sans);font-size:13px;height:38px;padding:5px 9px;border-radius:7px;border:1px solid var(--sand);background:#fff;color:var(--ink)}
   .btn{font-family:var(--sans);font-size:11px;letter-spacing:.07em;text-transform:uppercase;padding:7px 13px;border-radius:7px;border:1px solid var(--terra);background:#fff;color:var(--burnt);cursor:pointer;transition:.15s;font-weight:500}
   .btn:hover{background:var(--cream)}
   .btn.solid{background:var(--burnt);border-color:var(--burnt);color:#fff}
   .btn.solid:hover{background:var(--burnt-deep)}
   .btn.file{position:relative;overflow:hidden}
   .btn.file input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
-  .toolbar .spacer{flex:1}
-  .control-intro{font-family:var(--serif);font-size:18px;line-height:1;color:var(--ink);margin-right:4px;white-space:nowrap}
+  .toolbar .btn{height:38px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.toolbar .spacer{flex:1}
+  .control-title,.action-fld{display:flex;flex-direction:column;gap:3px;flex:none}.control-title>span,.action-fld>span{font-size:9.5px;line-height:1.55;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}.control-title>strong{height:38px;display:flex;align-items:center;font-family:var(--serif);font-size:20px;line-height:1;font-weight:400;white-space:nowrap;padding-right:6px}
   /* customize panel */
   .panel{background:var(--cream);border-bottom:1px solid var(--sand);padding:16px 22px;display:none}
   .panel.open{display:block}
@@ -250,9 +244,8 @@
   @keyframes lSealAway{50%{transform:translate(-50%,-58%) scale(1.12) rotate(8deg);opacity:1}100%{transform:translate(-50%,-190%) scale(.45) rotate(24deg);opacity:0}}
   @keyframes lFade{from{opacity:0}to{opacity:1}}
   @keyframes lOut{to{opacity:0;visibility:hidden}}
-  @media(max-width:900px){.sitebar{grid-template-columns:130px 1fr 130px;padding:0 18px}.sitebar nav{gap:18px}.goalgrid{grid-template-columns:1fr 1fr}.goalcard:nth-child(2){border-right:0}.goalcard:nth-child(-n+2){border-bottom:1px solid var(--sand)}.vizgrid{grid-template-columns:1fr}}
-  @media(max-width:900px){.toolbar{overflow-x:auto}.control-intro{display:none}}
-  @media(max-width:660px){.sitebar{height:72px;grid-template-columns:1fr auto}.sitebar .brand img{width:104px}.sitebar nav{display:none}.handover{padding:10px 16px}.toolbar{top:72px;padding:10px 14px}.goalgrid{grid-template-columns:1fr}.goalcard{border-right:0;border-bottom:1px solid var(--sand)}.rhead .cli{font-size:42px}section{padding:28px 24px}}
+  @media(max-width:900px){.goalgrid{grid-template-columns:1fr 1fr}.goalcard:nth-child(2){border-right:0}.goalcard:nth-child(-n+2){border-bottom:1px solid var(--sand)}.vizgrid{grid-template-columns:1fr}.toolbar{overflow-x:auto}}
+  @media(max-width:660px){.sitebar{height:68px}.sitebar .stamp img{width:48px;height:48px}.toolbar{top:68px;padding:10px 14px}.control-title{display:none}.goalgrid{grid-template-columns:1fr}.goalcard{border-right:0;border-bottom:1px solid var(--sand)}.rhead .cli{font-size:42px}section{padding:28px 24px}}
   @media print{.sitebar,.toolbar,.panel,#letterOverlay{display:none!important} body{background:#fff} .wrap{margin:0;max-width:none;padding:0} .report{box-shadow:none;border-radius:0;border:none} section{break-inside:avoid} .ed[contenteditable]{background:none!important;box-shadow:none!important}}
 </style>
 </head>
@@ -268,19 +261,11 @@
   </div>
   <div class="letterCard" id="letterCard"></div>
 </div>
-<header class="sitebar">
-  <a class="brand" href="https://cnocreative.co/" target="_blank" rel="noopener"><img src="cno-logo.png" alt="CNO Creative Co"></a>
-  <nav aria-label="Report sections">
-    <button class="active" data-jump="overview">Overview</button>
-    <button data-jump="performance">Performance</button>
-    <button data-jump="content-analysis">Content</button>
-    <button data-jump="outcomes">Outcomes</button>
-  </nav>
-  <label class="handover">Hand it over<input type="file" id="fileIn" accept=".csv" multiple></label>
-</header>
+<header class="sitebar"><a class="stamp" href="https://cnocreative.co/" target="_blank" rel="noopener"><img src="cno-seal.png" alt="CNO Creative Co"></a></header>
 <div class="toolbar">
-  <span class="control-intro">Monthly report</span>
-  <button class="btn" id="demoBtn">Load demo</button>
+  <div class="control-title"><span>Report</span><strong>Monthly report</strong></div>
+  <div class="action-fld"><span>Data</span><label class="btn file">Upload CSV(s)<input type="file" id="fileIn" accept=".csv" multiple></label></div>
+  <div class="action-fld"><span>Sample</span><button class="btn" id="demoBtn">Load demo</button></div>
   <label class="fld">Client<select id="clientSel"></select></label>
   <label class="fld">Period<select id="periodSel"></select></label>
   <label class="fld" id="fromWrap" style="display:none">From<input type="date" id="fromDate"></label>
@@ -1253,7 +1238,6 @@ $("printBtn").addEventListener("click",()=>window.print());
 $("custBtn").addEventListener("click",()=>$("custPanel").classList.toggle("open"));
 $("exportBtn").addEventListener("click",doExport);
 $("shareBtn").addEventListener("click",makeShareLink);
-document.querySelectorAll("[data-jump]").forEach(btn=>btn.addEventListener("click",()=>{const target=document.getElementById(btn.dataset.jump);if(target){document.querySelectorAll("[data-jump]").forEach(b=>b.classList.toggle("active",b===btn));target.scrollIntoView({behavior:"smooth",block:"start"});}}));
 $("fileIn").addEventListener("change",function(){const files=[...this.files];if(!files.length)return;let done=0;files.forEach(f=>{const r=new FileReader();r.onload=e=>{ingest(e.target.result);done++;if(done===files.length){refreshAll();}};r.readAsText(f);});this.value="";});
 $("demoBtn").addEventListener("click",()=>{resetData();ingest(DEMO_ACC);ingest(DEMO_CON);refreshAll();});
 
