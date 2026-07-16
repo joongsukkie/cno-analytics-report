@@ -19,7 +19,7 @@ This checklist records what the report supports and what the operator does each 
 - [x] Branded wax-seal envelope and letter introduction.
 - [x] Paid/boosted data: spend, paid reach/impressions, cost per click, cost per thousand, cost per follower, and return on ad spend when inputs are available.
 - [x] Full uploaded dataset is available as a spreadsheet at the bottom and can be downloaded in normalized form.
-- [x] Visualization-first success scorecard covering authority, audience quality, campaign momentum, and business growth.
+- [x] Visualization-first success scorecard covering authority, audience quality, campaign momentum, and business growth, with optional per-metric monthly targets and progress-to-goal bars (`<metric>_target` columns).
 - [x] Formula-matched platform benchmark context, with warnings against blending platforms or mismatching engagement-rate denominators; client-specific peer norms can replace the reference.
 - [x] CNO website styling—including top navigation, typography, color, fine rules, editorial layouts, and “Hand it over” upload action.
 

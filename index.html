@@ -17,9 +17,15 @@
   *{box-sizing:border-box}
   body{margin:0;font-family:var(--sans);color:var(--ink);background:var(--page);line-height:1.55;font-weight:400}
   /* quiet seal masthead + aligned report controls */
-  .sitebar{height:80px;background:var(--cream);border-top:3px solid var(--ink);border-bottom:1px solid rgba(153,97,55,.12);display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:30}
-  .sitebar .stamp{display:block;line-height:0}.sitebar .stamp img{display:block;width:56px;height:56px;object-fit:contain}
-  .toolbar{background:#fff;color:var(--ink);padding:12px 24px;display:flex;flex-wrap:nowrap;gap:10px;align-items:flex-end;border-bottom:1px solid var(--sand);position:sticky;top:80px;z-index:25;box-shadow:0 8px 24px rgba(42,31,18,.045)}
+  .sitebar{height:104px;background:var(--cream);border-top:3px solid var(--ink);border-bottom:1px solid rgba(153,97,55,.12);display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 max(28px,calc((100vw - 1180px)/2));position:sticky;top:0;z-index:30}
+  .sitebar .brandwrap{display:flex;align-items:center;gap:20px;min-width:0}
+  .sitebar .stamp{display:block;line-height:0;flex:none;transition:transform .18s}.sitebar .stamp:hover{transform:scale(1.04)}.sitebar .stamp img{display:block;width:84px;height:84px;object-fit:contain}
+  .mhid{display:flex;flex-direction:column;gap:3px;min-width:0;border-left:1px solid rgba(153,97,55,.22);padding-left:20px}
+  .mhid .k{font-family:var(--sans);font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--burnt);font-weight:600}
+  .mhid .t{font-family:var(--serif);font-size:27px;font-weight:400;line-height:1.04;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+  .mhid .m{font-family:var(--sans);font-size:11px;letter-spacing:.02em;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sitebar .mhtag{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--burnt);white-space:nowrap;flex:none}
+  .toolbar{background:#fff;color:var(--ink);padding:12px 24px;display:flex;flex-wrap:nowrap;gap:10px;align-items:flex-end;border-bottom:1px solid var(--sand);position:sticky;top:104px;z-index:25;box-shadow:0 8px 24px rgba(42,31,18,.045)}
   .toolbar .fld{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:flex;flex-direction:column;gap:3px}
   .toolbar select,.toolbar input[type=date]{font-family:var(--sans);font-size:13px;height:38px;padding:5px 9px;border-radius:7px;border:1px solid var(--sand);background:#fff;color:var(--ink)}
   .btn{font-family:var(--sans);font-size:11px;letter-spacing:.07em;text-transform:uppercase;padding:7px 13px;border-radius:7px;border:1px solid var(--terra);background:#fff;color:var(--burnt);cursor:pointer;transition:.15s;font-weight:500}
@@ -196,6 +202,13 @@
   .goalmetric .gm-change{grid-column:1/-1;font-size:10px;color:var(--ink-soft)}
   .goalmetric.missing .gm-value{font-family:var(--sans);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#aa9f94}
   .goalmetric>b{font-family:var(--serif);font-size:18px;font-weight:400;text-align:right}.goalmetric>b small{font-family:var(--sans);font-size:9px;margin-left:5px}.goalmetric .missing{font-family:var(--sans);font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:#aa9f94}
+  .goalmetric>b small.pos{color:#5c7150}.goalmetric>b small.neg{color:#b0574a}
+  .goalbar{grid-column:1/-1;margin-top:7px}
+  .gtrack{height:5px;border-radius:3px;background:rgba(153,97,55,.16);overflow:hidden}
+  .gfill{height:100%;border-radius:3px;background:var(--terra);transition:width .5s ease}
+  .gfill.hit{background:var(--sage)}
+  .gcap{display:flex;justify-content:space-between;gap:8px;margin-top:4px;font-family:var(--sans);font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+  .gcap .hitlabel{color:#5c7150;font-weight:700}
   .vizgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
   .vizcard{border:1px solid var(--sand);padding:20px;background:#fff;min-width:0}
   .vizcard h4{font-family:var(--serif);font-weight:400;font-size:23px;margin:0 0 4px}
@@ -244,8 +257,8 @@
   @keyframes lSealAway{50%{transform:translate(-50%,-58%) scale(1.12) rotate(8deg);opacity:1}100%{transform:translate(-50%,-190%) scale(.45) rotate(24deg);opacity:0}}
   @keyframes lFade{from{opacity:0}to{opacity:1}}
   @keyframes lOut{to{opacity:0;visibility:hidden}}
-  @media(max-width:900px){.goalgrid{grid-template-columns:1fr 1fr}.goalcard:nth-child(2){border-right:0}.goalcard:nth-child(-n+2){border-bottom:1px solid var(--sand)}.vizgrid{grid-template-columns:1fr}.toolbar{overflow-x:auto}}
-  @media(max-width:660px){.sitebar{height:68px}.sitebar .stamp img{width:48px;height:48px}.toolbar{top:68px;padding:10px 14px}.control-title{display:none}.goalgrid{grid-template-columns:1fr}.goalcard{border-right:0;border-bottom:1px solid var(--sand)}.rhead .cli{font-size:42px}section{padding:28px 24px}}
+  @media(max-width:900px){.goalgrid{grid-template-columns:1fr 1fr}.goalcard:nth-child(2){border-right:0}.goalcard:nth-child(-n+2){border-bottom:1px solid var(--sand)}.vizgrid{grid-template-columns:1fr}.toolbar{overflow-x:auto}.sitebar .mhtag{display:none}}
+  @media(max-width:660px){.sitebar{height:84px;padding:0 16px}.sitebar .stamp img{width:64px;height:64px}.sitebar .brandwrap{gap:14px}.mhid{padding-left:14px}.mhid .k{display:none}.mhid .t{font-size:21px;max-width:56vw}.toolbar{top:84px;padding:10px 14px}.control-title{display:none}.goalgrid{grid-template-columns:1fr}.goalcard{border-right:0;border-bottom:1px solid var(--sand)}.rhead .cli{font-size:42px}section{padding:28px 24px}}
   @media print{.sitebar,.toolbar,.panel,#letterOverlay{display:none!important} body{background:#fff} .wrap{margin:0;max-width:none;padding:0} .report{box-shadow:none;border-radius:0;border:none} section{break-inside:avoid} .ed[contenteditable]{background:none!important;box-shadow:none!important}}
 </style>
 </head>
@@ -261,9 +274,18 @@
   </div>
   <div class="letterCard" id="letterCard"></div>
 </div>
-<header class="sitebar"><a class="stamp" href="https://cnocreative.co/" target="_blank" rel="noopener"><img src="cno-seal.png" alt="CNO Creative Co"></a></header>
+<header class="sitebar">
+  <div class="brandwrap">
+    <a class="stamp" href="https://cnocreative.co/" target="_blank" rel="noopener"><img src="cno-seal.png" alt="CNO Creative Co"></a>
+    <div class="mhid">
+      <div class="k">CNO Creative Co · Monthly Analytics Report</div>
+      <div class="t" id="mhClient">Monthly Analytics Report</div>
+      <div class="m" id="mhPeriod">Upload a CSV or load the demo to begin</div>
+    </div>
+  </div>
+  <div class="mhtag">Hand it over. We'll handle it.</div>
+</header>
 <div class="toolbar">
-  <div class="control-title"><span>Report</span><strong>Monthly report</strong></div>
   <div class="action-fld"><span>Data</span><label class="btn file">Upload CSV(s)<input type="file" id="fileIn" accept=".csv" multiple></label></div>
   <div class="action-fld"><span>Sample</span><button class="btn" id="demoBtn">Load demo</button></div>
   <label class="fld">Client<select id="clientSel"></select></label>
@@ -507,11 +529,12 @@ function classify(rows){
         event_reach:num(r.event_reach),event_engagement:num(r.event_engagement),event_registrations:num(r.event_registrations),event_attendees:num(r.event_attendees),
         conversions:num(r.conversions),paid_reach:num(r.paid_reach),paid_impressions:num(r.paid_impressions),organic_reach:num(r.organic_reach),organic_impressions:num(r.organic_impressions),
         clicks:num(r.clicks),video_completions:num(r.video_completions),spend:num(r.spend),
-        top_age_group:r.top_age_group||"",top_gender:r.top_gender||"",top_countries:r.top_countries||"",top_cities:r.top_cities||"",industry:r.industry||"",raw:r._raw});
+        top_age_group:r.top_age_group||"",top_gender:r.top_gender||"",top_countries:r.top_countries||"",top_cities:r.top_cities||"",industry:r.industry||"",targets:collectTargets(r),raw:r._raw});
     }
   });
   return {posts,periods};
 }
+function collectTargets(r){const t={};for(const k in r){if(k==="_raw")continue;if(/target$/.test(k)){const base=k.slice(0,-6),v=num(r[k]);if(v!==null&&v!==undefined)t[base]=v;}}return t;}
 function ingest(text){const {posts,periods}=classify(parseCSV(text));POSTS=POSTS.concat(posts);PERIODS=PERIODS.concat(periods);}
 function resetData(){POSTS=[];PERIODS=[];}
 
@@ -586,6 +609,12 @@ function windowMetrics(c,from,to){
   m.roas=(m.revenue!==null&&m.spend)?m.revenue/m.spend:null;
   m.click_through_rate=(m.clicks!==null&&m.impressions)?m.clicks/m.impressions:null;
   m.video_completion_rate=(m.video_completions!==null&&m.views)?m.video_completions/m.views:null;
+  // ---- Optional monthly targets (from <metric>_target columns). Flow metrics sum across the window; rate metrics average. ----
+  const RATEKEYS=new Set(["followergrowthrate","er","roas","profiletoclick","eventconversion","clickthroughrate"]);
+  const tacc={};
+  perIn.forEach(p=>{if(!p.targets)return;for(const bk in p.targets){const v=p.targets[bk];if(v===null||v===undefined)continue;(tacc[bk]=tacc[bk]||[]).push(v);}});
+  m._targets={};
+  for(const bk in tacc){const vals=tacc[bk];m._targets[bk]=RATEKEYS.has(bk)?vals.reduce((a,b)=>a+b,0)/vals.length:vals.reduce((a,b)=>a+b,0);}
   return m;
 }
 function prevRange(from,to){const len=daysBetween(from,to)+1;return{from:addDays(from,-len),to:addDays(from,-1)};}
@@ -867,7 +896,14 @@ function goalMetricRow(cur,prev,key){
   const M=METRICS[key],v=cur[key],pv=prev?prev[key]:null;
   const value=(v===null||v===undefined)?'<span class="missing">Add data</span>':M.fmt(v);
   let delta="";if(v!==null&&v!==undefined&&pv!==null&&pv!==undefined&&!M.snapshot){const d=chg(v,pv);if(d!==null)delta=`<small class="${d>=0?"pos":"neg"}">${d>=0?"↑":"↓"} ${pct(Math.abs(d),0)}</small>`;}
-  return `<div class="goalmetric"><span>${M.label}</span><b>${value}${delta}</b></div>`;
+  const tkey=key.replace(/[^a-z0-9]/gi,"").toLowerCase();
+  const target=cur._targets?cur._targets[tkey]:undefined;
+  let bar="";
+  if(v!==null&&v!==undefined&&target!==undefined&&target>0){
+    const ratio=v/target,w=Math.max(3,Math.min(100,ratio*100)),hit=ratio>=1;
+    bar=`<div class="goalbar"><div class="gtrack"><div class="gfill${hit?" hit":""}" style="width:${w}%"></div></div><div class="gcap"><span class="${hit?"hitlabel":""}">${hit?"Goal met · ":""}${Math.round(ratio*100)}% of goal</span><span>Target ${M.fmt(target)}</span></div></div>`;
+  }
+  return `<div class="goalmetric"><span>${M.label}</span><b>${value}${delta}</b>${bar}</div>`;
 }
 function goalsHtml(cur,prev){
   const goals=[
@@ -876,7 +912,7 @@ function goalsHtml(cur,prev){
     ["03","Position for What’s Next","Track whether campaign and event content creates momentum and action.",["event_reach","event_engagement","event_registrations","event_attendees","event_conversion"]],
     ["04","Drive Business Growth","Connect social presence to inquiries, bookings, memberships, sales, and revenue.",["leads","bookings","membership_signups","retail_sales","revenue"]]
   ];
-  return `<div class="goalgrid">${goals.map((g,i)=>`<article class="goalcard"><div class="goalnum">${g[0]}</div><h3>${g[1]}</h3><p>${g[2]}</p><div class="goaltrack">We’ll track</div>${g[3].map(k=>goalMetricRow(cur,prev,k)).join("")}</article>`).join("")}</div><div class="note">Goals are a flexible measurement framework. “Add data” means the selected exports do not contain that business outcome yet; it can be supplied in the same CSV from a booking, CRM, event, or sales export.</div>`;
+  return `<div class="goalgrid">${goals.map((g,i)=>`<article class="goalcard"><div class="goalnum">${g[0]}</div><h3>${g[1]}</h3><p>${g[2]}</p><div class="goaltrack">We’ll track</div>${g[3].map(k=>goalMetricRow(cur,prev,k)).join("")}</article>`).join("")}</div><div class="note">Goals are a flexible measurement framework. “Add data” means the selected exports do not contain that business outcome yet; it can be supplied in the same CSV from a booking, CRM, event, or sales export. Progress bars appear when a monthly goal is set for a metric — add a <b>&lt;metric&gt;_target</b> column (e.g. <b>reach_target</b>, <b>bookings_target</b>) to the account CSV.</div>`;
 }
 function horizontalBars(rows,valueKey,formatter=fmtInt){const max=Math.max(1,...rows.map(r=>r[valueKey]||0));return `<div class="hbars">${rows.map(r=>`<div class="hbarrow"><span>${r.name}</span><div class="track"><div class="fill" style="width:${Math.max(2,(r[valueKey]||0)/max*100)}%"></div></div><span class="hv">${formatter(r[valueKey])}</span></div>`).join("")}</div>`;}
 function performanceBoard(c,cur,from,to){
@@ -917,6 +953,7 @@ function render(){
   const A=analyze(c,cur,prev,from,to);
   const goal=cget("goal","balanced");
   const nameShow=cget("name","")||c;
+  if($("mhClient")){$("mhClient").textContent=nameShow;$("mhPeriod").textContent=`${label} · ${dateSpan}`;}
   const platsUsed=[...selectedPlats(c)];
   CTX=c+"|"+label+"|"+platsUsed.join("+");
   const multiPlat=platsUsed.length>1;
@@ -1242,13 +1279,13 @@ $("fileIn").addEventListener("change",function(){const files=[...this.files];if(
 $("demoBtn").addEventListener("click",()=>{resetData();ingest(DEMO_ACC);ingest(DEMO_CON);refreshAll();});
 
 /* ==================== demo (fictional) ==================== */
-const DEMO_ACC=`client,platform,month,followers_total,followers_growth,reach,impressions,engagement,views,profile_views,link_clicks,dms,meaningful_comments,comment_replies,leads,bookings,membership_signups,retail_sales,revenue,event_reach,event_engagement,event_registrations,event_attendees,conversions,paid_reach,paid_impressions,organic_reach,organic_impressions,spend,posts,top_age_group,top_gender,top_countries,top_cities
-Example Brand,instagram,2026-04,2400,-8,1900,6100,180,5200,150,22,9,6,5,4,2,1,3,285,0,0,0,0,2,0,0,1900,6100,0,2,,,,
-Example Brand,instagram,2026-05,2422,22,2600,9400,330,8100,205,31,14,10,8,6,3,2,4,460,580,72,18,13,3,0,0,2600,9400,0,2,,,,
-Example Brand,instagram,2026-06,2483,61,4700,18100,880,15400,390,58,26,21,17,14,8,4,9,1125,2100,310,62,48,8,1600,7200,3100,10900,145,4,25-34,F,United States|Canada|United Kingdom,Portland|Seattle
-Example Brand,tiktok,2026-04,540,3,2200,3900,120,3400,45,7,2,3,0,1,0,0,0,0,0,0,0,0,0,0,0,2200,3900,0,1,,,,
-Example Brand,tiktok,2026-05,547,7,720,1100,35,900,18,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,720,1100,0,1,,,,
-Example Brand,tiktok,2026-06,587,40,4100,6900,210,6100,95,15,6,8,2,4,1,0,2,190,880,86,21,15,1,900,1800,3200,5100,36,1,18-24,F,United States|Canada,`;
+const DEMO_ACC=`client,platform,month,followers_total,followers_growth,reach,impressions,engagement,views,profile_views,link_clicks,dms,meaningful_comments,comment_replies,leads,bookings,membership_signups,retail_sales,revenue,event_reach,event_engagement,event_registrations,event_attendees,conversions,paid_reach,paid_impressions,organic_reach,organic_impressions,spend,posts,top_age_group,top_gender,top_countries,top_cities,reach_target,profile_views_target,link_clicks_target,followers_growth_target,event_registrations_target,event_attendees_target,bookings_target,revenue_target
+Example Brand,instagram,2026-04,2400,-8,1900,6100,180,5200,150,22,9,6,5,4,2,1,3,285,0,0,0,0,2,0,0,1900,6100,0,2,,,,,,,,,,,,
+Example Brand,instagram,2026-05,2422,22,2600,9400,330,8100,205,31,14,10,8,6,3,2,4,460,580,72,18,13,3,0,0,2600,9400,0,2,,,,,3000,200,40,25,20,15,4,600
+Example Brand,instagram,2026-06,2483,61,4700,18100,880,15400,390,58,26,21,17,14,8,4,9,1125,2100,310,62,48,8,1600,7200,3100,10900,145,4,25-34,F,United States|Canada|United Kingdom,Portland|Seattle,5000,350,75,50,60,55,10,1500
+Example Brand,tiktok,2026-04,540,3,2200,3900,120,3400,45,7,2,3,0,1,0,0,0,0,0,0,0,0,0,0,0,2200,3900,0,1,,,,,,,,,,,,
+Example Brand,tiktok,2026-05,547,7,720,1100,35,900,18,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,720,1100,0,1,,,,,,,,,,,,
+Example Brand,tiktok,2026-06,587,40,4100,6900,210,6100,95,15,6,8,2,4,1,0,2,190,880,86,21,15,1,900,1800,3200,5100,36,1,18-24,F,United States|Canada,,4000,100,20,30,20,18,2,300`;
 const DEMO_CON=`client,platform,month,date,post_type,engagement,reach,views,likes,comments,shares,saves,follows,hashtag_count,caption_length,caption_snippet,campaign,pillar
 Example Brand,instagram,2026-04,2026-04-05,CAROUSEL,58,720,1400,48,4,4,2,1,5,410,"Small habits that compound over a season.",,Education
 Example Brand,instagram,2026-04,2026-04-18,IMAGE,40,480,900,36,2,1,1,0,3,150,"A quiet studio afternoon.",,Behind the scenes

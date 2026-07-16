@@ -41,6 +41,9 @@ Unrecognized columns are ignored, not fatal. Missing metrics just hide their car
 - **Account-level file:** `client, platform, month` + at least one of `reach / followers / engagement`.
 - **Post-level file:** `client, platform, date, post_type` + any per-post metrics.
 
+## Optional: monthly goals (targets)
+The **Client goals & success metrics** scorecard can show a progress bar for any metric once you give it a monthly target. Add a column named `<metric>_target` to the **account-level** file — e.g. `reach_target`, `profile_views_target`, `link_clicks_target`, `followers_growth_target`, `event_registrations_target`, `bookings_target`, `revenue_target`. Each row's target applies to that account/period; across a multi-month window, flow targets (reach, leads, revenue…) sum and rate targets average. Leave a cell blank for no target — the row simply shows the value and its change instead of a bar.
+
 ## A note on Rella's follower count
 Rella returns the **current** follower total regardless of the date range, so follower *trends* are computed from monthly **growth**, not by differencing the total. The tool handles this for you.
 
