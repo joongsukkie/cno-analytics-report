@@ -21,7 +21,12 @@ This checklist records what the report supports and what the operator does each 
 - [x] Full uploaded dataset is available as a spreadsheet at the bottom and can be downloaded in normalized form.
 - [x] Visualization-first success scorecard covering authority, audience quality, campaign momentum, and business growth, with optional per-metric monthly targets and progress-to-goal bars (`<metric>_target` columns).
 - [x] Formula-matched platform benchmark context, with warnings against blending platforms or mismatching engagement-rate denominators; client-specific peer norms can replace the reference.
-- [x] CNO website styling—including top navigation, typography, color, fine rules, editorial layouts, and “Hand it over” upload action.
+- [x] CNO website styling—including typography, color, fine rules, editorial layouts, and “Hand it over” upload action.
+- [x] Report leads with the story and the client's goals (the summarized, plain-language view) before the detailed data.
+- [x] Optional AI narrative: paste an OpenAI or Anthropic API key to rewrite the opening letter and takeaways from the client's real numbers, in a veteran-analyst voice, no em dashes. Key stays in the browser only and never travels in a share link.
+- [x] Shared links are scoped to a single client's data and open view-only (no uploading, switching clients, editing, or export), so one client can never see another's results even if a password is mishandled.
+- [x] Installable, offline-capable app (PWA): add to home screen or install on Mac/Windows/phone, and bookmark to return anytime.
+- [x] Expanded paid vs. organic section: reach and impressions splits, paid share of reach, and an optional AI read on spend.
 
 ## Monthly refresh workflow
 

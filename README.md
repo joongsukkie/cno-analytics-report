@@ -25,10 +25,20 @@ Most social tools show isolated platform numbers. This one turns them into a **v
 - **Effort vs. return per platform** — posts published against what they actually earned; flags dead channels
 
 **Story-first and yours to shape.**
-- A headline plus **Working Now / Needs Attention / Best Next Move**, every claim grounded in the numbers
+- The report **opens with the story and the client's goals**, then the numbers. A warm opening letter, a headline, and **Working Now / Needs Attention / Best Next Move**, every claim grounded in the data.
 - **Customize** panel: report goal (reorders/emphasizes KPIs), featured-KPI picker, section toggles, client display name — remembered across visits
 - **Every summary, finding, and recommendation is editable inline** and prints as edited
-- Deterministic: identical input always yields the identical report
+- Deterministic by default: identical input always yields the identical report
+
+**Optional AI narrative (bring your own key).**
+- Paste an **OpenAI or Anthropic API key** in Customize and the opening letter and takeaways are rewritten from *this client's actual numbers* in the voice of a veteran analyst who can tell a story. No em dashes, no template filler.
+- The key is stored **only in your browser**. It is never uploaded and never included in a share link. The client sees only the finished words, which stay fully editable.
+
+**Private, view-only sharing.**
+- A share link contains **only the one client's data** — never anyone else's — and opens as a **locked, view-only report**: no uploading, no client switching, no editing, no export. This holds even without a password, so one client can never reach another's results.
+
+**Installable and offline.**
+- It is a **PWA**: add it to the home screen or install it as an app on Mac, Windows, or phone, and it keeps working offline. Bookmark it and come back anytime.
 
 ## Usage
 
@@ -64,10 +74,11 @@ Static site, no build. On [Render](https://render.com): connect the repo, choose
 |------|---------|
 | `index.html` | The generator (the whole app) |
 | `fonts.css` + `resources/*.woff2` | CNO website typography (Cormorant Garamond and DM Sans), with offline fallbacks |
-| `cno-logo.png` | CNO lockup used in the report header/footer |
+| `cno-logo.png` / `cno-seal.png` | CNO lockup and wax seal used in the report and the opening letter |
+| `manifest.webmanifest` + `sw.js` + `icon-*.png` | Installable/offline PWA support |
 | `resources/brand-style.md` | Official brand palette, type, and voice |
 | `01_METRICS_DICTIONARY.md` | Every metric and its exact formula |
-| `06_CSV_SCHEMA.md` | The CSV contract |
+| `06_CSV_SCHEMA.md` | The CSV contract (including optional `<metric>_target` goal columns) |
 
 ## Brand
 

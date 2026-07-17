@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CNO Creative Co — Monthly Analytics Report</title>
+<meta name="description" content="Turn social exports into a branded, client-ready analytics report. Works offline.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#a05f34">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="CNO Reports">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="stylesheet" href="fonts.css">
 <style>
   :root{
@@ -36,6 +45,14 @@
   .btn.file input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
   .toolbar .btn{height:38px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.toolbar .spacer{flex:1}
   .control-title,.action-fld{display:flex;flex-direction:column;gap:3px;flex:none}.control-title>span,.action-fld>span{font-size:9.5px;line-height:1.55;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}.control-title>strong{height:38px;display:flex;align-items:center;font-family:var(--serif);font-size:20px;line-height:1;font-weight:400;white-space:nowrap;padding-right:6px}
+  /* view-lock: a shared report is read-only and shows only its one client */
+  body.view-lock .action-fld,
+  body.view-lock #custBtn,
+  body.view-lock #shareBtn,
+  body.view-lock #exportBtn,
+  body.view-lock #installBtn,
+  body.view-lock label.fld:has(#clientSel){display:none!important}
+  body.view-lock .toolbar::before{content:"Client report · view only";font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--burnt);font-weight:600;align-self:center}
   /* customize panel */
   .panel{background:var(--cream);border-bottom:1px solid var(--sand);padding:16px 22px;display:none}
   .panel.open{display:block}
@@ -46,6 +63,21 @@
   .panel .chk{display:flex;align-items:center;gap:7px;font-size:13px;margin-bottom:5px;cursor:pointer}
   .panel .chk input{accent-color:var(--burnt)}
   .panel select,.panel input[type=text]{font-family:var(--sans);font-size:13px;padding:6px 8px;border-radius:7px;border:1px solid var(--sand);background:#fff;color:var(--ink);width:100%}
+  /* AI narrative box */
+  .aibox{margin-top:16px;padding:15px 16px;border:1px solid var(--terra-soft);border-radius:12px;background:linear-gradient(180deg,rgba(219,155,127,.08),rgba(255,255,255,0))}
+  .ailab{font-family:var(--serif);font-size:15px;color:var(--burnt);font-weight:500}
+  .ailab span{font-family:var(--sans);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);border:1px solid var(--sand);border-radius:20px;padding:1px 7px;margin-left:6px;vertical-align:middle}
+  .aidesc{font-size:11.5px;line-height:1.5;color:var(--ink-soft);margin:6px 0 11px;max-width:80ch}
+  .airow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .airow select{width:auto;min-width:150px}
+  .airow input[type=password]{font-family:var(--sans);font-size:13px;padding:6px 8px;border-radius:7px;border:1px solid var(--sand);background:#fff;color:var(--ink);flex:1;min-width:200px}
+  .airow #aiModel{width:150px;flex:none}
+  .airow .btn{white-space:nowrap}
+  .aistatus{display:none;margin-top:9px;font-size:12px;line-height:1.5;color:var(--ink-soft)}
+  .aistatus.show{display:block}
+  .aistatus.busy{color:var(--burnt)}
+  .aistatus.busy::before{content:"";display:inline-block;width:11px;height:11px;margin-right:7px;border:2px solid var(--terra-soft);border-top-color:var(--burnt);border-radius:50%;vertical-align:-1px;animation:aispin .8s linear infinite}
+  @keyframes aispin{to{transform:rotate(360deg)}}
   .wrap{max-width:1120px;margin:28px auto;padding:0 22px 80px}
   .report{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(60,40,20,.08);border:1px solid var(--sand)}
   /* editorial accents */
@@ -70,7 +102,10 @@
   .sec-label{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--burnt);font-weight:500;margin-bottom:7px}
   .sec-sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:20px;max-width:70ch}
   /* story */
+  .letterlead{font-family:var(--serif);font-size:20px;line-height:1.62;color:var(--ink);max-width:60ch;margin:6px 0 22px}
+  .letterlead b{font-weight:600}
   .headline{font-family:var(--serif);font-size:29px;line-height:1.34;font-weight:400;margin:4px 0 24px;letter-spacing:-.012em;max-width:34ch}
+  .aibadge{display:inline-block;margin-left:10px;font-family:var(--sans);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--burnt);border:1px solid var(--terra-soft);border-radius:20px;padding:2px 9px;vertical-align:middle;font-weight:600}
   .storycols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
   .storycol h4{display:flex;align-items:center;gap:8px;margin:0 0 4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:500}
   .storycol h4 .ic{width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:13px}
@@ -295,6 +330,7 @@
   <label class="fld">Chart detail<select id="grainSel"><option value="day">Daily</option><option value="week">Weekly</option><option value="month">Monthly</option></select></label>
   <span class="fld">Platforms<span class="chips" id="platChips"></span></span>
   <div class="spacer"></div>
+  <button class="btn" id="installBtn" style="display:none">⤓ Install app</button>
   <button class="btn" id="custBtn">Customize</button>
   <button class="btn" id="shareBtn">Share link</button>
   <button class="btn" id="exportBtn">Export data</button>
@@ -329,6 +365,20 @@
       <div class="lab">Sections to show</div>
       <div id="sectionChecks"></div>
     </div>
+  </div>
+  <div class="aibox">
+    <div class="ailab">✦ AI narrative <span>optional</span></div>
+    <div class="aidesc">Write the opening letter and takeaways with AI, grounded in this exact client's numbers, in the voice of a veteran analyst who can actually tell a story. Your API key is stored only in this browser. It is never uploaded and never baked into a share link. The client sees only the finished words.</div>
+    <div class="airow">
+      <select id="aiProvider">
+        <option value="anthropic">Claude (Anthropic)</option>
+        <option value="openai">OpenAI</option>
+      </select>
+      <input type="password" id="aiKey" placeholder="Your API key (stored in this browser)" autocomplete="off" spellcheck="false">
+      <input type="text" id="aiModel" placeholder="model" spellcheck="false">
+      <button class="btn solid" id="aiRun">Write with AI</button>
+    </div>
+    <div class="aistatus" id="aiStatus"></div>
   </div>
   <div style="margin-top:14px;display:flex;gap:10px">
     <button class="btn" id="resetTextBtn">Reset edited text</button>
@@ -452,7 +502,20 @@ function normalizedBundle(){
   const con=toCSV(POSTS.map(p=>({client:p.client,platform:p.platform,date:ymd(p.date),post_type:p.type,campaign:p.campaign,campaign_phase:p.campaign_phase,pillar:p.pillar,engagement:p.engagement,reach:p.reach,impressions:p.impressions,views:p.views,likes:p.likes,comments:p.comments,meaningful_comments:p.meaningful_comments,shares:p.shares,saves:p.saves,follows:p.follows,clicks:p.clicks,video_completions:p.video_completions,spend:p.spend,hashtag_count:p.tags,caption_length:p.len,caption_snippet:p.snippet})));
   return {acc,con};
 }
-function buildBundle(){const norm=normalizedBundle();return {acc:PERIODS.length?toCSV(PERIODS.map(p=>p.raw||p)):norm.acc,con:POSTS.length?toCSV(POSTS.map(p=>p.raw||p)):norm.con};}
+function buildBundle(clientOnly){
+  const pers=clientOnly?PERIODS.filter(p=>p.client===clientOnly):PERIODS;
+  const pos=clientOnly?POSTS.filter(p=>p.client===clientOnly):POSTS;
+  return {acc:pers.length?toCSV(pers.map(p=>p.raw||p)):"", con:pos.length?toCSV(pos.map(p=>p.raw||p)):""};
+}
+function scopedByClient(store,client){const o={};Object.keys(store).forEach(k=>{if(k.indexOf(client+"|")===0)o[k]=store[k];});return o;}
+/* Lock a shared report to view-only: recipient sees ONE client, cannot upload/switch/export/customize. */
+function applyViewLock(client){
+  VIEW_LOCK=true;
+  document.body.classList.add("view-lock");
+  const fi=$("fileIn");if(fi){fi.disabled=true;fi.value="";}
+  const cs=$("clientSel");if(cs)cs.disabled=true;
+  const ib=$("installBtn");if(ib)ib.style.display="none";
+}
 function doExport(){if(!POSTS.length&&!PERIODS.length){alert("Load data first.");return;}const {acc,con}=normalizedBundle();if(PERIODS.length)download("accounts_normalized.csv",acc);if(POSTS.length)setTimeout(()=>download("content_normalized.csv",con),300);}
 async function gzB64(str){const cs=new CompressionStream("gzip");const stream=new Blob([str]).stream().pipeThrough(cs);const buf=new Uint8Array(await new Response(stream).arrayBuffer());let bin="";for(let i=0;i<buf.length;i++)bin+=String.fromCharCode(buf[i]);return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
 async function gunzB64(b64){b64=b64.replace(/-/g,"+").replace(/_/g,"/");while(b64.length%4)b64+="=";const bin=atob(b64);const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);const ds=new DecompressionStream("gzip");const stream=new Blob([bytes]).stream().pipeThrough(ds);return await new Response(stream).text();}
@@ -464,9 +527,14 @@ async function encryptStr(str,pw){const salt=crypto.getRandomValues(new Uint8Arr
 async function decryptStr(payload,pw){const parts=payload.split(".");const key=await pwKey(pw,unb64uBytes(parts[0]));const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:unb64uBytes(parts[1])},key,unb64uBytes(parts[2]));return new TextDecoder().decode(pt);}
 async function makeShareLink(){
   if(!POSTS.length&&!PERIODS.length){alert("Load data first, then create a share link.");return;}
-  const {acc,con}=buildBundle();
-  let b64;try{b64=await gzB64(JSON.stringify({acc,con,cust:CUSTOM}));}catch(e){alert("This browser can't build a share link (compression unsupported). Use Export data instead.");return;}
-  const pw=prompt("Optional password for this link.\n\nLeave blank for an open link, or set a password so only people you give it to can open the report (each client gets their own link + password).","");
+  const client=(CURRENT&&CURRENT.client)||$("clientSel").value;
+  if(!client){alert("Pick a client first, then create their share link.");return;}
+  // Scope the link to THIS client only: their data, their edits, their AI narrative. Nobody else's.
+  const {acc,con}=buildBundle(client);
+  const edits=scopedByClient(EDITS,client);
+  const ai=scopedByClient(AINARR,client);
+  let b64;try{b64=await gzB64(JSON.stringify({acc,con,cust:CUSTOM,edits,ai,client,lock:true}));}catch(e){alert("This browser can't build a share link (compression unsupported). Use Export data instead.");return;}
+  const pw=prompt("Optional password for "+client+"'s link.\n\nThe link already contains ONLY "+client+"'s data and opens as a view-only report (no editing, no uploading, no other clients). A password adds a second lock on top.\n\nLeave blank for an open view-only link, or set a password.","");
   if(pw===null)return;
   let url;
   if(pw.trim()){
@@ -720,6 +788,10 @@ function cget(k,d){return CUSTOM[k]!==undefined?CUSTOM[k]:d;}
 let EDITS=loadEdits();
 function loadEdits(){try{return JSON.parse(localStorage.getItem(LSK+"_edits"))||{};}catch(e){return{};}}
 function saveEdits(){try{localStorage.setItem(LSK+"_edits",JSON.stringify(EDITS));}catch(e){}}
+/* AI-written narrative, keyed by the same client|period|platforms context as edits */
+let AINARR=loadAINarr();
+function loadAINarr(){try{return JSON.parse(localStorage.getItem(LSK+"_ai"))||{};}catch(e){return{};}}
+function saveAINarr(){try{localStorage.setItem(LSK+"_ai",JSON.stringify(AINARR));}catch(e){}}
 let CTX="";
 function ekey(eid){return CTX+"|"+eid;}
 function ed(eid,html){const cur=EDITS[ekey(eid)];const edited=cur!==undefined;return `<span class="ed${edited?" edited":""}" contenteditable="true" data-eid="${eid}">${edited?cur:html}</span>`;}
@@ -862,6 +934,104 @@ function headline(c,cur,prev,A){
   const p1=cap(parts[0]);
   return `${p1}, <span class="ac">${comp}</span>.`;
 }
+/* A warm, human opening for the report. Deterministic fallback when no AI narrative is generated. */
+function defaultLetterLead(c,cur,prev,A,label,nameShow,platsUsed,dateSpan){
+  const rC=A.rC,eC=A.eC;
+  const move=(rC!==null&&rC>0.15)?"more people saw the work this period":(rC!==null&&rC<-0.15)?"fewer people saw the work this period, and that is worth a closer look":"reach held roughly steady this period";
+  const eng=(eC!==null&&eC>0.15)?" and the people who found it leaned in more than before":(eC!==null&&eC<-0.15)?", though the response cooled a little from last period":"";
+  const fg=cur.followers_growth;
+  const aud=(fg!==null&&fg>0)?` The audience grew by ${fmtInt(fg)} this period.`:(fg!==null&&fg<0)?` The audience dipped by ${fmtInt(Math.abs(fg))}, so winning attention back is the near-term focus.`:"";
+  return `Here is your ${label} report for <b>${nameShow}</b>, covering ${dateSpan}. The short version is that ${move}${eng}.${aud} Below, the story of what happened, the goals it moves, and every number behind it. Read the top for the takeaways, and keep scrolling for the full detail.`;
+}
+
+/* ==================== AI narrative (optional, user-supplied API key) ==================== */
+const AI_SYSTEM=`You are the analyst and writer behind a monthly social media report for CNO Creative Co, a boutique marketing studio. You combine the rigor of a data scientist with thirty years of experience and the narrative instinct of the greatest storytellers, the kind who can make a single detail carry a whole scene. You are writing for a small business owner who is smart but is not a data person.
+
+How you work:
+- Ground every sentence in the numbers you are given. Never invent a metric, a cause, or an outcome that the data does not support.
+- Explain why things moved, not only what moved. Connect the movement to the client's stated goals.
+- Find the one or two things that actually matter this period and lead with them. Do not narrate every number.
+- Be warm, honest, and specific. Celebrate real wins by name. Name real problems plainly and kindly.
+- Write like a thoughtful person talking to someone they respect, not like a template or a chatbot. Use the client's name.
+- Never use em dashes. Use commas, periods, or the word and. Avoid buzzwords, hype, and hedging.
+- Keep the letter to three or four short paragraphs. Keep each takeaway to one or two sentences.
+
+Return ONLY a JSON object, no markdown fences, with exactly these keys:
+{"headline": "one vivid grounded sentence", "letter": "HTML, three or four short paragraphs separated by <br><br>", "working_now": [{"t":"short title","d":"one or two sentences"}], "needs_attention": [{"t":"short title","d":"one or two sentences"}], "best_move": {"t":"short imperative","d":"one or two sentences of why"}, "paid_takeaway": "one or two sentences on paid versus organic, or null if there was no ad spend"}`;
+
+function aiCfg(){try{return JSON.parse(localStorage.getItem("cno_ai_cfg"))||{};}catch(e){return{};}}
+function saveAICfg(cfg){try{localStorage.setItem("cno_ai_cfg",JSON.stringify(cfg));}catch(e){}}
+function aiDefaultModel(p){return p==="openai"?"gpt-4o":"claude-sonnet-5";}
+function aiSay(msg,busy){const el=$("aiStatus");if(el){el.textContent=msg||"";el.className="aistatus"+(busy?" busy":"")+(msg?" show":"");}}
+function pctChange(v,pv){if(v==null||pv==null||pv===0)return null;return +(((v-pv)/Math.abs(pv))*100).toFixed(1);}
+function buildAIContext(){
+  const c=CURRENT.client,from=CURRENT.from,to=CURRENT.to,label=CURRENT.label;
+  if(!c||!from)return null;
+  const cur=windowMetrics(c,from,to);
+  const pr=prevRange(from,to);const prev=windowMetrics(c,pr.from,pr.to);
+  const plats=[...new Set(cur._periods.map(p=>p.platform).concat(cur._posts.map(p=>p.platform)))];
+  const metrics={};
+  ["reach","impressions","views","engagement","profile_views","link_clicks","dms","followers_growth","followers_total","posts","shares","saves","comments","likes"].forEach(k=>{
+    if(cur[k]!=null){metrics[k]={value:cur[k],prev:(prev&&prev[k]!=null)?prev[k]:null,pct_change:pctChange(cur[k],prev?prev[k]:null)};}
+  });
+  const goals={};
+  ["reach","impressions","follower_growth_rate","profile_views","saves","link_clicks","meaningful_comments","dms","followers_growth","event_reach","event_registrations","event_attendees","leads","bookings","membership_signups","retail_sales","revenue"].forEach(k=>{
+    if(cur[k]!=null){const tk=k.replace(/[^a-z0-9]/gi,"").toLowerCase();const t=cur._targets?cur._targets[tk]:undefined;goals[k]={value:cur[k],target:(t!==undefined?t:null),pct_of_goal:(t?Math.round(cur[k]/t*100):null)};}
+  });
+  let paid=null;
+  if(cur.spend!=null&&cur.spend>0){paid={spend:cur.spend,paid_reach:cur.paid_reach,organic_reach:cur.organic_reach,paid_impressions:cur.paid_impressions,organic_impressions:cur.organic_impressions,roas:cur.roas,cost_per_click:cur.link_clicks?+(cur.spend/cur.link_clicks).toFixed(2):null};}
+  const top=cur._posts.slice().map(p=>({...p,_e:p.engagement!=null?p.engagement:(p.likes+p.comments+p.shares+p.saves)})).sort((a,b)=>b._e-a._e).slice(0,5).map(p=>({type:fmtName(p.type),reach:p.reach,engagement:p._e,caption:(p.snippet||"").slice(0,140)}));
+  let audience=null;const ar=cur._periods.filter(p=>p.top_age_group||p.top_countries||p.top_cities).slice(-1)[0];
+  if(ar)audience={top_age_group:ar.top_age_group,top_gender:ar.top_gender,top_countries:ar.top_countries,top_cities:ar.top_cities};
+  return {
+    client:cget("name","")||c, period:label,
+    date_range:`${MON[from.getUTCMonth()]} ${from.getUTCDate()} to ${MON[to.getUTCMonth()]} ${to.getUTCDate()}, ${to.getUTCFullYear()}`,
+    platforms:plats.map(plat), report_goal:cget("goal","balanced"),
+    has_prior_period:!!(prev&&(prev.reach!=null||prev.engagement!=null)),
+    engagement_rate_pct:cur.er!=null?+(cur.er*100).toFixed(1):null,
+    metrics, goals, paid_vs_organic:paid, top_posts:top, audience
+  };
+}
+function stripEmDash(s){return typeof s==="string"?s.replace(/\s*—\s*/g,", ").replace(/\s*–\s*/g,", ").replace(/--/g,", "):s;}
+function deepStrip(o){if(typeof o==="string")return stripEmDash(o);if(Array.isArray(o))return o.map(deepStrip);if(o&&typeof o==="object"){const r={};for(const k in o)r[k]=deepStrip(o[k]);return r;}return o;}
+function parseAIJSON(text){
+  if(!text)return null;
+  let t=String(text).trim().replace(/^```(json)?/i,"").replace(/```$/,"").trim();
+  const i=t.indexOf("{"),j=t.lastIndexOf("}");
+  if(i>=0&&j>i)t=t.slice(i,j+1);
+  try{return deepStrip(JSON.parse(t));}catch(e){return null;}
+}
+async function callAnthropic(key,model,sys,user){
+  const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:model,max_tokens:1800,system:sys,messages:[{role:"user",content:user}]})});
+  if(!res.ok)throw new Error("Anthropic "+res.status+": "+(await res.text()).slice(0,180));
+  const d=await res.json();return(d.content&&d.content[0]&&d.content[0].text)||"";
+}
+async function callOpenAI(key,model,sys,user){
+  const res=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"content-type":"application/json","authorization":"Bearer "+key},body:JSON.stringify({model:model,messages:[{role:"system",content:sys},{role:"user",content:user}],temperature:0.7,response_format:{type:"json_object"}})});
+  if(!res.ok)throw new Error("OpenAI "+res.status+": "+(await res.text()).slice(0,180));
+  const d=await res.json();return(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||"";
+}
+async function generateAINarrative(){
+  if(VIEW_LOCK)return;
+  if(!CURRENT.client){aiSay("Load data and pick a client first.");return;}
+  const provider=$("aiProvider").value,key=$("aiKey").value.trim();
+  let model=$("aiModel").value.trim()||aiDefaultModel(provider);
+  if(!key){aiSay("Enter your "+(provider==="openai"?"OpenAI":"Anthropic")+" API key first. It stays in this browser only.");return;}
+  saveAICfg({provider,model,key});
+  const ctx=buildAIContext();if(!ctx){aiSay("No data to analyze.");return;}
+  aiSay("Reading the data and writing the letter. This usually takes five to fifteen seconds...",true);
+  $("aiRun").disabled=true;
+  try{
+    const user="Analyze this reporting period and write the narrative. The data is below as JSON.\n\n"+JSON.stringify(ctx,null,1)+"\n\nReturn only the JSON object described in your instructions.";
+    const text=await(provider==="openai"?callOpenAI(key,model,AI_SYSTEM,user):callAnthropic(key,model,AI_SYSTEM,user));
+    const obj=parseAIJSON(text);
+    if(!obj||!obj.letter)throw new Error("the model did not return usable JSON. Try again, or try a different model.");
+    AINARR[CTX]=obj;saveAINarr();
+    render();
+    aiSay("Done. The story section is AI written and fully editable. Click any line to tweak it, then create the share link.");
+  }catch(e){aiSay("Could not generate: "+(e.message||e));}
+  finally{const b=$("aiRun");if(b)b.disabled=false;}
+}
 
 /* ==================== deeper analytics ==================== */
 const DOW=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
@@ -939,6 +1109,7 @@ function benchmarkHtml(cur,plats){
 
 /* ==================== render ==================== */
 let CURRENT={client:null,from:null,to:null,label:""};
+let VIEW_LOCK=false;   // true when opened from a shared link: recipient sees one client, view-only
 function render(){
   const c=$("clientSel").value; if(!c){$("report").innerHTML='<div class="empty">Upload a CSV to begin.</div>';return;}
   const range=currentRange(c); if(!range){$("report").innerHTML='<div class="empty">No data in the selected period.</div>';return;}
@@ -1078,15 +1249,25 @@ function render(){
     const cpm=(cur.paid_impressions||cur.impressions)?cur.spend/(cur.paid_impressions||cur.impressions)*1000:null;
     const cpc=cur.link_clicks?cur.spend/cur.link_clicks:null;
     const cpf=(cur.followers_growth&&cur.followers_growth>0)?cur.spend/cur.followers_growth:null;
-    const paidMix=(cur.paid_reach!==null&&cur.organic_reach!==null)?horizontalBars([{name:"Organic reach",value:cur.organic_reach},{name:"Paid reach",value:cur.paid_reach}],"value"):"";
+    const hasReachSplit=cur.paid_reach!==null&&cur.organic_reach!==null;
+    const hasImprSplit=cur.paid_impressions!==null&&cur.organic_impressions!==null;
+    const paidReachShare=hasReachSplit&&(cur.paid_reach+cur.organic_reach)>0?cur.paid_reach/(cur.paid_reach+cur.organic_reach):null;
+    const paidImprShare=hasImprSplit&&(cur.paid_impressions+cur.organic_impressions)>0?cur.paid_impressions/(cur.paid_impressions+cur.organic_impressions):null;
+    const reachMix=hasReachSplit?horizontalBars([{name:"Organic reach",value:cur.organic_reach},{name:"Paid reach",value:cur.paid_reach}],"value"):"";
+    const imprMix=hasImprSplit?horizontalBars([{name:"Organic impressions",value:cur.organic_impressions},{name:"Paid impressions",value:cur.paid_impressions}],"value"):"";
     paidHtml=`<div class="cardgrid">
       <div class="mcard"><div class="top">${ico("trending")} Spend</div><div class="val">$${fmtInt(cur.spend)}</div><div class="cdesc">boosted posts + ads this period</div></div>
       ${cpm!==null?`<div class="mcard"><div class="top">${ico("eye")} Cost per 1k impressions</div><div class="val">$${cpm.toFixed(2)}</div><div class="cdesc">spend ÷ paid impressions × 1,000</div></div>`:""}
       ${cpc!==null?`<div class="mcard"><div class="top">${ico("link")} Cost per click</div><div class="val">$${cpc.toFixed(2)}</div><div class="cdesc">spend ÷ website clicks</div></div>`:""}
       ${cpf!==null?`<div class="mcard"><div class="top">${ico("user-plus")} Cost per follower</div><div class="val">$${cpf.toFixed(2)}</div><div class="cdesc">spend ÷ net new followers</div></div>`:""}
+      ${paidReachShare!==null?`<div class="mcard"><div class="top">${ico("radio")} Paid share of reach</div><div class="val">${pct(paidReachShare,0)}</div><div class="cdesc">how much of total reach the spend bought</div></div>`:""}
       ${cur.roas!==null?`<div class="mcard"><div class="top">${ico("trending")} Return on ad spend</div><div class="val">${fmtX(cur.roas)}</div><div class="cdesc">attributed revenue ÷ spend</div></div>`:""}
-    </div>${paidMix?`<div class="vizcard" style="margin-top:18px"><div class="viztitle">Organic vs. paid reach</div><div class="vizsub">How much visibility came from content distribution versus media spend.</div>${paidMix}</div>`:""}
-    <div class="note">Organic and paid are blended in the totals above when spend ran this period. For boosted-post and dark-ad detail (per-ad results, audiences, placements), export from Ads Manager and upload it here — the columns are recognized automatically.</div>`;
+    </div>
+    ${(reachMix||imprMix)?`<div class="vizgrid" style="margin-top:18px">
+      ${reachMix?`<div class="vizcard"><div class="viztitle">Organic vs. paid reach</div><div class="vizsub">How many accounts you reached for free versus through spend.</div>${reachMix}</div>`:""}
+      ${imprMix?`<div class="vizcard"><div class="viztitle">Organic vs. paid impressions</div><div class="vizsub">Total views split by whether spend was behind them.</div>${imprMix}</div>`:""}
+    </div>`:""}
+    <div class="note" style="font-size:13px;color:var(--ink);line-height:1.7;margin-top:14px">${paidReachShare!==null?`Spend of <b>$${fmtInt(cur.spend)}</b> drove <b>${pct(paidReachShare,0)}</b> of total reach${paidImprShare!==null?` and <b>${pct(paidImprShare,0)}</b> of total impressions`:""}. The remaining ${pct(1-paidReachShare,0)} of reach was earned organically. ${paidReachShare>0.6?"Paid is carrying most of the visibility right now, so it is worth watching what happens organically when spend pauses.":paidReachShare<0.25?"Organic is doing the heavy lifting, and the spend is a helpful amplifier rather than a crutch.":"Paid and organic are working together in healthy balance."}`:`Organic and paid are blended in the account totals when spend ran this period.`} For per-ad detail (individual ad results, audiences, placements, and dark or unpublished ads), export from Ads Manager and upload it here. The columns are recognized automatically.</div>`;
   }
   let demo="";
 
@@ -1100,9 +1281,17 @@ function render(){
     if(pm2&&pm2.label!==label){followup=`<div class="note" style="margin-top:12px;font-size:12.5px">${ed("followup",`Carrying the thread: in the <b>${pm2.label}</b> report the recommended move was “${pm2.t}” — the findings below show how this period responded.`)}</div>`;}
   }catch(e){}
 
-  // wins/watch (top 3 each) with editable text
-  const winHtml=A.wins.slice(0,3).map((w,i)=>`<div class="ins win"><div class="t">${ed("win_t"+i,w.t)}</div><div class="d">${ed("win_d"+i,w.d)}</div></div>`).join("")||'<div class="note">Not enough signal yet.</div>';
-  const watchHtml=A.watch.slice(0,3).map((w,i)=>`<div class="ins watch"><div class="t">${ed("watch_t"+i,w.t)}</div><div class="d">${ed("watch_d"+i,w.d)}</div></div>`).join("")||'<div class="ins win"><div class="t">Nothing urgent</div><div class="d">No red flags in this period’s data.</div></div>';
+  // AI-written narrative for this exact client|period|platform context, if the operator generated one
+  const ai=AINARR[CTX]||null;
+  const winsSrc=(ai&&ai.working_now&&ai.working_now.length)?ai.working_now.slice(0,3):A.wins.slice(0,3);
+  const watchSrc=(ai&&ai.needs_attention&&ai.needs_attention.length)?ai.needs_attention.slice(0,3):A.watch.slice(0,3);
+  const bestSrc=(ai&&ai.best_move&&ai.best_move.t)?ai.best_move:A.best;
+  const letterLeadHtml=edBlock("letter_lead",(ai&&ai.letter)?ai.letter:defaultLetterLead(c,cur,prev,A,label,nameShow,platsUsed,dateSpan));
+  const headlineHtml=edBlock("headline",(ai&&ai.headline)?ai.headline:headline(c,cur,prev,A));
+  // wins/watch with editable text (em dashes stripped to match the house voice)
+  const winHtml=winsSrc.map((w,i)=>`<div class="ins win"><div class="t">${ed("win_t"+i,stripEmDash(w.t))}</div><div class="d">${ed("win_d"+i,stripEmDash(w.d))}</div></div>`).join("")||'<div class="note">Not enough signal yet.</div>';
+  const watchHtml=watchSrc.map((w,i)=>`<div class="ins watch"><div class="t">${ed("watch_t"+i,stripEmDash(w.t))}</div><div class="d">${ed("watch_d"+i,stripEmDash(w.d))}</div></div>`).join("")||'<div class="ins win"><div class="t">Nothing urgent</div><div class="d">No red flags in this period’s data.</div></div>';
+  const aiBadge=ai?`<span class="aibadge" title="Written with AI from this period's data. Click any line to edit.">✦ AI narrative</span>`:"";
 
   $("report").innerHTML=`
   <div class="rhead">
@@ -1113,17 +1302,10 @@ function render(){
     <div class="daterange">${dateSpan}</div>
   </div>
 
-  <section id="overview"><div class="sec-label">Headline numbers</div><div class="sec-sub">${multiPlat?`Combined across ${platsUsed.map(plat).join(" + ")} — uncheck platforms above to see one at a time. `:`${plat(platsUsed[0]||"")} only. `}Totals for ${dateSpan}. ${hasPrevData?"“vs prior” compares to the previous period of equal length.":"This is the earliest period in the data, so there’s nothing earlier to compare against yet."}</div><div class="cardgrid">${heroCards}</div></section>
-
-  <section id="outcomes"><div class="sec-label">Client goals &amp; success metrics</div><div class="sec-sub">A client-specific scorecard that connects social activity to brand, audience, campaign, and company growth.</div>${goalBoard}${journey?`<div style="margin-top:26px"><div class="sec-label">The path from attention to action</div>${journey}</div>`:""}</section>
-
-  <section id="performance"><div class="sec-label">Performance at a glance</div><div class="sec-sub">The clearest available signal in each stage, with interactive daily, weekly, or monthly detail.</div>${performanceHtml}</section>
-
-  ${showSec("benchmarks")?`<section><div class="sec-label">Benchmark context</div><div class="sec-sub">A formula-matched platform reference alongside the client’s own history. Industry- and account-size-matched norms should replace this reference when available.</div>${benchmark}</section>`:""}
-
-  <section class="narrative-section">
-    <div class="sec-label">The story this period</div>
-    <div class="headline">${edBlock("headline",headline(c,cur,prev,A))}</div>
+  <section class="narrative-section" id="story">
+    <div class="sec-label">The story this period ${aiBadge}</div>
+    <div class="letterlead">${letterLeadHtml}</div>
+    <div class="headline">${headlineHtml}</div>
     ${followup}
     <div class="storycols">
       <div class="storycol">
@@ -1139,10 +1321,18 @@ function render(){
     </div>
     <div class="bestmove">
       <div class="lab">Best next move</div>
-      <div class="t">${ed("best_t",A.best.t)}</div>
-      <div class="d">${ed("best_d",A.best.d)}</div>
+      <div class="t">${ed("best_t",stripEmDash(bestSrc.t))}</div>
+      <div class="d">${ed("best_d",stripEmDash(bestSrc.d))}</div>
     </div>
   </section>
+
+  <section id="outcomes"><div class="sec-label">Client goals &amp; success metrics</div><div class="sec-sub">The measurable promises behind the story above, tracked against target.</div>${goalBoard}${journey?`<div style="margin-top:26px"><div class="sec-label">The path from attention to action</div>${journey}</div>`:""}</section>
+
+  <section id="overview"><div class="sec-label">Headline numbers</div><div class="sec-sub">${multiPlat?`Combined across ${platsUsed.map(plat).join(" + ")} — uncheck platforms above to see one at a time. `:`${plat(platsUsed[0]||"")} only. `}Totals for ${dateSpan}. ${hasPrevData?"“vs prior” compares to the previous period of equal length.":"This is the earliest period in the data, so there’s nothing earlier to compare against yet."}</div><div class="cardgrid">${heroCards}</div></section>
+
+  <section id="performance"><div class="sec-label">Performance at a glance</div><div class="sec-sub">The clearest available signal in each stage, with interactive daily, weekly, or monthly detail.</div>${performanceHtml}</section>
+
+  ${showSec("benchmarks")?`<section><div class="sec-label">Benchmark context</div><div class="sec-sub">A formula-matched platform reference alongside the client’s own history. Industry- and account-size-matched norms should replace this reference when available.</div>${benchmark}</section>`:""}
 
   ${showSec("audience")&&audHtml?`<section><div class="sec-label">Audience</div><div class="sec-sub">Who's actually watching, per platform.</div>${audHtml}</section>`:""}
 
@@ -1162,7 +1352,7 @@ function render(){
 
   ${showSec("pillars")&&pillHtml?`<section><div class="sec-label">Content pillars</div><div class="sec-sub">Which of the content themes you've committed to is actually landing.</div>${pillHtml}</section>`:""}
 
-  ${showSec("paid")&&paidHtml?`<section><div class="sec-label">Paid performance</div><div class="sec-sub">What the ad spend bought this period.</div>${paidHtml}</section>`:""}
+  ${showSec("paid")&&paidHtml?`<section><div class="sec-label">Paid vs. organic</div><div class="sec-sub">What the ad spend bought this period, and how it compares to what the content earned on its own.</div>${ai&&ai.paid_takeaway?`<div class="bestmove" style="margin:0 0 18px"><div class="lab">The read on spend</div><div class="d">${ed("paid_ai",ai.paid_takeaway)}</div></div>`:""}${paidHtml}</section>`:""}
 
   ${showSec("bestday")&&bestDayHtml?`<section><div class="sec-label">Best day to post</div><div class="sec-sub">Median engagement per post, by day of the week.</div>${bestDayHtml}</section>`:""}
 
@@ -1172,7 +1362,7 @@ function render(){
 
   ${showSec("content_list")?`<section><div class="sec-label">Content that resonated</div>${contentList}</section>`:""}
 
-  <section><div class="sec-label">Recommendations</div><ol class="recs">${[A.best,...A.watch.slice(0,2).map(w=>({t:w.t,d:w.d}))].map((r,i)=>`<li>${ed("rec"+i,"<b>"+r.t+".</b> "+r.d.replace(/<[^>]+>/g,""))}</li>`).join("")}</ol></section>
+  <section><div class="sec-label">Recommendations</div><ol class="recs">${[bestSrc,...watchSrc.slice(0,2).map(w=>({t:w.t,d:w.d}))].map((r,i)=>`<li>${ed("rec"+i,stripEmDash("<b>"+r.t+".</b> "+String(r.d||"").replace(/<[^>]+>/g,"")))}</li>`).join("")}</ol></section>
 
   ${showSec("matrix")&&matrixHtml?`<section><div class="sec-label">Every metric, month by month</div><div class="sec-sub">The full history in one table. Scroll sideways for more months.</div>${matrixHtml}</section>`:""}
 
@@ -1182,7 +1372,7 @@ function render(){
 
   mountCharts();
   wireEdits();
-  try{const lm=JSON.parse(localStorage.getItem(LSK+"_lastmove")||"{}");lm[c]={label,t:A.best.t};localStorage.setItem(LSK+"_lastmove",JSON.stringify(lm));}catch(e){}
+  try{if(!VIEW_LOCK){const lm=JSON.parse(localStorage.getItem(LSK+"_lastmove")||"{}");lm[c]={label,t:bestSrc.t};localStorage.setItem(LSK+"_lastmove",JSON.stringify(lm));}}catch(e){}
 }
 function metricCard(c,key,cur,prev,hero){
   const M=METRICS[key];const v=cur[key];const pv=prev?prev[key]:null;
@@ -1248,7 +1438,14 @@ function wireCustom(){
   $("heroChecks").addEventListener("change",e=>{if(!e.target.dataset.hero)return;const chosen=[...document.querySelectorAll("#heroChecks input:checked")].map(i=>i.dataset.hero);CUSTOM.hero=chosen;saveCustom();render();});
   $("sectionChecks").addEventListener("change",e=>{if(!e.target.dataset.sec)return;CUSTOM["sec_"+e.target.dataset.sec]=e.target.checked;saveCustom();render();});
   $("resetCustBtn").addEventListener("click",()=>{CUSTOM={};saveCustom();buildCustomUI();render();});
-  $("resetTextBtn").addEventListener("click",()=>{Object.keys(EDITS).forEach(k=>{if(k.indexOf(CTX+"|")===0)delete EDITS[k];});saveEdits();render();});
+  $("resetTextBtn").addEventListener("click",()=>{Object.keys(EDITS).forEach(k=>{if(k.indexOf(CTX+"|")===0)delete EDITS[k];});delete AINARR[CTX];saveEdits();saveAINarr();render();});
+  // AI narrative controls
+  const cfg=aiCfg();
+  if(cfg.provider)$("aiProvider").value=cfg.provider;
+  $("aiModel").value=cfg.model||aiDefaultModel($("aiProvider").value);
+  if(cfg.key)$("aiKey").value=cfg.key;
+  $("aiProvider").addEventListener("change",e=>{$("aiModel").value=aiDefaultModel(e.target.value);});
+  $("aiRun").addEventListener("click",generateAINarrative);
 }
 /* ==================== editable text ==================== */
 function wireEdits(){
@@ -1275,8 +1472,8 @@ $("printBtn").addEventListener("click",()=>window.print());
 $("custBtn").addEventListener("click",()=>$("custPanel").classList.toggle("open"));
 $("exportBtn").addEventListener("click",doExport);
 $("shareBtn").addEventListener("click",makeShareLink);
-$("fileIn").addEventListener("change",function(){const files=[...this.files];if(!files.length)return;let done=0;files.forEach(f=>{const r=new FileReader();r.onload=e=>{ingest(e.target.result);done++;if(done===files.length){refreshAll();}};r.readAsText(f);});this.value="";});
-$("demoBtn").addEventListener("click",()=>{resetData();ingest(DEMO_ACC);ingest(DEMO_CON);refreshAll();});
+$("fileIn").addEventListener("change",function(){if(VIEW_LOCK)return;const files=[...this.files];if(!files.length)return;let done=0;files.forEach(f=>{const r=new FileReader();r.onload=e=>{ingest(e.target.result);done++;if(done===files.length){refreshAll();}};r.readAsText(f);});this.value="";});
+$("demoBtn").addEventListener("click",()=>{if(VIEW_LOCK)return;resetData();ingest(DEMO_ACC);ingest(DEMO_CON);refreshAll();});
 
 /* ==================== demo (fictional) ==================== */
 const DEMO_ACC=`client,platform,month,followers_total,followers_growth,reach,impressions,engagement,views,profile_views,link_clicks,dms,meaningful_comments,comment_replies,leads,bookings,membership_signups,retail_sales,revenue,event_reach,event_engagement,event_registrations,event_attendees,conversions,paid_reach,paid_impressions,organic_reach,organic_impressions,spend,posts,top_age_group,top_gender,top_countries,top_cities,reach_target,profile_views_target,link_clicks_target,followers_growth_target,event_registrations_target,event_attendees_target,bookings_target,revenue_target
@@ -1321,16 +1518,24 @@ $("lseal").addEventListener("click",()=>{$("envScene").classList.add("open");$("
 $("letterSkip").addEventListener("click",closeLetter);
 
 /* ---- drag & drop CSVs anywhere on the page ---- */
-document.addEventListener("dragover",e=>{e.preventDefault();document.body.classList.add("dragging");});
+document.addEventListener("dragover",e=>{if(VIEW_LOCK)return;e.preventDefault();document.body.classList.add("dragging");});
 document.addEventListener("dragleave",e=>{if(!e.relatedTarget)document.body.classList.remove("dragging");});
-document.addEventListener("drop",e=>{e.preventDefault();document.body.classList.remove("dragging");
+document.addEventListener("drop",e=>{if(VIEW_LOCK)return;e.preventDefault();document.body.classList.remove("dragging");
   const files=[...e.dataTransfer.files].filter(f=>/\.csv$/i.test(f.name));if(!files.length)return;
   let done=0;files.forEach(f=>{const r=new FileReader();r.onload=ev=>{ingest(ev.target.result);done++;if(done===files.length)refreshAll();};r.readAsText(f);});});
 
 buildCustomUI();wireCustom();
 (async function(){
   const h=location.hash;
-  async function loadBundle(j){const d=JSON.parse(j);resetData();if(d.acc)ingest(d.acc);if(d.con)ingest(d.con);if(d.cust){CUSTOM=d.cust;saveCustom();buildCustomUI();}refreshAll();maybeShowLetter(false);}
+  async function loadBundle(j){
+    const d=JSON.parse(j);resetData();
+    if(d.acc)ingest(d.acc);if(d.con)ingest(d.con);
+    if(d.cust){CUSTOM=d.cust;buildCustomUI();}
+    if(d.edits)EDITS=d.edits;      // recipient sees the report exactly as it was written
+    if(d.ai)AINARR=d.ai;
+    if(d.lock){VIEW_LOCK=true;applyViewLock(d.client);}
+    refreshAll();maybeShowLetter(false);
+  }
   if(h.indexOf("#edata=")===0){
     const payload=h.slice(7);
     for(let i=0;i<3;i++){
@@ -1348,6 +1553,21 @@ buildCustomUI();wireCustom();
   if(h==="#demo"||h==="#letter"){document.getElementById("demoBtn").click();maybeShowLetter(h==="#letter");}
   if(h==="#test"){fetch("resources/native_platform_comprehensive_test.csv").then(r=>r.text()).then(t=>{resetData();ingest(t);refreshAll();}).catch(()=>alert("The comprehensive test file could not be loaded."));}
 })();
+
+/* ==================== installable app (PWA) ==================== */
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+let DEFERRED_INSTALL=null;
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault();DEFERRED_INSTALL=e;
+  if(!VIEW_LOCK){const b=$("installBtn");if(b)b.style.display="";}
+});
+window.addEventListener("appinstalled",()=>{DEFERRED_INSTALL=null;const b=$("installBtn");if(b)b.style.display="none";});
+if($("installBtn"))$("installBtn").addEventListener("click",async()=>{
+  if(!DEFERRED_INSTALL){alert("To install: in your browser menu choose “Install app” or “Add to Home Screen”.\n\nOn iPhone Safari: tap Share, then “Add to Home Screen.”");return;}
+  DEFERRED_INSTALL.prompt();await DEFERRED_INSTALL.userChoice;DEFERRED_INSTALL=null;$("installBtn").style.display="none";
+});
 </script>
 </body>
 </html>
