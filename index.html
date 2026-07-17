@@ -525,6 +525,10 @@ function unb64uBytes(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4
 async function pwKey(pw,salt){const km=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:150000,hash:"SHA-256"},km,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);}
 async function encryptStr(str,pw){const salt=crypto.getRandomValues(new Uint8Array(16));const iv=crypto.getRandomValues(new Uint8Array(12));const key=await pwKey(pw,salt);const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,new TextEncoder().encode(str));return b64uBytes(salt)+"."+b64uBytes(iv)+"."+b64uBytes(ct);}
 async function decryptStr(payload,pw){const parts=payload.split(".");const key=await pwKey(pw,unb64uBytes(parts[0]));const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:unb64uBytes(parts[1])},key,unb64uBytes(parts[2]));return new TextDecoder().decode(pt);}
+// Where share links should point. In the hosted web app this is the current site; in the
+// packaged desktop app (file:// origin) it falls back to the hosted site so clients can open the link.
+const HOSTED_BASE="https://cno-analytics-report.onrender.com/";
+function shareBase(){return location.protocol.startsWith("http")?(location.origin+location.pathname):HOSTED_BASE;}
 async function makeShareLink(){
   if(!POSTS.length&&!PERIODS.length){alert("Load data first, then create a share link.");return;}
   const client=(CURRENT&&CURRENT.client)||$("clientSel").value;
@@ -538,9 +542,9 @@ async function makeShareLink(){
   if(pw===null)return;
   let url;
   if(pw.trim()){
-    try{url=location.origin+location.pathname+"#edata="+await encryptStr(b64,pw.trim());}
+    try{url=shareBase()+"#edata="+await encryptStr(b64,pw.trim());}
     catch(e){alert("Password protection isn't available in this browser — link not created.");return;}
-  }else{url=location.origin+location.pathname+"#data="+b64;}
+  }else{url=shareBase()+"#data="+b64;}
   try{await navigator.clipboard.writeText(url);}catch(e){}
   const lockNote=pw.trim()?"🔒 Password-protected — it only opens with the password you set. Share the password separately.\n\n":"";
   if(url.length>16000){alert("Share link copied to clipboard.\n\n"+lockNote+"Heads up: it's long ("+url.length.toLocaleString()+" characters). If a chat app trims it, narrow to one client first, then share.");}

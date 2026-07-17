@@ -39,6 +39,7 @@ Most social tools show isolated platform numbers. This one turns them into a **v
 
 **Installable and offline.**
 - It is a **PWA**: add it to the home screen or install it as an app on Mac, Windows, or phone, and it keeps working offline. Bookmark it and come back anytime.
+- It can also be packaged as a **native desktop app** (a real `.exe` / `.dmg`) for Windows and macOS. GitHub builds both installers for you — see [`DESKTOP.md`](DESKTOP.md).
 
 ## Usage
 

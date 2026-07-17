@@ -18,6 +18,11 @@ serve.ps1
 _seed.html
 _verify_*.csv
 
+# desktop app build (Electron) — installers are produced by CI, not committed
+node_modules/
+dist-desktop/
+package-lock.json
+
 # OS / editor noise
 Thumbs.db
 .DS_Store
