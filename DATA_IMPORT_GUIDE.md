@@ -2,7 +2,7 @@
 
 ## The short answer
 
-Use the **Import center** in the report. Drop a whole reporting folder or select every CSV from Rella and the native platforms at once. The app:
+Use **Import data** in the report. It is now the only manual upload path: drop a whole reporting folder or select every CSV from Rella and the native platforms at once. The app:
 
 1. detects account-level versus post-level rows;
 2. maps common Instagram, Meta, TikTok, LinkedIn, YouTube, and Rella column names;
@@ -32,7 +32,7 @@ Client Name — 2026-06/
   business-outcomes.csv
 ```
 
-Not every client needs every file. Add what exists, then choose **Import center → Choose folder**. Confirm the detected platform, row type, and coverage in the audit. Download the combined master CSV if you want one clean archive for the month. Then select the report period, make any editorial edits, and create a new private share link.
+Not every client needs every file. Add what exists, then choose **Import data → Choose folder**. Confirm the detected platform, row type, and coverage in the audit. Download the combined master CSV if you want one clean archive for the month. Then select the report period, make any editorial edits, and create a new private share link.
 
 Uploading the same export twice is safe: exact duplicate rows are ignored. A complementary export with different columns or values is retained.
 
@@ -71,9 +71,9 @@ Keep the report self-contained and use multi-file/folder import. This removes ma
 
 Where a platform or reporting tool can email or schedule exports, save them into the same client/month folder. CNO staff still review and import the folder, but collecting data becomes predictable and auditable.
 
-### 3. CNO-only secure sync service — future add-on
+### 3. CNO-only secure sync service — foundation now included
 
-Build a separate internal connection service. Each client authorizes CNO once through OAuth; the service refreshes tokens and writes normalized data to a private store. The public client report remains view-only and never receives platform credentials. This is the right architecture for automatic refresh, but it is a separate hosted product with maintenance and approval costs.
+The repository now includes this separate internal connection service under `sync-service/`. Each client authorizes CNO once through OAuth; the service encrypts tokens, refreshes connected analytics on a schedule, and writes normalized snapshots to a private database. A ten-minute, single-use import link moves the latest rows into CNO Reports without exposing platform credentials. Provider developer-app approval, a persistent Postgres database, and production testing are still required before live client use.
 
 ### 4. Automation vendors
 

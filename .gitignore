@@ -23,6 +23,12 @@ node_modules/
 dist-desktop/
 package-lock.json
 
+# local OAuth service credentials
+.env
+.env.*
+!.env.example
+sync-service/.env
+
 # OS / editor noise
 Thumbs.db
 .DS_Store

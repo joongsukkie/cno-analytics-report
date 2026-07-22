@@ -12,7 +12,9 @@ Most social tools show isolated platform numbers. This one turns them into a **v
 
 **Reads any export.** One upload accepts multiple files at once and normalizes column names across Rella, Instagram/Meta, TikTok, LinkedIn, and YouTube — no renaming required. It auto-detects account-level vs. post-level data. See [`06_CSV_SCHEMA.md`](06_CSV_SCHEMA.md).
 
-**Import center.** Drop in a whole client/month folder, audit every file's detected platform, row type, row count, and date coverage, safely remove exact duplicate rows, then download one standardized combined master CSV without losing the original source columns. See [`DATA_IMPORT_GUIDE.md`](DATA_IMPORT_GUIDE.md).
+**One clear manual import.** Click **Import data** once, then add one CSV, many CSVs, or a whole client/month folder. The same panel audits each file's platform, row type, row count, and date coverage, safely removes exact duplicate rows, and can download one standardized combined master CSV without losing original source columns. See [`DATA_IMPORT_GUIDE.md`](DATA_IMPORT_GUIDE.md).
+
+**Native sync foundation.** A separate CNO-only OAuth service now handles Meta, TikTok, and LinkedIn authorization server-side, encrypts tokens before storage, supports scheduled refreshes, and transfers normalized analytics into the report through ten-minute, single-use links. Provider app approval and deployment configuration are still required. See [`sync-service/README.md`](sync-service/README.md).
 
 **Interactive, like a real dashboard.**
 - Pick any **time period inside the report** — a month, last 30/90 days, all time, or a custom date range — and everything recomputes vs. the previous comparable period. No re-uploading.
@@ -33,7 +35,7 @@ Most social tools show isolated platform numbers. This one turns them into a **v
 - Deterministic by default: identical input always yields the identical report
 
 **Optional AI narrative (bring your own key).**
-- Paste an **OpenAI or Anthropic API key** in Customize and the opening letter and takeaways are rewritten from *this client's actual numbers* in the voice of a veteran analyst who can tell a story. No em dashes, no template filler.
+- Open **AI narrative** as its own workspace, then paste an **OpenAI or Anthropic API key**. The opening letter and takeaways are rewritten from *this client's actual numbers* in the voice of a veteran analyst who can tell a story. No em dashes, no template filler.
 - The key is stored **only in your browser**. It is never uploaded and never included in a share link. The client sees only the finished words, which stay fully editable.
 
 **Private, view-only sharing.**
@@ -47,16 +49,16 @@ Most social tools show isolated platform numbers. This one turns them into a **v
 
 Open `index.html` in any browser (or visit the deployed site with `#demo` to auto-load a sample).
 
-1. Open **Import center**, then drop in the whole reporting folder or select all available CSVs at once
+1. Click **Import data**, then drop in the whole reporting folder or select all available CSVs at once
 2. Pick a **client** and **period** (month / last 30 / 90 / all / custom range)
-3. **Customize** the goal, featured KPIs, and sections; edit any text inline
+3. **Customize** the goal, featured KPIs, and sections; use **AI narrative** only when you want an optional AI-written draft; edit any text inline
 4. **Export data** to download normalized CSVs, or **Print / PDF** for the client leave-behind
 
 Templates: `resources/template_accounts.csv`, `resources/template_content.csv`. A larger synthetic test file covering Instagram, TikTok, and LinkedIn is at `resources/native_platform_comprehensive_test.csv`.
 
 ## Keeping reports refreshed
 
-No API key or backend is required. For each reporting cycle, export the available date range from Rella and/or the native platforms, add any offline outcomes from the client’s booking/CRM/sales records, then upload the whole folder in Import center. The report audits and merges the files, separates platforms, removes exact duplicate rows, and recalculates the selected period. Create a new password-protected share link after the refresh; that link contains a private snapshot of the uploaded report data.
+No API key or backend is required. For each reporting cycle, export the available date range from Rella and/or the native platforms, add any offline outcomes from the client’s booking/CRM/sales records, then upload the whole folder through **Import data**. The report audits and merges the files, separates platforms, removes exact duplicate rows, and recalculates the selected period. Create a new password-protected share link after the refresh; that link contains a private snapshot of the uploaded report data.
 
 For the exact recommended folder structure, refresh checklist, and the tradeoffs of a future automatic API sync, see [`DATA_IMPORT_GUIDE.md`](DATA_IMPORT_GUIDE.md).
 
@@ -85,6 +87,7 @@ Static site, no build. On [Render](https://render.com): connect the repo, choose
 | `01_METRICS_DICTIONARY.md` | Every metric and its exact formula |
 | `06_CSV_SCHEMA.md` | The CSV contract (including optional `<metric>_target` goal columns) |
 | `DATA_IMPORT_GUIDE.md` | Monthly import workflow and realistic native-platform connection options |
+| `sync-service/` | Private OAuth, encrypted token storage, scheduled native-platform sync, and one-use report imports |
 
 ## Brand
 

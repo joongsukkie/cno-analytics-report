@@ -33,7 +33,7 @@
   .mhid .k{font-family:var(--sans);font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--burnt);font-weight:600}
   .mhid .t{font-family:var(--serif);font-size:27px;font-weight:400;line-height:1.04;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
   .mhid .m{font-family:var(--sans);font-size:11px;letter-spacing:.02em;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .sitebar .mhtag{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--burnt);white-space:nowrap;flex:none}
+  .sitebar .site-actions{display:flex;align-items:center;gap:18px;flex:none}.sitebar .mhtag{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--burnt);white-space:nowrap}.sitebar .btn{height:38px;display:inline-flex;align-items:center;background:var(--burnt);border-color:var(--burnt);color:#fff}.sitebar .btn:hover{background:var(--burnt-deep)}
   .toolbar{background:#fff;color:var(--ink);padding:13px max(28px,calc((100vw - 1180px)/2));display:flex;flex-wrap:wrap;gap:10px 12px;align-items:flex-end;border-bottom:1px solid var(--sand);position:sticky;top:104px;z-index:25;box-shadow:0 8px 24px rgba(42,31,18,.045)}
   .toolbar .fld{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:flex;flex-direction:column;gap:3px}
   .toolbar select,.toolbar input[type=date]{font-family:var(--sans);font-size:13px;height:38px;padding:5px 9px;border-radius:7px;border:1px solid var(--sand);background:#fff;color:var(--ink)}
@@ -52,8 +52,12 @@
   body.view-lock #exportBtn,
   body.view-lock #installBtn,
   body.view-lock #dataBtn,
+  body.view-lock #aiBtn,
+  body.view-lock #syncBtn,
   body.view-lock #dataPanel,
   body.view-lock #installPanel,
+  body.view-lock #aiPanel,
+  body.view-lock #syncPanel,
   body.view-lock label.fld:has(#clientSel){display:none!important}
   body.view-lock .toolbar::before{content:"Client report · view only";font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--burnt);font-weight:600;align-self:center}
   /* customize panel */
@@ -83,7 +87,7 @@
   .aidesc{font-size:11.5px;line-height:1.5;color:var(--ink-soft);margin:6px 0 11px;max-width:80ch}
   .airow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
   .airow select{width:auto;min-width:150px}
-  .airow input[type=password]{font-family:var(--sans);font-size:13px;padding:6px 8px;border-radius:7px;border:1px solid var(--sand);background:#fff;color:var(--ink);flex:1;min-width:200px}
+  .airow input[type=password],.airow input[type=text]{font-family:var(--sans);font-size:13px;padding:6px 8px;border-radius:7px;border:1px solid var(--sand);background:#fff;color:var(--ink);flex:1;min-width:200px}
   .airow #aiModel{width:150px;flex:none}
   .airow .btn{white-space:nowrap}
   .aistatus{display:none;margin-top:9px;font-size:12px;line-height:1.5;color:var(--ink-soft)}
@@ -317,7 +321,7 @@
   @keyframes lOut{to{opacity:0;visibility:hidden}}
   @media(prefers-reduced-motion:reduce){.envScene,.flap,.lseal,.letterCard,#letterOverlay,#letterOverlay::before{animation:none!important;transition-duration:.01ms!important;transition-delay:0ms!important}}
   @media(max-width:900px){.goalgrid{grid-template-columns:1fr 1fr}.goalcard:nth-child(2){border-right:0}.goalcard:nth-child(-n+2){border-bottom:1px solid var(--sand)}.vizgrid{grid-template-columns:1fr}.sitebar .mhtag{display:none}}
-  @media(max-width:660px){.sitebar{height:84px;padding:0 16px}.sitebar .stamp img{width:64px;height:64px}.sitebar .brandwrap{gap:14px}.mhid{padding-left:14px}.mhid .k{display:none}.mhid .t{font-size:21px;max-width:56vw}.toolbar{top:84px;padding:10px 14px}.control-title{display:none}.goalgrid{grid-template-columns:1fr}.goalcard{border-right:0;border-bottom:1px solid var(--sand)}.rhead .cli{font-size:42px}section{padding:28px 24px}}
+  @media(max-width:660px){.sitebar{height:84px;padding:0 12px}.sitebar .stamp img{width:58px;height:58px}.sitebar .brandwrap{gap:10px}.mhid{padding-left:10px}.mhid .k{display:none}.mhid .t{font-size:19px;max-width:42vw}.mhid .m{font-size:9px;max-width:42vw}.sitebar .site-actions{gap:8px}.sitebar .btn{font-size:9px;padding:6px 9px}.toolbar{top:84px;padding:10px 14px}.control-title{display:none}.goalgrid{grid-template-columns:1fr}.goalcard{border-right:0;border-bottom:1px solid var(--sand)}.rhead .cli{font-size:42px}section{padding:28px 24px}}
   @media print{.sitebar,.toolbar,.panel,.utility-panel,#letterOverlay{display:none!important} body{background:#fff} .wrap{margin:0;max-width:none;padding:0} .report{box-shadow:none;border-radius:0;border:none} section{break-inside:avoid} .ed[contenteditable]{background:none!important;box-shadow:none!important}}
 </style>
 </head>
@@ -344,10 +348,10 @@
       <div class="m" id="mhPeriod">Upload a CSV or load the demo to begin</div>
     </div>
   </div>
-  <div class="mhtag">Hand it over. We'll handle it.</div>
+  <div class="site-actions"><div class="mhtag">Hand it over. We'll handle it.</div><button class="btn" id="installBtn">Get the app</button></div>
 </header>
 <div class="toolbar">
-  <div class="action-fld"><span>Data</span><label class="btn file">Upload CSV(s)<input type="file" id="fileIn" accept=".csv" multiple></label></div>
+  <div class="action-fld"><span>Data</span><button class="btn solid" id="dataBtn">Import data</button></div>
   <div class="action-fld"><span>Sample</span><button class="btn" id="demoBtn">Load demo</button></div>
   <label class="fld">Client<select id="clientSel"></select></label>
   <label class="fld">Period<select id="periodSel"></select></label>
@@ -356,8 +360,8 @@
   <label class="fld">Chart detail<select id="grainSel"><option value="day">Daily</option><option value="week">Weekly</option><option value="month">Monthly</option></select></label>
   <span class="fld">Platforms<span class="chips" id="platChips"></span></span>
   <div class="spacer"></div>
-  <button class="btn" id="dataBtn">Import center</button>
-  <button class="btn" id="installBtn">Get the app</button>
+  <button class="btn" id="syncBtn">Native sync</button>
+  <button class="btn" id="aiBtn">✦ AI narrative</button>
   <button class="btn" id="custBtn">Customize</button>
   <button class="btn" id="shareBtn">Share link</button>
   <button class="btn" id="exportBtn">Export data</button>
@@ -365,7 +369,7 @@
 </div>
 
 <div class="utility-panel" id="dataPanel">
-  <div class="utility-head"><div><h3>Import center</h3><p>Bring every export into one place. The report detects the platform and row type, keeps original columns, removes exact duplicate rows, and can produce one standardized master CSV.</p></div><button class="utility-close" id="dataClose" aria-label="Close import center">×</button></div>
+  <div class="utility-head"><div><h3>Import data</h3><p>This is the single place for manual data uploads. Choose one CSV, many CSVs, or a whole folder; the report merges and audits them automatically.</p></div><button class="utility-close" id="dataClose" aria-label="Close import center">×</button></div>
   <div class="import-grid">
     <div class="dropzone" id="importDrop">
       <img class="dropseal" src="cno-seal.png" alt="">
@@ -380,6 +384,32 @@
     </div>
   </div>
   <div class="sourcecards"><div class="sourcecard"><b>Rella</b><span>Export account and content data. Add both files; the importer merges them automatically.</span></div><div class="sourcecard"><b>Instagram / Meta</b><span>Export account insights, content, and Ads Manager results when paid or dark ads ran.</span></div><div class="sourcecard"><b>TikTok</b><span>Add account analytics and video-level exports. Watch-time fields are retained when present.</span></div><div class="sourcecard"><b>LinkedIn</b><span>Add visitor, follower, content, and campaign exports. Professional audience fields stay intact.</span></div></div>
+</div>
+
+<div class="utility-panel" id="syncPanel">
+  <div class="utility-head"><div><h3>Native platform sync</h3><p>CNO's private connection service collects approved account analytics on a schedule. Platform passwords and OAuth tokens never enter this report or a client share link.</p></div><button class="utility-close" id="syncClose" aria-label="Close native sync">×</button></div>
+  <div class="sourcecards installcards">
+    <div class="sourcecard"><b>1 · Authorize once</b><span>An account administrator signs in on Meta, TikTok, or LinkedIn and approves read-only analytics access. The platform still controls OAuth and 2FA.</span></div>
+    <div class="sourcecard"><b>2 · Store securely</b><span>The server encrypts tokens with AES-256-GCM before database storage. CNO staff see connection status, never the token itself.</span></div>
+    <div class="sourcecard"><b>3 · Refresh automatically</b><span>A scheduled private job refreshes connected accounts. The report receives normalized metrics through a short-lived, single-use import link.</span></div>
+  </div>
+  <div class="aibox"><div class="ailab">CNO internal console <span>staff only</span></div><div class="aidesc">The service must be deployed and configured once with approved platform apps. After that, connections and refreshes are managed in the private console.</div><div class="airow"><input type="text" id="syncServiceUrl" value="https://cno-native-sync.onrender.com" aria-label="Native sync service URL"><button class="btn solid" id="syncOpen">Open secure sync console</button><a class="btn" href="https://github.com/joongsukkie/cno-analytics-report/blob/main/sync-service/README.md" target="_blank" rel="noopener">Setup guide</a></div><div class="aistatus" id="syncStatus"></div></div>
+</div>
+
+<div class="utility-panel" id="aiPanel">
+  <div class="utility-head"><div><h3>AI narrative</h3><p>Optionally turn the selected client's report data into a sharper opening letter and executive takeaways. The visual analysis works without AI.</p></div><button class="utility-close" id="aiClose" aria-label="Close AI narrative">×</button></div>
+  <div class="aibox" style="margin-top:0">
+    <div class="ailab">✦ Write from this report <span>optional</span></div>
+    <div class="aidesc">Choose a provider and supply your own API key. The selected report metrics are sent directly to that provider only when you click Write with AI. The key stays in this browser and is excluded from client share links.</div>
+    <div class="airow">
+      <select id="aiProvider"><option value="anthropic">Claude (Anthropic)</option><option value="openai">OpenAI</option></select>
+      <input type="password" id="aiKey" placeholder="Your API key (stored in this browser)" autocomplete="off" spellcheck="false">
+      <input type="text" id="aiModel" placeholder="model" spellcheck="false">
+      <button class="btn solid" id="aiRun">Write with AI</button>
+      <button class="btn" id="aiForget">Forget API key</button>
+    </div>
+    <div class="aistatus" id="aiStatus"></div>
+  </div>
 </div>
 
 <div class="utility-panel" id="installPanel">
@@ -420,20 +450,6 @@
       <div id="sectionChecks"></div>
     </div>
   </div>
-  <div class="aibox">
-    <div class="ailab">✦ AI narrative <span>optional</span></div>
-    <div class="aidesc">Write the opening letter and takeaways with AI, grounded in this exact client's numbers, in the voice of a veteran analyst who can actually tell a story. Your API key is stored only in this browser. It is never uploaded and never baked into a share link. The client sees only the finished words.</div>
-    <div class="airow">
-      <select id="aiProvider">
-        <option value="anthropic">Claude (Anthropic)</option>
-        <option value="openai">OpenAI</option>
-      </select>
-      <input type="password" id="aiKey" placeholder="Your API key (stored in this browser)" autocomplete="off" spellcheck="false">
-      <input type="text" id="aiModel" placeholder="model" spellcheck="false">
-      <button class="btn solid" id="aiRun">Write with AI</button>
-    </div>
-    <div class="aistatus" id="aiStatus"></div>
-  </div>
   <div style="margin-top:14px;display:flex;gap:10px">
     <button class="btn" id="resetTextBtn">Reset edited text</button>
     <button class="btn" id="resetCustBtn">Reset customization</button>
@@ -441,7 +457,7 @@
 </div>
 
 <div class="wrap"><div class="report" id="report">
-  <div class="empty">Upload one or more CSVs (from Rella, Instagram, TikTok, LinkedIn, YouTube, or Meta), or click <b>Load demo</b>.<br><span style="font-size:13px">Select multiple files at once, or just <b>drag &amp; drop them anywhere on this page</b> — account-level and post-level exports are detected and normalized automatically.</span></div>
+  <div class="empty">Click <b>Import data</b> to add one CSV, many CSVs, or a whole reporting folder—or click <b>Load demo</b>.<br><span style="font-size:13px">Account-level and post-level exports are detected, audited, and normalized automatically.</span></div>
 </div></div>
 
 <script>
@@ -567,7 +583,6 @@ function scopedByClient(store,client){const o={};Object.keys(store).forEach(k=>{
 function applyViewLock(client){
   VIEW_LOCK=true;
   document.body.classList.add("view-lock");
-  const fi=$("fileIn");if(fi){fi.disabled=true;fi.value="";}
   const cs=$("clientSel");if(cs)cs.disabled=true;
   const ib=$("installBtn");if(ib)ib.style.display="none";
 }
@@ -1558,13 +1573,19 @@ $("fromDate").addEventListener("change",render);
 $("toDate").addEventListener("change",render);
 $("printBtn").addEventListener("click",()=>window.print());
 $("custBtn").addEventListener("click",()=>$("custPanel").classList.toggle("open"));
+$("aiBtn").addEventListener("click",()=>$("aiPanel").classList.toggle("open"));
+$("aiClose").addEventListener("click",()=>$("aiPanel").classList.remove("open"));
+$("aiForget").addEventListener("click",()=>{localStorage.removeItem("cno_ai_cfg");$("aiKey").value="";aiSay("API key removed from this browser.");});
+$("syncBtn").addEventListener("click",()=>$("syncPanel").classList.toggle("open"));
+$("syncClose").addEventListener("click",()=>$("syncPanel").classList.remove("open"));
+const savedSyncUrl=localStorage.getItem("cno_sync_service_url");if(savedSyncUrl)$("syncServiceUrl").value=savedSyncUrl;
+$("syncOpen").addEventListener("click",()=>{const url=$("syncServiceUrl").value.trim().replace(/\/$/,"");if(!/^https:\/\//i.test(url)&&!/^http:\/\/localhost(?::\d+)?$/i.test(url)){$("syncStatus").textContent="Use an HTTPS service URL (or localhost while developing).";$("syncStatus").className="aistatus show";return;}localStorage.setItem("cno_sync_service_url",url);window.open(url+"/admin","_blank","noopener");});
 $("exportBtn").addEventListener("click",doExport);
 $("shareBtn").addEventListener("click",makeShareLink);
 $("dataBtn").addEventListener("click",()=>$("dataPanel").classList.toggle("open"));
 $("dataClose").addEventListener("click",()=>$("dataPanel").classList.remove("open"));
 $("masterBtn").addEventListener("click",downloadMaster);
 $("clearDataBtn").addEventListener("click",()=>{if(!confirm("Clear all imported data from this report?"))return;resetData();refreshAll();});
-$("fileIn").addEventListener("change",function(){importFiles(this.files);this.value="";});
 $("prepFileIn").addEventListener("change",function(){importFiles(this.files);this.value="";});
 $("folderIn").addEventListener("change",function(){importFiles(this.files);this.value="";});
 $("importDrop").addEventListener("dragover",e=>{e.preventDefault();e.stopPropagation();$("importDrop").classList.add("over");});
@@ -1648,6 +1669,15 @@ renderImportCenter();
   if(h.indexOf("#data=")===0){
     try{await loadBundle(await gunzB64(h.slice(6)));return;}
     catch(e){console.warn("share link decode failed",e);}
+  }
+  if(h.indexOf("#sync=")===0){
+    try{
+      const endpoint=decodeURIComponent(h.slice(6));
+      if(!/^https:\/\//i.test(endpoint)&&!/^http:\/\/localhost(?::\d+)?\//i.test(endpoint))throw new Error("Invalid sync link");
+      const d=await fetch(endpoint,{cache:"no-store"}).then(async r=>{const j=await r.json();if(!r.ok)throw new Error(j.error||"Native sync failed");return j;});
+      if(!Array.isArray(d.rows)||!d.rows.length)throw new Error("The sync service returned no analytics rows");
+      resetData();ingest(toCSV(d.rows),(d.client||"Client")+" · Native sync");refreshAll();history.replaceState(null,"",location.pathname);return;
+    }catch(e){alert("Native sync could not be imported: "+e.message);return;}
   }
   if(h==="#demo"||h==="#letter"){document.getElementById("demoBtn").click();maybeShowLetter(h==="#letter");}
   if(h==="#test"){fetch("resources/native_platform_comprehensive_test.csv").then(r=>r.text()).then(t=>{resetData();ingest(t);refreshAll();}).catch(()=>alert("The comprehensive test file could not be loaded."));}

@@ -9,3 +9,37 @@ services:
       - path: /*
         name: Cache-Control
         value: no-cache
+
+  - type: web
+    name: cno-native-sync
+    runtime: node
+    plan: free
+    rootDir: sync-service
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REPORT_ORIGIN
+        value: https://cno-analytics-report.onrender.com
+      - key: DATABASE_URL
+        sync: false
+      - key: CNO_ADMIN_TOKEN
+        generateValue: true
+      - key: TOKEN_ENCRYPTION_KEY
+        generateValue: true
+      - key: SYNC_CRON_SECRET
+        generateValue: true
+      - key: META_CLIENT_ID
+        sync: false
+      - key: META_CLIENT_SECRET
+        sync: false
+      - key: TIKTOK_CLIENT_KEY
+        sync: false
+      - key: TIKTOK_CLIENT_SECRET
+        sync: false
+      - key: LINKEDIN_CLIENT_ID
+        sync: false
+      - key: LINKEDIN_CLIENT_SECRET
+        sync: false
