@@ -34,7 +34,7 @@
   .mhid .t{font-family:var(--serif);font-size:27px;font-weight:400;line-height:1.04;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
   .mhid .m{font-family:var(--sans);font-size:11px;letter-spacing:.02em;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .sitebar .mhtag{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--burnt);white-space:nowrap;flex:none}
-  .toolbar{background:#fff;color:var(--ink);padding:12px 24px;display:flex;flex-wrap:nowrap;gap:10px;align-items:flex-end;border-bottom:1px solid var(--sand);position:sticky;top:104px;z-index:25;box-shadow:0 8px 24px rgba(42,31,18,.045)}
+  .toolbar{background:#fff;color:var(--ink);padding:13px max(28px,calc((100vw - 1180px)/2));display:flex;flex-wrap:wrap;gap:10px 12px;align-items:flex-end;border-bottom:1px solid var(--sand);position:sticky;top:104px;z-index:25;box-shadow:0 8px 24px rgba(42,31,18,.045)}
   .toolbar .fld{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:flex;flex-direction:column;gap:3px}
   .toolbar select,.toolbar input[type=date]{font-family:var(--sans);font-size:13px;height:38px;padding:5px 9px;border-radius:7px;border:1px solid var(--sand);background:#fff;color:var(--ink)}
   .btn{font-family:var(--sans);font-size:11px;letter-spacing:.07em;text-transform:uppercase;padding:7px 13px;border-radius:7px;border:1px solid var(--terra);background:#fff;color:var(--burnt);cursor:pointer;transition:.15s;font-weight:500}
@@ -43,7 +43,7 @@
   .btn.solid:hover{background:var(--burnt-deep)}
   .btn.file{position:relative;overflow:hidden}
   .btn.file input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
-  .toolbar .btn{height:38px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.toolbar .spacer{flex:1}
+  .toolbar .btn{height:38px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.toolbar .spacer{flex:0 0 100%;height:0}.toolbar #platChips{min-width:210px}
   .control-title,.action-fld{display:flex;flex-direction:column;gap:3px;flex:none}.control-title>span,.action-fld>span{font-size:9.5px;line-height:1.55;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}.control-title>strong{height:38px;display:flex;align-items:center;font-family:var(--serif);font-size:20px;line-height:1;font-weight:400;white-space:nowrap;padding-right:6px}
   /* view-lock: a shared report is read-only and shows only its one client */
   body.view-lock .action-fld,
@@ -51,6 +51,9 @@
   body.view-lock #shareBtn,
   body.view-lock #exportBtn,
   body.view-lock #installBtn,
+  body.view-lock #dataBtn,
+  body.view-lock #dataPanel,
+  body.view-lock #installPanel,
   body.view-lock label.fld:has(#clientSel){display:none!important}
   body.view-lock .toolbar::before{content:"Client report · view only";font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--burnt);font-weight:600;align-self:center}
   /* customize panel */
@@ -63,6 +66,16 @@
   .panel .chk{display:flex;align-items:center;gap:7px;font-size:13px;margin-bottom:5px;cursor:pointer}
   .panel .chk input{accent-color:var(--burnt)}
   .panel select,.panel input[type=text]{font-family:var(--sans);font-size:13px;padding:6px 8px;border-radius:7px;border:1px solid var(--sand);background:#fff;color:var(--ink);width:100%}
+  /* import center: merge and audit native exports without an API */
+  .utility-panel{padding:24px max(24px,calc((100vw - 1120px)/2));background:#fff;border-bottom:1px solid var(--sand);display:none}
+  .utility-panel.open{display:block}
+  .utility-head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:18px}.utility-head h3{font-family:var(--serif);font-size:27px;font-weight:400;margin:0}.utility-head p{font-size:12px;color:var(--ink-soft);max-width:72ch;margin:4px 0 0}.utility-close{border:0;background:none;color:var(--ink-soft);font-size:22px;cursor:pointer;padding:0 4px}
+  .import-grid{display:grid;grid-template-columns:minmax(260px,.85fr) minmax(420px,1.65fr);gap:18px}.dropzone{min-height:190px;border:1px dashed var(--terra);background:linear-gradient(180deg,rgba(219,155,127,.07),rgba(255,248,231,.55));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:25px;transition:background .18s,border-color .18s,transform .18s}.dropzone.over{background:rgba(219,155,127,.14);border-style:solid;transform:translateY(-2px)}.dropseal{width:55px;height:55px;object-fit:contain;margin-bottom:10px}.dropzone h4{font-family:var(--serif);font-size:22px;font-weight:400;margin:0 0 5px}.dropzone p{font-size:11px;color:var(--ink-soft);margin:0 0 14px;max-width:34ch}.dropactions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  .import-summary{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--sand);margin-bottom:12px}.isum{padding:13px 14px;border-right:1px solid var(--sand)}.isum:last-child{border-right:0}.isum span{display:block;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}.isum b{font-family:var(--serif);font-size:24px;font-weight:400}
+  .fileaudit{border:1px solid var(--sand);max-height:220px;overflow:auto}.fileaudit-empty{height:130px;display:grid;place-items:center;text-align:center;padding:20px;color:var(--ink-soft);font-size:12px}.file-row{display:grid;grid-template-columns:minmax(150px,1.5fr) 76px 64px minmax(130px,1fr) 72px;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--sand);font-size:10.5px}.file-row:last-child{border-bottom:0}.file-row.head{position:sticky;top:0;background:var(--sand-2);z-index:1;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}.file-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.file-ok{color:var(--sage-deep)}.file-warn{color:var(--burnt)}
+  .import-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}.import-actions .quiet{font-size:10.5px;color:var(--ink-soft);margin-left:auto}.sourcecards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}.sourcecard{padding:14px;border:1px solid var(--sand);background:var(--sand-2)}.sourcecard b{display:block;font-family:var(--serif);font-size:18px;font-weight:400}.sourcecard span{display:block;font-size:10.5px;line-height:1.5;color:var(--ink-soft);margin-top:3px}.sourcecard .btn{display:inline-block;margin-top:13px;text-decoration:none}.installcards{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:900px){.import-grid{grid-template-columns:1fr}.sourcecards{grid-template-columns:1fr 1fr}.file-row{grid-template-columns:minmax(140px,1fr) 65px 55px minmax(105px,1fr)}}
+  @media(max-width:620px){.utility-panel{padding:20px 14px}.import-summary{grid-template-columns:1fr 1fr}.isum:nth-child(2){border-right:0}.isum:nth-child(-n+2){border-bottom:1px solid var(--sand)}.sourcecards{grid-template-columns:1fr}.file-row{grid-template-columns:1fr 58px 50px}.file-row>:nth-child(4),.file-row>:nth-child(5){display:none}}
   /* AI narrative box */
   .aibox{margin-top:16px;padding:15px 16px;border:1px solid var(--terra-soft);border-radius:12px;background:linear-gradient(180deg,rgba(219,155,127,.08),rgba(255,255,255,0))}
   .ailab{font-family:var(--serif);font-size:15px;color:var(--burnt);font-weight:500}
@@ -263,38 +276,49 @@
   .journey-step .js-rate{font-size:10px;color:var(--burnt);margin-top:5px}
   .journey-step>span{display:block;font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-soft)}.journey-step>b{display:block;font-family:var(--serif);font-size:30px;font-weight:400;margin-top:7px}.journey-step>small{display:block;font-size:10px;color:var(--burnt);margin-top:5px}.journey-arrow{display:none}
   .narrative-section{background:linear-gradient(90deg,rgba(245,237,216,.55),rgba(255,255,255,0))}
-  /* letter overlay */
-  #letterOverlay{position:fixed;inset:0;background:var(--cream);z-index:100;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  /* website-matched envelope → parchment letter */
+  #letterOverlay{position:fixed;inset:0;background:var(--cream);z-index:100;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:background .65s ease}
+  #letterOverlay::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .65s ease .55s;background-image:repeating-linear-gradient(92deg,rgba(255,255,255,.035) 0,rgba(255,255,255,.035) 1px,transparent 1px,transparent 8px),repeating-linear-gradient(2deg,rgba(0,0,0,.025) 0,rgba(0,0,0,.025) 1px,transparent 1px,transparent 12px),radial-gradient(ellipse at 20% 30%,rgba(180,130,70,.3),transparent 60%),radial-gradient(ellipse at 80% 70%,rgba(200,160,100,.25),transparent 55%),radial-gradient(ellipse at 50% 50%,#d4aa7d,#b8894f)}
+  #letterOverlay.opened::before{opacity:1}
   #letterOverlay[hidden]{display:none}
-  #letterOverlay .hint{position:absolute;top:8%;width:100%;text-align:center;font-size:11.5px;letter-spacing:.24em;color:var(--burnt);text-transform:uppercase;animation:lFade .9s .9s both}
-  #letterOverlay .skip{position:absolute;top:18px;right:24px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);cursor:pointer;background:none;border:none;font-family:var(--sans)}
-  .envScene{position:relative;width:min(520px,90vw);aspect-ratio:1.5;perspective:1300px;animation:lDrop 1.15s cubic-bezier(.22,1.15,.36,1) both}
-  .envBody{position:absolute;inset:0;background:#f4ead0;border:1.5px solid #dcc0a4;border-radius:5px;transform-style:preserve-3d;box-shadow:0 22px 55px rgba(120,80,40,.16)}
-  .envBody::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top right,transparent calc(50% - .8px),#dcc0a4 calc(50% - .8px),#dcc0a4 calc(50% + .8px),transparent calc(50% + .8px)) bottom left/50% 50% no-repeat,linear-gradient(to top left,transparent calc(50% - .8px),#dcc0a4 calc(50% - .8px),#dcc0a4 calc(50% + .8px),transparent calc(50% + .8px)) bottom right/50% 50% no-repeat}
-  .flap{position:absolute;left:0;top:0;width:100%;height:50%;transform-origin:top center;transform-style:preserve-3d;backface-visibility:hidden;transition:transform 1s cubic-bezier(.6,0,.3,1);z-index:5;clip-path:polygon(0 0,100% 0,50% 100%);background:#efe1c1;border-bottom:1.5px solid #dcc0a4}
-  .lseal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:102px;cursor:pointer;z-index:7;transition:transform .3s;filter:drop-shadow(0 8px 16px rgba(80,45,15,.28))}
-  .lseal:hover{transform:translate(-50%,-50%) scale(1.07)}
-  .envScene.open .flap{transform:rotateX(-180deg);z-index:2}
-  .envScene.open .lseal{animation:lSealAway .8s cubic-bezier(.5,0,.7,.4) both;pointer-events:none}
-  .letterCard{position:fixed;left:50%;top:50%;width:min(660px,94vw);max-height:90vh;background:#fffdf6;border:1px solid var(--sand);border-radius:12px;z-index:1;transform:translate(-50%,calc(-50% + 120px)) scale(.94);opacity:0;pointer-events:none;transition:transform 1.05s .45s cubic-bezier(.2,1,.32,1),opacity .8s .45s,box-shadow 1.05s .45s;overflow-y:auto;padding:46px 52px 40px;text-align:center}
-  #letterOverlay.opened .letterCard{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto;z-index:12;box-shadow:0 44px 100px rgba(80,50,20,.34)}
-  .letterCard img.lsm{height:66px;margin:0 auto 20px;display:block}
-  .letterCard h2{font-family:var(--serif);font-weight:500;font-size:28px;margin:0 0 20px;letter-spacing:-.01em}
-  .letterCard .lbody{font-size:16.5px;line-height:1.95;text-align:left;color:var(--ink)}
+  #letterOverlay .hint{position:absolute;top:8%;width:100%;text-align:center;font-size:11px;letter-spacing:.22em;color:var(--burnt);text-transform:uppercase;opacity:.65;animation:lPulse 2s ease-in-out infinite;transition:opacity .4s}
+  #letterOverlay.opened .hint{opacity:0}
+  #letterOverlay .skip{position:absolute;top:18px;right:24px;z-index:30;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);cursor:pointer;background:none;border:none;font-family:var(--sans)}
+  .envScene{position:relative;width:min(480px,86vw);perspective:1300px;animation:lDrop 1.15s cubic-bezier(.22,1.15,.36,1) both;transition:opacity .5s ease .62s,transform .5s ease .62s}
+  #letterOverlay.opened .envScene{opacity:0;transform:scale(.96);pointer-events:none}
+  .envBody{position:relative;background:var(--cream-mid,#f5edd8);border:1px solid rgba(153,97,55,.25);border-radius:2px;overflow:hidden;transform-style:preserve-3d;box-shadow:0 8px 40px rgba(0,0,0,.12)}
+  .flap{position:absolute;left:0;top:0;width:100%;height:46%;transform-origin:top center;transform-style:preserve-3d;backface-visibility:hidden;transition:transform .7s cubic-bezier(.4,0,.2,1);z-index:5}
+  .flap svg{display:block;width:100%;height:100%}
+  .envInnerLines{position:absolute;inset:auto 0 0;width:100%;height:63%;pointer-events:none}
+  .envSpace{height:320px}
+  .lseal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:130px;height:130px;padding:0;background:none;border:none;border-radius:50%;overflow:hidden;cursor:pointer;z-index:7;transition:transform .3s ease;filter:drop-shadow(0 8px 16px rgba(80,45,15,.28))}
+  .lseal img{width:100%;height:100%;object-fit:contain;display:block}
+  .lseal:hover{transform:translate(-50%,-50%) scale(1.06) rotate(3deg)}
+  .envScene.open .flap{transform:rotateX(180deg);z-index:2}
+  .envScene.open .lseal{animation:lSealAway .68s cubic-bezier(.5,0,.7,.4) both;pointer-events:none}
+  body.letter-active{overflow:hidden}
+  .letterCard{position:fixed;left:50%;top:50%;width:min(640px,92vw);max-height:calc(100vh - 52px);background:#fdf6e3;border:0;border-top:3px solid var(--burnt);border-radius:0;z-index:1;transform:translate(-50%,calc(-50% + 45px)) scale(.985);opacity:0;pointer-events:none;transition:transform .85s .7s cubic-bezier(.2,1,.32,1),opacity .65s .7s,box-shadow .85s .7s;overflow-y:auto;padding:54px 56px 46px;text-align:center}
+  .letterCard::before,.letterCard::after{content:"";position:absolute;width:22px;height:22px;border-color:rgba(153,97,55,.4);border-style:solid}.letterCard::before{top:14px;left:14px;border-width:1px 0 0 1px}.letterCard::after{right:14px;bottom:14px;border-width:0 1px 1px 0}
+  #letterOverlay.opened .letterCard{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto;z-index:12;box-shadow:0 4px 32px rgba(100,60,10,.25),0 1px 0 rgba(255,255,255,.8) inset}
+  .letterCard img.lsm{height:80px;margin:0 auto 24px;display:block}
+  .letterCard h2{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(25px,3vw,34px);line-height:1.25;margin:0 0 22px;letter-spacing:-.01em}
+  .letterCard .lbody{font-size:15px;font-weight:400;line-height:1.95;text-align:left;color:rgba(42,31,18,.72)}
   .letterCard .lbody b{font-weight:500;color:var(--burnt-deep)}
   .letterCard .lsign{font-family:var(--serif);font-size:19px;margin-top:22px;text-align:left;font-style:italic;color:var(--burnt-deep)}
-  .letterCard .lopen{margin-top:28px;font-family:var(--sans);font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:14px 30px;border-radius:9px;border:none;background:var(--burnt);color:#fff;cursor:pointer;opacity:0;transition:opacity .55s 1.5s,background .15s}
+  .letterCard .lopen{margin-top:28px;font-family:var(--sans);font-size:11px;letter-spacing:.18em;text-transform:uppercase;padding:14px 34px;border-radius:0;border:none;background:var(--burnt);color:#fff;cursor:pointer;opacity:0;transition:opacity .55s 1.35s,background .15s,transform .15s}
   #letterOverlay.opened .lopen{opacity:1}
-  .letterCard .lopen:hover{background:var(--burnt-deep)}
+  .letterCard .lopen:hover{background:var(--burnt-deep);transform:translateY(-2px)}
   @media(max-width:560px){.letterCard{padding:34px 26px 30px}.letterCard h2{font-size:24px}.letterCard .lbody{font-size:15.5px;line-height:1.85}}
   #letterOverlay.done{animation:lOut .55s both}
   @keyframes lDrop{from{transform:translateY(-115vh) rotate(-5deg)}60%{transform:translateY(2.5%) rotate(.8deg)}to{transform:translateY(0) rotate(0)}}
-  @keyframes lSealAway{50%{transform:translate(-50%,-58%) scale(1.12) rotate(8deg);opacity:1}100%{transform:translate(-50%,-190%) scale(.45) rotate(24deg);opacity:0}}
+  @keyframes lSealAway{50%{transform:translate(-50%,-54%) scale(1.08) rotate(5deg);opacity:1}100%{transform:translate(-50%,-78%) scale(.84) rotate(10deg);opacity:0}}
   @keyframes lFade{from{opacity:0}to{opacity:1}}
+  @keyframes lPulse{0%,100%{opacity:.4}50%{opacity:.8}}
   @keyframes lOut{to{opacity:0;visibility:hidden}}
-  @media(max-width:900px){.goalgrid{grid-template-columns:1fr 1fr}.goalcard:nth-child(2){border-right:0}.goalcard:nth-child(-n+2){border-bottom:1px solid var(--sand)}.vizgrid{grid-template-columns:1fr}.toolbar{overflow-x:auto}.sitebar .mhtag{display:none}}
+  @media(prefers-reduced-motion:reduce){.envScene,.flap,.lseal,.letterCard,#letterOverlay,#letterOverlay::before{animation:none!important;transition-duration:.01ms!important;transition-delay:0ms!important}}
+  @media(max-width:900px){.goalgrid{grid-template-columns:1fr 1fr}.goalcard:nth-child(2){border-right:0}.goalcard:nth-child(-n+2){border-bottom:1px solid var(--sand)}.vizgrid{grid-template-columns:1fr}.sitebar .mhtag{display:none}}
   @media(max-width:660px){.sitebar{height:84px;padding:0 16px}.sitebar .stamp img{width:64px;height:64px}.sitebar .brandwrap{gap:14px}.mhid{padding-left:14px}.mhid .k{display:none}.mhid .t{font-size:21px;max-width:56vw}.toolbar{top:84px;padding:10px 14px}.control-title{display:none}.goalgrid{grid-template-columns:1fr}.goalcard{border-right:0;border-bottom:1px solid var(--sand)}.rhead .cli{font-size:42px}section{padding:28px 24px}}
-  @media print{.sitebar,.toolbar,.panel,#letterOverlay{display:none!important} body{background:#fff} .wrap{margin:0;max-width:none;padding:0} .report{box-shadow:none;border-radius:0;border:none} section{break-inside:avoid} .ed[contenteditable]{background:none!important;box-shadow:none!important}}
+  @media print{.sitebar,.toolbar,.panel,.utility-panel,#letterOverlay{display:none!important} body{background:#fff} .wrap{margin:0;max-width:none;padding:0} .report{box-shadow:none;border-radius:0;border:none} section{break-inside:avoid} .ed[contenteditable]{background:none!important;box-shadow:none!important}}
 </style>
 </head>
 <body>
@@ -303,8 +327,10 @@
   <button class="skip" id="letterSkip">Skip to report →</button>
   <div class="envScene" id="envScene">
     <div class="envBody">
-      <div class="flap"></div>
-      <img class="lseal" id="lseal" src="cno-seal.png" alt="CNO wax seal — click to open">
+      <div class="flap"><svg viewBox="0 0 480 220" preserveAspectRatio="none" aria-hidden="true"><polygon points="0,0 480,0 240,210" fill="#ede3cc" stroke="#b8956a" stroke-width="1.5" stroke-linejoin="round"/><line x1="2" y1="1" x2="240" y2="210" stroke="#b8956a" stroke-width=".75" opacity=".4"/><line x1="478" y1="1" x2="240" y2="210" stroke="#b8956a" stroke-width=".75" opacity=".4"/></svg></div>
+      <svg class="envInnerLines" viewBox="0 0 480 200" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="200" x2="240" y2="80" stroke="#b8956a" stroke-width=".75" opacity=".35"/><line x1="480" y1="200" x2="240" y2="80" stroke="#b8956a" stroke-width=".75" opacity=".35"/></svg>
+      <div class="envSpace"></div>
+      <button class="lseal" id="lseal" type="button" title="Open the letter"><img src="cno-seal.png" alt="CNO wax seal — click to open"></button>
     </div>
   </div>
   <div class="letterCard" id="letterCard"></div>
@@ -330,11 +356,39 @@
   <label class="fld">Chart detail<select id="grainSel"><option value="day">Daily</option><option value="week">Weekly</option><option value="month">Monthly</option></select></label>
   <span class="fld">Platforms<span class="chips" id="platChips"></span></span>
   <div class="spacer"></div>
-  <button class="btn" id="installBtn" style="display:none">⤓ Install app</button>
+  <button class="btn" id="dataBtn">Import center</button>
+  <button class="btn" id="installBtn">Get the app</button>
   <button class="btn" id="custBtn">Customize</button>
   <button class="btn" id="shareBtn">Share link</button>
   <button class="btn" id="exportBtn">Export data</button>
   <button class="btn solid" id="printBtn">Print / PDF</button>
+</div>
+
+<div class="utility-panel" id="dataPanel">
+  <div class="utility-head"><div><h3>Import center</h3><p>Bring every export into one place. The report detects the platform and row type, keeps original columns, removes exact duplicate rows, and can produce one standardized master CSV.</p></div><button class="utility-close" id="dataClose" aria-label="Close import center">×</button></div>
+  <div class="import-grid">
+    <div class="dropzone" id="importDrop">
+      <img class="dropseal" src="cno-seal.png" alt="">
+      <h4>Drop the whole reporting folder</h4>
+      <p>Account, post, paid, and outcome CSVs can all be selected together. No renaming or manual copy-and-paste.</p>
+      <div class="dropactions"><label class="btn file">Choose CSVs<input type="file" id="prepFileIn" accept=".csv" multiple></label><label class="btn file">Choose folder<input type="file" id="folderIn" accept=".csv" multiple webkitdirectory directory></label></div>
+    </div>
+    <div>
+      <div class="import-summary" id="importSummary"></div>
+      <div class="fileaudit" id="fileAudit"><div class="fileaudit-empty">Imported files will appear here with their detected platform, data grain, date coverage, and mapping status.</div></div>
+      <div class="import-actions"><button class="btn solid" id="masterBtn">Download combined master CSV</button><button class="btn" id="clearDataBtn">Clear imported data</button><span class="quiet">The original source columns remain available in Full data.</span></div>
+    </div>
+  </div>
+  <div class="sourcecards"><div class="sourcecard"><b>Rella</b><span>Export account and content data. Add both files; the importer merges them automatically.</span></div><div class="sourcecard"><b>Instagram / Meta</b><span>Export account insights, content, and Ads Manager results when paid or dark ads ran.</span></div><div class="sourcecard"><b>TikTok</b><span>Add account analytics and video-level exports. Watch-time fields are retained when present.</span></div><div class="sourcecard"><b>LinkedIn</b><span>Add visitor, follower, content, and campaign exports. Professional audience fields stay intact.</span></div></div>
+</div>
+
+<div class="utility-panel" id="installPanel">
+  <div class="utility-head"><div><h3>Take CNO Reports with you</h3><p>The same private, no-subscription reporting workspace can be installed from the browser or downloaded as a desktop app. Your imported CSVs stay on this device unless you intentionally create a share link.</p></div><button class="utility-close" id="installClose" aria-label="Close installation guide">×</button></div>
+  <div class="sourcecards installcards">
+    <div class="sourcecard"><b>Install from this browser</b><span>The fastest option. In Chrome or Edge, choose <em>Install now</em>. On iPhone or iPad, use Safari's Share menu and choose <em>Add to Home Screen</em>. On Mac Safari, choose File → Add to Dock.</span><button class="btn solid" id="pwaInstallNow">Install now</button></div>
+    <div class="sourcecard"><b>Download the desktop version</b><span>Use the Windows installer (.exe) or Mac disk image (.dmg). It opens like a normal desktop app and works without keeping a browser tab open.</span><a class="btn" href="https://github.com/joongsukkie/cno-analytics-report/releases/latest" target="_blank" rel="noopener">Open downloads</a></div>
+    <div class="sourcecard"><b>How the download is made</b><span>The report is wrapped in a lightweight desktop shell. Each published version is built automatically for Windows and macOS from the same audited report code.</span><a class="btn" href="https://github.com/joongsukkie/cno-analytics-report/blob/main/DESKTOP.md" target="_blank" rel="noopener">Read the guide</a></div>
+  </div>
 </div>
 
 <div class="panel" id="custPanel">
@@ -480,6 +534,7 @@ const ALIAS={};
 for(const canon in map){for(const a of map[canon]){ALIAS[a]=canon;}ALIAS[canon.replace(/_/g,"")]=canon;}})();
 const normKey=h=>String(h).toLowerCase().replace(/[^a-z0-9]/g,"");
 function normalizeRow(raw){const o={_raw:raw};for(const k in raw){const canon=ALIAS[normKey(k)];if(canon)o[canon]=raw[k];else o[normKey(k)]=raw[k];}return o;}
+const escHtml=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 /* ==================== CSV ==================== */
 function parseCSV(text){
@@ -567,7 +622,7 @@ function rawDataTables(c){
 }
 
 /* ==================== ingest ==================== */
-let POSTS=[], PERIODS=[];
+let POSTS=[], PERIODS=[], IMPORT_LOG=[];
 function classify(rows){
   const posts=[],periods=[];
   rows.forEach(raw=>{
@@ -607,8 +662,37 @@ function classify(rows){
   return {posts,periods};
 }
 function collectTargets(r){const t={};for(const k in r){if(k==="_raw")continue;if(/target$/.test(k)){const base=k.slice(0,-6),v=num(r[k]);if(v!==null&&v!==undefined)t[base]=v;}}return t;}
-function ingest(text){const {posts,periods}=classify(parseCSV(text));POSTS=POSTS.concat(posts);PERIODS=PERIODS.concat(periods);}
-function resetData(){POSTS=[];PERIODS=[];}
+function recordKey(r,grain){const raw=r.raw||{};return grain+"|"+Object.keys(raw).sort().map(k=>k+"="+String(raw[k]??"").trim()).join("&");}
+function addUnique(existing,incoming,grain){const seen=new Set(existing.map(r=>recordKey(r,grain))),kept=[];let duplicates=0;incoming.forEach(r=>{const k=recordKey(r,grain);if(seen.has(k))duplicates++;else{seen.add(k);kept.push(r);}});existing.push(...kept);return{kept:kept.length,duplicates};}
+function ingest(text,sourceName=""){
+  const rows=parseCSV(text),headers=rows.length?Object.keys(rows[0]):[],classified=classify(rows);
+  [...classified.posts,...classified.periods].forEach(r=>r.source=sourceName);
+  const pa=addUnique(POSTS,classified.posts,"post"),aa=addUnique(PERIODS,classified.periods,"account");
+  if(sourceName){const all=[...classified.posts,...classified.periods],dates=all.map(r=>r.date).filter(Boolean),platforms=[...new Set(all.map(r=>r.platform).filter(Boolean))],recognizedHeaders=headers.filter(h=>ALIAS[normKey(h)]||/target$/i.test(normKey(h))).length;
+    IMPORT_LOG.push({name:sourceName,rows:rows.length,used:pa.kept+aa.kept,duplicates:pa.duplicates+aa.duplicates,posts:classified.posts.length,periods:classified.periods.length,grain:classified.posts.length&&classified.periods.length?"Mixed":classified.posts.length?"Post":"Account",platforms,dateFrom:dates.length?ymd(new Date(Math.min(...dates))):"",dateTo:dates.length?ymd(new Date(Math.max(...dates))):"",mapped:recognizedHeaders,headers:headers.length,skipped:Math.max(0,rows.length-classified.posts.length-classified.periods.length)});
+    renderImportCenter();
+  }
+  return{posts:pa.kept,periods:aa.kept,duplicates:pa.duplicates+aa.duplicates};
+}
+function resetData(){POSTS=[];PERIODS=[];IMPORT_LOG=[];renderImportCenter();}
+function combinedMasterCSV(){
+  const rows=[];
+  PERIODS.forEach(p=>rows.push({record_type:p.date?"account_daily":"account_monthly",source_file:p.source||"",...(p.raw||{}),client:p.client,platform:p.platform,month:p.month,date:p.date?ymd(p.date):"",followers_total:p.followers_total,followers_growth:p.followers_growth,reach:p.reach,impressions:p.impressions,views:p.views,engagement:p.engagement,profile_views:p.profile_views,link_clicks:p.link_clicks,dms:p.dms,meaningful_comments:p.meaningful_comments,comment_replies:p.comment_replies,leads:p.leads,bookings:p.bookings,membership_signups:p.membership_signups,retail_sales:p.retail_sales,revenue:p.revenue,event_reach:p.event_reach,event_engagement:p.event_engagement,event_registrations:p.event_registrations,event_attendees:p.event_attendees,conversions:p.conversions,paid_reach:p.paid_reach,paid_impressions:p.paid_impressions,organic_reach:p.organic_reach,organic_impressions:p.organic_impressions,spend:p.spend,posts:p.posts,top_age_group:p.top_age_group,top_gender:p.top_gender,top_countries:p.top_countries,top_cities:p.top_cities,...Object.fromEntries(Object.entries(p.targets||{}).map(([k,v])=>[k+"_target",v]))}));
+  POSTS.forEach(p=>rows.push({record_type:"post",source_file:p.source||"",...(p.raw||{}),client:p.client,platform:p.platform,month:p.month,date:ymd(p.date),post_type:p.type,campaign:p.campaign,campaign_phase:p.campaign_phase,pillar:p.pillar,engagement:p.engagement,reach:p.reach,impressions:p.impressions,views:p.views,likes:p.likes,comments:p.comments,meaningful_comments:p.meaningful_comments,shares:p.shares,saves:p.saves,reposts:p.reposts,replies:p.replies,follows:p.follows,clicks:p.clicks,video_completions:p.video_completions,watch_time:p.watch,spend:p.spend,hashtag_count:p.tags,caption_length:p.len,caption_snippet:p.snippet}));
+  return toCSV(rows);
+}
+function downloadMaster(){if(!POSTS.length&&!PERIODS.length){alert("Import data first.");return;}download("cno_combined_master.csv",combinedMasterCSV());}
+function renderImportCenter(){
+  const s=$("importSummary"),a=$("fileAudit");if(!s||!a)return;
+  const ps=[...new Set([...POSTS,...PERIODS].map(r=>r.platform))],cs=clients(),dupes=sum(IMPORT_LOG.map(x=>x.duplicates));
+  s.innerHTML=[["Files",IMPORT_LOG.length],["Rows ready",POSTS.length+PERIODS.length],["Platforms",ps.length],["Duplicates removed",dupes]].map(x=>`<div class="isum"><span>${x[0]}</span><b>${fmtInt(x[1])}</b></div>`).join("");
+  if(!IMPORT_LOG.length){a.innerHTML='<div class="fileaudit-empty">Imported files will appear here with their detected platform, data grain, date coverage, and mapping status.</div>';return;}
+  a.innerHTML=`<div class="file-row head"><span>File</span><span>Type</span><span>Rows</span><span>Coverage</span><span>Status</span></div>`+IMPORT_LOG.map(f=>{const coverage=f.dateFrom?(f.dateFrom+(f.dateTo&&f.dateTo!==f.dateFrom?" → "+f.dateTo:"")):"Period totals";const ok=f.used>0&&f.skipped===0,detail=f.duplicates?f.duplicates+" duplicate"+(f.duplicates===1?"":"s"):f.skipped?f.skipped+" skipped":"Ready";return `<div class="file-row"><span class="file-name" title="${escHtml(f.name)}">${escHtml(f.name)}</span><span>${f.grain}</span><span>${fmtInt(f.used)}</span><span>${escHtml((f.platforms.map(plat).join(", ")||"Unknown")+" · "+coverage)}</span><span class="${ok?"file-ok":"file-warn"}">${escHtml(detail)}</span></div>`;}).join("");
+}
+function importFiles(files){
+  if(VIEW_LOCK)return;const csv=[...files].filter(f=>/\.csv$/i.test(f.name));if(!csv.length){alert("No CSV files were found in that selection.");return;}
+  $("dataPanel").classList.add("open");let done=0;csv.forEach(f=>{const r=new FileReader();r.onload=e=>{ingest(e.target.result,f.webkitRelativePath||f.name);if(++done===csv.length){refreshAll();renderImportCenter();}};r.onerror=()=>{IMPORT_LOG.push({name:f.name,rows:0,used:0,duplicates:0,posts:0,periods:0,grain:"Unknown",platforms:[],dateFrom:"",dateTo:"",mapped:0,headers:0,skipped:1});if(++done===csv.length){refreshAll();renderImportCenter();}};r.readAsText(f);});
+}
 
 /* ==================== data model ==================== */
 function clients(){return [...new Set([...POSTS.map(p=>p.client),...PERIODS.map(p=>p.client)])].sort();}
@@ -1466,7 +1550,7 @@ function wireEdits(){
 }
 
 /* ==================== wiring ==================== */
-function refreshAll(){const cs=clients();$("clientSel").innerHTML=cs.map(c=>`<option>${c}</option>`).join("");refreshPeriods();}
+function refreshAll(){const cs=clients();$("clientSel").innerHTML=cs.map(c=>`<option>${c}</option>`).join("");refreshPeriods();renderImportCenter();}
 $("clientSel").addEventListener("change",refreshPeriods);
 $("periodSel").addEventListener("change",onPeriodChange);
 $("grainSel").addEventListener("change",e=>{CUSTOM.grain=e.target.value;saveCustom();render();});
@@ -1476,8 +1560,17 @@ $("printBtn").addEventListener("click",()=>window.print());
 $("custBtn").addEventListener("click",()=>$("custPanel").classList.toggle("open"));
 $("exportBtn").addEventListener("click",doExport);
 $("shareBtn").addEventListener("click",makeShareLink);
-$("fileIn").addEventListener("change",function(){if(VIEW_LOCK)return;const files=[...this.files];if(!files.length)return;let done=0;files.forEach(f=>{const r=new FileReader();r.onload=e=>{ingest(e.target.result);done++;if(done===files.length){refreshAll();}};r.readAsText(f);});this.value="";});
-$("demoBtn").addEventListener("click",()=>{if(VIEW_LOCK)return;resetData();ingest(DEMO_ACC);ingest(DEMO_CON);refreshAll();});
+$("dataBtn").addEventListener("click",()=>$("dataPanel").classList.toggle("open"));
+$("dataClose").addEventListener("click",()=>$("dataPanel").classList.remove("open"));
+$("masterBtn").addEventListener("click",downloadMaster);
+$("clearDataBtn").addEventListener("click",()=>{if(!confirm("Clear all imported data from this report?"))return;resetData();refreshAll();});
+$("fileIn").addEventListener("change",function(){importFiles(this.files);this.value="";});
+$("prepFileIn").addEventListener("change",function(){importFiles(this.files);this.value="";});
+$("folderIn").addEventListener("change",function(){importFiles(this.files);this.value="";});
+$("importDrop").addEventListener("dragover",e=>{e.preventDefault();e.stopPropagation();$("importDrop").classList.add("over");});
+$("importDrop").addEventListener("dragleave",e=>{e.stopPropagation();$("importDrop").classList.remove("over");});
+$("importDrop").addEventListener("drop",e=>{e.preventDefault();e.stopPropagation();$("importDrop").classList.remove("over");importFiles(e.dataTransfer.files);});
+$("demoBtn").addEventListener("click",()=>{if(VIEW_LOCK)return;resetData();ingest(DEMO_ACC,"Demo account data.csv");ingest(DEMO_CON,"Demo content data.csv");refreshAll();});
 
 /* ==================== demo (fictional) ==================== */
 const DEMO_ACC=`client,platform,month,followers_total,followers_growth,reach,impressions,engagement,views,profile_views,link_clicks,dms,meaningful_comments,comment_replies,leads,bookings,membership_signups,retail_sales,revenue,event_reach,event_engagement,event_registrations,event_attendees,conversions,paid_reach,paid_impressions,organic_reach,organic_impressions,spend,posts,top_age_group,top_gender,top_countries,top_cities,reach_target,profile_views_target,link_clicks_target,followers_growth_target,event_registrations_target,event_attendees_target,bookings_target,revenue_target
@@ -1507,6 +1600,7 @@ function maybeShowLetter(force){
   if(!force&&cget("letter",true)===false)return;
   if(!clients().length)return;
   LETTER_SHOWN=true;
+  document.body.classList.add("letter-active");
   const c=$("clientSel").value, nameShow=cget("name","")||c;
   const headEl=document.querySelector("#report .headline");
   const head=headEl?headEl.textContent.trim():"";
@@ -1517,8 +1611,8 @@ function maybeShowLetter(force){
   $("lopenBtn").addEventListener("click",closeLetter);
   wireEdits();
 }
-function closeLetter(){const ov=$("letterOverlay");ov.classList.add("done");setTimeout(()=>{ov.hidden=true;ov.classList.remove("done","opened");$("envScene").classList.remove("open");},600);}
-$("lseal").addEventListener("click",()=>{$("envScene").classList.add("open");$("letterOverlay").classList.add("opened");});
+function closeLetter(){const ov=$("letterOverlay");ov.classList.add("done");document.body.classList.remove("letter-active");setTimeout(()=>{ov.hidden=true;ov.classList.remove("done","opened");$("envScene").classList.remove("open");},600);}
+$("lseal").addEventListener("click",()=>{const scene=$("envScene"),ov=$("letterOverlay");scene.classList.add("open");setTimeout(()=>ov.classList.add("opened"),680);});
 $("letterSkip").addEventListener("click",closeLetter);
 
 /* ---- drag & drop CSVs anywhere on the page ---- */
@@ -1526,9 +1620,10 @@ document.addEventListener("dragover",e=>{if(VIEW_LOCK)return;e.preventDefault();
 document.addEventListener("dragleave",e=>{if(!e.relatedTarget)document.body.classList.remove("dragging");});
 document.addEventListener("drop",e=>{if(VIEW_LOCK)return;e.preventDefault();document.body.classList.remove("dragging");
   const files=[...e.dataTransfer.files].filter(f=>/\.csv$/i.test(f.name));if(!files.length)return;
-  let done=0;files.forEach(f=>{const r=new FileReader();r.onload=ev=>{ingest(ev.target.result);done++;if(done===files.length)refreshAll();};r.readAsText(f);});});
+  importFiles(files);});
 
 buildCustomUI();wireCustom();
+renderImportCenter();
 (async function(){
   const h=location.hash;
   async function loadBundle(j){
@@ -1565,12 +1660,14 @@ if("serviceWorker" in navigator && location.protocol.startsWith("http")){
 let DEFERRED_INSTALL=null;
 window.addEventListener("beforeinstallprompt",e=>{
   e.preventDefault();DEFERRED_INSTALL=e;
-  if(!VIEW_LOCK){const b=$("installBtn");if(b)b.style.display="";}
+  const b=$("pwaInstallNow");if(b)b.textContent="Install now";
 });
-window.addEventListener("appinstalled",()=>{DEFERRED_INSTALL=null;const b=$("installBtn");if(b)b.style.display="none";});
-if($("installBtn"))$("installBtn").addEventListener("click",async()=>{
-  if(!DEFERRED_INSTALL){alert("To install: in your browser menu choose “Install app” or “Add to Home Screen”.\n\nOn iPhone Safari: tap Share, then “Add to Home Screen.”");return;}
-  DEFERRED_INSTALL.prompt();await DEFERRED_INSTALL.userChoice;DEFERRED_INSTALL=null;$("installBtn").style.display="none";
+window.addEventListener("appinstalled",()=>{DEFERRED_INSTALL=null;const b=$("pwaInstallNow");if(b)b.textContent="Installed";});
+$("installBtn").addEventListener("click",()=>$("installPanel").classList.toggle("open"));
+$("installClose").addEventListener("click",()=>$("installPanel").classList.remove("open"));
+$("pwaInstallNow").addEventListener("click",async()=>{
+  if(!DEFERRED_INSTALL){alert("Chrome / Edge: open the browser menu and choose “Install CNO Reports.”\n\niPhone / iPad Safari: tap Share, then “Add to Home Screen.”\n\nMac Safari: choose File, then “Add to Dock.”");return;}
+  DEFERRED_INSTALL.prompt();await DEFERRED_INSTALL.userChoice;DEFERRED_INSTALL=null;
 });
 </script>
 </body>

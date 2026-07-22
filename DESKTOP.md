@@ -4,10 +4,26 @@ The report generator can be packaged as a real installable app for **Windows** a
 in addition to running in a browser or as an installable web app (PWA). Same single `index.html`
 inside a native window, powered by [Electron](https://www.electronjs.org/).
 
+Most users should keep the hosted report bookmarked or install the web app; no separate download is required. The native installer is optional for CNO staff who want a dedicated offline desktop window.
+
+## Fastest installation: save the hosted report as an app
+
+Open `https://cno-analytics-report.onrender.com/`, then click **Get the app** in the top toolbar for device-specific instructions.
+
+- **Chrome or Edge:** use the install icon in the address bar or the browser menu's **Install CNO Reports** command.
+- **Mac Safari (macOS Sonoma 14+):** choose **File → Add to Dock**.
+- **iPhone or iPad Safari:** tap **Share → Add to Home Screen**.
+
+This keeps the app up to date automatically and avoids unsigned-installer warnings.
+
 You do **not** need a Mac to build the Mac version, and you do not need to install anything to
 get the installers. GitHub builds them for you.
 
-## The easy way: let GitHub build the installers
+## Native installer download
+
+Published Windows and Mac installers appear on the repo's [latest release](https://github.com/joongsukkie/cno-analytics-report/releases/latest). If no release is listed yet, use the GitHub build steps below.
+
+## How GitHub builds the installers
 
 A workflow at `.github/workflows/build-desktop.yml` builds both installers on GitHub's own
 Windows and macOS machines.
@@ -15,14 +31,14 @@ Windows and macOS machines.
 **Option A — tag a release (recommended).** From the repo:
 
 ```bash
-git tag v1.0.0
-git push origin v1.0.0
+git tag v1.1.0
+git push origin v1.1.0
 ```
 
 In a few minutes a **Release** appears on GitHub with two files attached:
 
-- `CNO Reports Setup 1.0.0.exe` — Windows installer
-- `CNO Reports-1.0.0.dmg` — macOS disk image
+- `CNO Reports Setup 1.1.0.exe` — Windows installer
+- `CNO Reports-1.1.0.dmg` — macOS disk image
 
 **Option B — run it on demand.** On GitHub: **Actions → "Build desktop installers" → Run workflow.**
 When it finishes, download the installers from the run's **Artifacts** section.

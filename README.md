@@ -2,7 +2,7 @@
 
 A standalone, deterministic reporting tool for CNO Creative Co. Feed it a CSV of social media data and it produces the same branded, client-ready analytics report every time.
 
-**No install. No API key. No build step. Works offline.**
+**No required install. No required API key. No build step. Works offline.**
 
 ---
 
@@ -11,6 +11,8 @@ A standalone, deterministic reporting tool for CNO Creative Co. Feed it a CSV of
 Most social tools show isolated platform numbers. This one turns them into a **visual, client-specific measurement system** spanning awareness, audience quality, campaigns, and business outcomes.
 
 **Reads any export.** One upload accepts multiple files at once and normalizes column names across Rella, Instagram/Meta, TikTok, LinkedIn, and YouTube — no renaming required. It auto-detects account-level vs. post-level data. See [`06_CSV_SCHEMA.md`](06_CSV_SCHEMA.md).
+
+**Import center.** Drop in a whole client/month folder, audit every file's detected platform, row type, row count, and date coverage, safely remove exact duplicate rows, then download one standardized combined master CSV without losing the original source columns. See [`DATA_IMPORT_GUIDE.md`](DATA_IMPORT_GUIDE.md).
 
 **Interactive, like a real dashboard.**
 - Pick any **time period inside the report** — a month, last 30/90 days, all time, or a custom date range — and everything recomputes vs. the previous comparable period. No re-uploading.
@@ -45,7 +47,7 @@ Most social tools show isolated platform numbers. This one turns them into a **v
 
 Open `index.html` in any browser (or visit the deployed site with `#demo` to auto-load a sample).
 
-1. **Upload CSV(s)** — drop in any account-level and/or post-level exports, or click **Load demo**
+1. Open **Import center**, then drop in the whole reporting folder or select all available CSVs at once
 2. Pick a **client** and **period** (month / last 30 / 90 / all / custom range)
 3. **Customize** the goal, featured KPIs, and sections; edit any text inline
 4. **Export data** to download normalized CSVs, or **Print / PDF** for the client leave-behind
@@ -54,7 +56,9 @@ Templates: `resources/template_accounts.csv`, `resources/template_content.csv`. 
 
 ## Keeping reports refreshed
 
-No API key or backend is required. For each reporting cycle, export the available date range from Rella and/or the native platforms, add any offline outcomes from the client’s booking/CRM/sales records, then upload all CSVs together. The report merges them, separates platforms, and recalculates the selected period. Create a new password-protected share link after the refresh; that link contains a private snapshot of the uploaded report data.
+No API key or backend is required. For each reporting cycle, export the available date range from Rella and/or the native platforms, add any offline outcomes from the client’s booking/CRM/sales records, then upload the whole folder in Import center. The report audits and merges the files, separates platforms, removes exact duplicate rows, and recalculates the selected period. Create a new password-protected share link after the refresh; that link contains a private snapshot of the uploaded report data.
+
+For the exact recommended folder structure, refresh checklist, and the tradeoffs of a future automatic API sync, see [`DATA_IMPORT_GUIDE.md`](DATA_IMPORT_GUIDE.md).
 
 > **Note:** Rella returns the *current* follower total for any date range, so follower *trends* come from monthly **growth**, not by differencing the total. The tool handles this.
 
@@ -80,6 +84,7 @@ Static site, no build. On [Render](https://render.com): connect the repo, choose
 | `resources/brand-style.md` | Official brand palette, type, and voice |
 | `01_METRICS_DICTIONARY.md` | Every metric and its exact formula |
 | `06_CSV_SCHEMA.md` | The CSV contract (including optional `<metric>_target` goal columns) |
+| `DATA_IMPORT_GUIDE.md` | Monthly import workflow and realistic native-platform connection options |
 
 ## Brand
 
