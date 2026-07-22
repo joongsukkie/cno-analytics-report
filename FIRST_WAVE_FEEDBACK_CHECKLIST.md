@@ -4,7 +4,7 @@ This checklist records what the report supports and what the operator does each 
 
 - [x] CNO wax seal centered on the report and used in the opening letter.
 - [x] Instagram, TikTok, LinkedIn, YouTube, Facebook/Meta, and other detected platforms appear as checkboxes.
-- [x] Metrics, audience data, charts, and comparisons recalculate for the selected platform(s); one platform is selected by default to avoid accidental blending.
+- [x] Metrics, audience data, charts, and comparisons recalculate for the selected platform(s); one platform is selected by default, and a multi-platform selection renders separate platform KPI panels and charts instead of a blended engagement rate or funnel.
 - [x] Multiple CSV selection and page-wide drag-and-drop.
 - [x] Campaign tags and campaign comparison using robust medians.
 - [x] Content-pillar tags and pillar comparison, with a visible count of untagged posts.
@@ -17,13 +17,14 @@ This checklist records what the report supports and what the operator does each 
 - [x] Website clicks, DMs, meaningful comments, comment replies, leads, bookings, memberships, retail sales, revenue, and event outcomes are recognized.
 - [x] Current-versus-prior comparisons on headline, profile, content, and journey metrics.
 - [x] Branded wax-seal envelope and letter introduction.
-- [x] Paid/boosted data: spend, paid reach/impressions, cost per click, cost per thousand, cost per follower, and return on ad spend when inputs are available.
+- [x] Paid/boosted data: spend, paid reach/impressions, paid clicks/follows/conversions/revenue, paid CTR, CPM, cost per paid click/follow/conversion, and ROAS. Paid efficiency never substitutes total organic-plus-paid outcomes.
 - [x] Full uploaded dataset is available as a spreadsheet at the bottom and can be downloaded in normalized form.
 - [x] Visualization-first success scorecard covering authority, audience quality, campaign momentum, and business growth, with optional per-metric monthly targets and progress-to-goal bars (`<metric>_target` columns).
 - [x] Formula-matched platform benchmark context, with warnings against blending platforms or mismatching engagement-rate denominators; client-specific peer norms can replace the reference.
 - [x] CNO website styling—including typography, color, fine rules, editorial layouts, and “Hand it over” upload action.
 - [x] Report leads with the story and the client's goals (the summarized, plain-language view) before the detailed data.
-- [x] Optional AI narrative: paste an OpenAI or Anthropic API key to rewrite the opening letter and takeaways from the client's real numbers, in a veteran-analyst voice, no em dashes. Key stays in the browser only and never travels in a share link.
+- [x] Optional AI narrative: paste an OpenAI or Anthropic API key to rewrite the opening letter and takeaways from the client's real numbers. It includes structured evidence keys, confidence levels, sample-size rules, data-quality cautions, optional CNO context, and a CNO-only evidence review. Key stays in the browser only and never travels in a share link.
+- [x] CNO-only data-quality audit and visibly separate **CNO workspace · staff tools** versus **Client report · view only** experiences.
 - [x] Shared links are scoped to a single client's data and open view-only (no uploading, switching clients, editing, or export), so one client can never see another's results even if a password is mishandled.
 - [x] Installable, offline-capable app (PWA): add to home screen or install on Mac/Windows/phone, and bookmark to return anytime.
 - [x] Expanded paid vs. organic section: reach and impressions splits, paid share of reach, and an optional AI read on spend.
@@ -38,4 +39,4 @@ This checklist records what the report supports and what the operator does each 
 6. Edit the narrative where human context is required. The charts and calculations remain deterministic.
 7. Create a new password-protected share link for that client and cycle. Send the password separately.
 
-No API key or server database is involved. A shared link is a self-contained encrypted snapshot, so refreshing the source data requires creating a fresh link.
+Manual CSV reporting still needs no API key or server database. A shared link is a self-contained encrypted snapshot, so refreshing manual source data requires creating a fresh link. The optional native-sync service is a separate CNO-only backend and is not exposed in client reports.

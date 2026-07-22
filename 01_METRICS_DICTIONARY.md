@@ -9,7 +9,7 @@ This is the single reference for what each number means. Consistent definitions 
 
 | Metric | Formula / definition | Why it matters | "Vanity" risk |
 |--------|----------------------|----------------|---------------|
-| **Reach** | # of unique accounts that saw any content | Real audience size touched this month | Low |
+| **Reach** | # of unique accounts that saw content inside the platform's stated measurement window | Real audience size touched in that window; not additive across daily/monthly windows | Low |
 | **Impressions** | Total times content was shown (can repeat) | Exposure volume; pair with reach | Medium |
 | **Engagement Rate (ER)** | See formulas below | The #1 health metric — resonance, not just size | Low |
 | **Total Engagements** | Likes + Comments + Shares + Saves | Raw interaction volume | Medium |
@@ -94,7 +94,11 @@ Engagement rate is the headline metric, but it has multiple valid formulas. **We
 | **Reach-to-lead rate** | Qualified leads ÷ reach | Directional top-of-funnel business efficiency |
 | **Lead-to-booking rate** | New bookings ÷ qualified leads | Sales/booking conversion quality |
 | **Event attendance rate** | Attendees ÷ registrations | Whether event interest became attendance |
-| **ROAS** | Attributed revenue ÷ paid spend | Paid-media return when attribution data is available |
+| **Paid CTR** | Paid clicks ÷ paid impressions | Whether paid distribution produced click action |
+| **Paid CPC** | Paid spend ÷ paid-attributed clicks | Cost to earn one paid click |
+| **Cost per paid follow** | Paid spend ÷ paid-attributed follows | Paid audience-acquisition efficiency |
+| **Cost per paid conversion** | Paid spend ÷ paid-attributed conversions | Paid outcome efficiency |
+| **ROAS** | Paid-attributed revenue ÷ paid spend | Paid-media return when attribution data is available |
 
 ## Client-goal and business metrics
 
@@ -122,3 +126,5 @@ Per research on client value, we **demote pure vanity metrics** (raw follower co
 - **Reels/video "views" definitions differ by platform** — never sum views across platforms as if equal.
 - **Reporting window:** define the month consistently (calendar month, 1st–last day) for every client, every platform.
 - **Followers timing:** capture follower count on the same day each month (e.g., 1st) for clean growth math.
+- **Reach is non-additive:** summing daily or monthly unique reach can count the same person more than once. Use a platform total for the full reporting window when exact uniqueness matters.
+- **Paid attribution is strict:** never calculate CPC, cost per follow/conversion, or ROAS using total website clicks, total follower growth, total conversions, or total revenue. Use paid-specific denominators only.

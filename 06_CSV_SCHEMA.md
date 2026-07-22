@@ -31,11 +31,19 @@ You do **not** need to rename columns. The tool maps common header names from Re
 - **post type** ← `post type`, `media type`, `format`
 - plus `client`, `platform`, `caption`, `hashtags`, demographics (`gender`, `top countries`, `top cities`), etc.
 
-The goal scorecard also recognizes `meaningful comments`, `comment replies`, `DMs`, `leads`, `bookings`, `membership signups`, `retail sales`, `revenue`, `event reach`, `event engagement`, `event registrations`, `event attendees`, `conversions`, `spend`, `paid reach`, `paid impressions`, `organic reach`, and `organic impressions`.
+The goal scorecard also recognizes `meaningful comments`, `comment replies`, `DMs`, `leads`, `bookings`, `membership signups`, `retail sales`, `revenue`, `event reach`, `event engagement`, `event registrations`, `event attendees`, and `conversions`.
+
+Paid reporting recognizes `spend`, `paid_reach`, `paid_impressions`, `paid_clicks`, `paid_follows`, `paid_conversions`, `paid_revenue`, `organic_reach`, and `organic_impressions`. Paid-efficiency formulas require these paid-specific columns; generic `clicks`, total follower growth, total conversions, and total revenue are never assumed to be caused by ads.
+
+For lineage and grain control, add `data_source` (for example `rella`, `meta_native`, or `meta_ads_export`), `aggregation` (`daily`, `monthly`, `period`, `snapshot`, `post`, or `ad_daily`), and optional `period_start` / `period_end`. An exact period-total row takes priority over daily rows for the matching date window.
 
 Use an optional `record_type` column (`account_daily`, `account_monthly`, or `post`) when account and post rows live in the same CSV. This removes any ambiguity.
 
 Unrecognized columns are ignored, not fatal. Missing metrics just hide their card — nothing breaks.
+
+## Non-additive metrics
+
+Reach is a unique-account count within the platform's measurement window. Daily reach and separate monthly reach totals must not be treated as exact unique reach for a longer period because the same person can appear in more than one row. The report labels those sums directional and the CNO-only Data audit flags them. Supply a period-total row with `period_start` and `period_end` whenever exact unique reach for a custom window matters.
 
 ## Minimum to get a report
 - **Account-level file:** `client, platform, month` + at least one of `reach / followers / engagement`.

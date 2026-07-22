@@ -31,6 +31,8 @@ CNO staff can see:
 
 CNO staff cannot see OAuth tokens in the console. Render environment owners remain part of the infrastructure trust boundary because they can control the running service and its encryption key. Eliminating even that access requires a managed KMS/HSM with a narrowly scoped service identity; that is a later production-hardening step and is not honestly achievable with a completely free static site.
 
+The current admin token is a pilot control, not a complete employee account system. After metric and provider validation, replace it with individual managed staff identities, server-issued HTTP-only sessions, `owner` / `analyst` / `viewer` roles, and an audit log. Keep client identities in a separate tenant-scoped portal. See [`../DATA_ACCURACY_AND_ACCESS.md`](../DATA_ACCURACY_AND_ACCESS.md).
+
 ## Platform prerequisites
 
 ### Meta / Instagram

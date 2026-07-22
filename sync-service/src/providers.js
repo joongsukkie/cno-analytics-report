@@ -112,6 +112,12 @@ function metricValue(item) {
   return null;
 }
 
+function actionMetric(items, keys) {
+  const values = Object.fromEntries((items || []).map(x => [x.action_type, Number(x.value || 0)]));
+  for (const key of keys) if (values[key] != null) return values[key];
+  return null;
+}
+
 async function syncMeta(accessToken, clientRef, from, to) {
   const version = process.env.META_API_VERSION || "v25.0";
   const pageParams = new URLSearchParams({ fields: "id,name,access_token,instagram_business_account{id,username,followers_count,media_count}", access_token: accessToken });
@@ -130,7 +136,7 @@ async function syncMeta(accessToken, clientRef, from, to) {
         for (const metric of insight.data || []) {
         for (const point of metric.values || []) {
           const date = isoDay(point.end_time || to);
-          const row = accountByDate.get(date) || { record_type: "account_daily", client: clientRef, platform: "instagram", date };
+          const row = accountByDate.get(date) || { record_type: "account_daily", data_source: "meta_api", aggregation: "daily", client: clientRef, platform: "instagram", date };
           const value = typeof point.value === "object" ? null : point.value;
           if (metricMap[metric.name] && value != null) row[metricMap[metric.name]] = value;
           accountByDate.set(date, row);
@@ -138,14 +144,14 @@ async function syncMeta(accessToken, clientRef, from, to) {
       }
       } catch (error) { metricErrors.push(`${metricName}: ${error.message}`); }
     }
-    if (!accountByDate.size) accountByDate.set(to, { record_type: "account_daily", client: clientRef, platform: "instagram", date: to });
+    if (!accountByDate.size) accountByDate.set(to, { record_type: "account_daily", data_source: "meta_api", aggregation: "daily", client: clientRef, platform: "instagram", date: to });
     if (metricErrors.length) accountByDate.get([...accountByDate.keys()][0]).sync_note = `Unavailable metrics: ${metricErrors.join("; ").slice(0, 500)}`;
     for (const row of accountByDate.values()) rows.push({ followers_total: ig.followers_count, ...row });
 
     const mediaParams = new URLSearchParams({ fields: "id,caption,media_type,media_product_type,timestamp,permalink,like_count,comments_count", since: new Date(`${from}T00:00:00Z`).toISOString(), until: new Date(`${to}T23:59:59Z`).toISOString(), limit: "100", access_token: page.access_token });
     const media = await paged(`https://graph.facebook.com/${version}/${ig.id}/media?${mediaParams}`);
     for (const item of media) {
-      const post = { record_type: "post", client: clientRef, platform: "instagram", date: isoDay(item.timestamp), post_id: item.id, post_type: item.media_product_type || item.media_type, caption_snippet: String(item.caption || "").slice(0, 500), caption_length: String(item.caption || "").length, likes: item.like_count, comments: item.comments_count, permalink: item.permalink };
+      const post = { record_type: "post", data_source: "meta_api", aggregation: "post", client: clientRef, platform: "instagram", date: isoDay(item.timestamp), post_id: item.id, post_type: item.media_product_type || item.media_type, caption_snippet: String(item.caption || "").slice(0, 500), caption_length: String(item.caption || "").length, likes: item.like_count, comments: item.comments_count, permalink: item.permalink };
       try {
         const ip = new URLSearchParams({ metric: "reach,impressions,plays,saved,shares,total_interactions,video_views", access_token: page.access_token });
         const details = await apiJson(`https://graph.facebook.com/${version}/${item.id}/insights?${ip}`);
@@ -159,19 +165,21 @@ async function syncMeta(accessToken, clientRef, from, to) {
   try {
     const adAccounts = await paged(`https://graph.facebook.com/${version}/me/adaccounts?fields=id,name&access_token=${encodeURIComponent(accessToken)}`);
     for (const account of adAccounts) {
-      const summaryFields = "date_start,date_stop,spend,reach,impressions,clicks,actions";
+      const summaryFields = "date_start,date_stop,spend,reach,impressions,clicks,actions,action_values";
       const summaryParams = new URLSearchParams({ level: "account", time_range: JSON.stringify({ since: from, until: to }), time_increment: "1", fields: summaryFields, limit: "100", access_token: accessToken });
       const daily = await paged(`https://graph.facebook.com/${version}/${account.id}/insights?${summaryParams}`);
       for (const item of daily) {
-        const actions = Object.fromEntries((item.actions || []).map(x => [x.action_type, Number(x.value || 0)]));
-        rows.push({ record_type: "account_daily", client: clientRef, platform: "instagram", date: item.date_start, spend: item.spend, paid_reach: item.reach, paid_impressions: item.impressions, clicks: item.clicks, conversions: actions.purchase || actions.lead || actions.offsite_conversion || 0 });
+        const paidConversions = actionMetric(item.actions, ["purchase", "omni_purchase", "lead", "offsite_conversion"]);
+        const paidRevenue = actionMetric(item.action_values, ["purchase", "omni_purchase", "offsite_conversion.fb_pixel_purchase"]);
+        rows.push({ record_type: "account_daily", data_source: "meta_ads_api", aggregation: "daily", client: clientRef, platform: "instagram", date: item.date_start, spend: item.spend, paid_reach: item.reach, paid_impressions: item.impressions, paid_clicks: item.clicks, paid_conversions: paidConversions, paid_revenue: paidRevenue });
       }
-      const fields = "date_start,date_stop,campaign_name,ad_name,spend,reach,impressions,clicks,actions";
+      const fields = "date_start,date_stop,campaign_id,campaign_name,ad_id,ad_name,spend,reach,impressions,clicks,actions,action_values";
       const p = new URLSearchParams({ level: "ad", time_range: JSON.stringify({ since: from, until: to }), time_increment: "1", fields, limit: "100", access_token: accessToken });
       const ads = await paged(`https://graph.facebook.com/${version}/${account.id}/insights?${p}`);
       for (const ad of ads) {
-        const actions = Object.fromEntries((ad.actions || []).map(x => [x.action_type, Number(x.value || 0)]));
-        rows.push({ record_type: "post", client: clientRef, platform: "instagram", date: ad.date_start, post_type: "PAID_AD", campaign: ad.campaign_name || "Paid campaign", caption_snippet: ad.ad_name || "Paid / dark ad", spend: ad.spend, reach: ad.reach, impressions: ad.impressions, clicks: ad.clicks, conversions: actions.purchase || actions.lead || actions.offsite_conversion || 0 });
+        const paidConversions = actionMetric(ad.actions, ["purchase", "omni_purchase", "lead", "offsite_conversion"]);
+        const paidRevenue = actionMetric(ad.action_values, ["purchase", "omni_purchase", "offsite_conversion.fb_pixel_purchase"]);
+        rows.push({ record_type: "post", data_source: "meta_ads_api", aggregation: "ad_daily", client: clientRef, platform: "instagram", date: ad.date_start, post_id: ad.ad_id, post_type: "PAID_AD", campaign: ad.campaign_name || "Paid campaign", campaign_id: ad.campaign_id, caption_snippet: ad.ad_name || "Paid / dark ad", spend: ad.spend, reach: ad.reach, impressions: ad.impressions, paid_clicks: ad.clicks, paid_conversions: paidConversions, paid_revenue: paidRevenue });
       }
     }
   } catch { /* ads_read is optional; organic sync should still complete. */ }
@@ -183,14 +191,14 @@ async function syncTikTok(accessToken, clientRef, from, to) {
   const fields = "open_id,display_name,follower_count,following_count,likes_count,video_count";
   const profile = await apiJson(`https://open.tiktokapis.com/v2/user/info/?fields=${encodeURIComponent(fields)}`, { headers });
   const user = profile.data?.user || {};
-  const rows = [{ record_type: "account_daily", client: clientRef, platform: "tiktok", date: to, followers_total: user.follower_count, likes: user.likes_count, posts: user.video_count }];
+  const rows = [{ record_type: "account_daily", data_source: "tiktok_api", aggregation: "snapshot", client: clientRef, platform: "tiktok", date: to, followers_total: user.follower_count, likes: user.likes_count, posts: user.video_count }];
   let cursor = 0;
   for (let page = 0; page < 10; page += 1) {
     const vf = "id,title,video_description,duration,create_time,share_url,view_count,like_count,comment_count,share_count";
     const data = await apiJson(`https://open.tiktokapis.com/v2/video/list/?fields=${encodeURIComponent(vf)}`, { method: "POST", headers, body: JSON.stringify({ max_count: 20, cursor }) });
     for (const video of data.data?.videos || []) {
       const date = isoDay(Number(video.create_time) * 1000);
-      if (date >= from && date <= to) rows.push({ record_type: "post", client: clientRef, platform: "tiktok", date, post_id: video.id, post_type: "VIDEO", caption_snippet: video.video_description || video.title || "", caption_length: String(video.video_description || video.title || "").length, views: video.view_count, likes: video.like_count, comments: video.comment_count, shares: video.share_count, engagement: Number(video.like_count || 0) + Number(video.comment_count || 0) + Number(video.share_count || 0), permalink: video.share_url });
+      if (date >= from && date <= to) rows.push({ record_type: "post", data_source: "tiktok_api", aggregation: "post", client: clientRef, platform: "tiktok", date, post_id: video.id, post_type: "VIDEO", caption_snippet: video.video_description || video.title || "", caption_length: String(video.video_description || video.title || "").length, views: video.view_count, likes: video.like_count, comments: video.comment_count, shares: video.share_count, engagement: Number(video.like_count || 0) + Number(video.comment_count || 0) + Number(video.share_count || 0), permalink: video.share_url });
     }
     if (!data.data?.has_more) break;
     cursor = data.data.cursor;
@@ -213,7 +221,7 @@ async function syncLinkedIn(accessToken, clientRef, from, to, metadata) {
       const stats = item.totalPageStatistics || {};
       const views = stats.views?.allPageViews?.pageViews || stats.views?.allPageViews?.uniquePageViews;
       const clicks = Object.values(stats.clicks || {}).flatMap(x => Array.isArray(x) ? x : []).reduce((n, x) => n + Number(x.clicks || 0), 0);
-      rows.push({ record_type: "account_daily", client: clientRef, platform: "linkedin", date: isoDay(item.timeRange?.start || unixMs(to)), profile_views: views, link_clicks: clicks || null });
+      rows.push({ record_type: "account_daily", data_source: "linkedin_api", aggregation: "daily", client: clientRef, platform: "linkedin", date: isoDay(item.timeRange?.start || unixMs(to)), profile_views: views, link_clicks: clicks || null });
     }
   }
   return rows;

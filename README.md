@@ -27,6 +27,8 @@ Most social tools show isolated platform numbers. This one turns them into a **v
 - **Anomaly detection** — spikes/dips flagged against a rolling 3-month baseline (real signal vs. noise)
 - **Format intelligence** — which formats earn reach/engagement, by median (not outlier-skewed averages)
 - **Effort vs. return per platform** — posts published against what they actually earned; flags dead channels
+- **CNO-only data audit** — checks source coverage, row grain, non-additive reach, overlapping exports, missing KPIs, and account-total versus post-detail reconciliation before a report is published
+- **No false blending** — when several platforms are checked, headline KPIs and trend charts are shown in separate platform panels instead of one cross-platform engagement rate
 
 **Story-first and yours to shape.**
 - The report **opens with the story and the client's goals**, then the numbers. A warm opening letter, a headline, and **Working Now / Needs Attention / Best Next Move**, every claim grounded in the data.
@@ -35,11 +37,16 @@ Most social tools show isolated platform numbers. This one turns them into a **v
 - Deterministic by default: identical input always yields the identical report
 
 **Optional AI narrative (bring your own key).**
-- Open **AI narrative** as its own workspace, then paste an **OpenAI or Anthropic API key**. The opening letter and takeaways are rewritten from *this client's actual numbers* in the voice of a veteran analyst who can tell a story. No em dashes, no template filler.
-- The key is stored **only in your browser**. It is never uploaded and never included in a share link. The client sees only the finished words, which stay fully editable.
+- Open **AI narrative** as its own CNO workspace, then paste an **OpenAI or Anthropic API key**. The opening letter and takeaways are rewritten from *this client's actual numbers*, optional CNO context, campaign/pillar patterns, and data-quality cautions.
+- OpenAI uses the Responses API, configurable reasoning depth, strict JSON-schema output, `store: false`, evidence keys, and confidence labels. CNO gets a private evidence review before sharing; generated copy remains an editable draft.
+- The key is kept **only for the current browser session**. It is never included in a share link. The browser calls the chosen provider directly during the pilot; a production staff-account system should move the call and secret to the authenticated CNO backend.
 
 **Private, view-only sharing.**
 - A share link contains **only the one client's data** — never anyone else's — and opens as a **locked, view-only report**: no uploading, no client switching, no editing, no export. This holds even without a password, so one client can never reach another's results.
+
+**Clear CNO and client experiences.**
+- The working application is labeled **CNO workspace · staff tools** and contains import, sync, audit, AI, editing, and publishing controls.
+- Shared snapshots are labeled **Client report · view only** and remove CNO controls. This is a clear pilot workflow distinction, not employee authentication. The staff-account and client-portal rollout is defined in [`DATA_ACCURACY_AND_ACCESS.md`](DATA_ACCURACY_AND_ACCESS.md).
 
 **Installable and offline.**
 - It is a **PWA**: add it to the home screen or install it as an app on Mac, Windows, or phone, and it keeps working offline. Bookmark it and come back anytime.
@@ -51,8 +58,9 @@ Open `index.html` in any browser (or visit the deployed site with `#demo` to aut
 
 1. Click **Import data**, then drop in the whole reporting folder or select all available CSVs at once
 2. Pick a **client** and **period** (month / last 30 / 90 / all / custom range)
-3. **Customize** the goal, featured KPIs, and sections; use **AI narrative** only when you want an optional AI-written draft; edit any text inline
-4. **Export data** to download normalized CSVs, or **Print / PDF** for the client leave-behind
+3. Run **Data audit** and reconcile its warnings against the native source
+4. **Customize** the goal, featured KPIs, and sections; use **AI narrative** only when you want an optional, evidence-reviewed draft; edit any text inline
+5. **Export data** to download normalized CSVs, or **Print / PDF** for the client leave-behind
 
 Templates: `resources/template_accounts.csv`, `resources/template_content.csv`. A larger synthetic test file covering Instagram, TikTok, and LinkedIn is at `resources/native_platform_comprehensive_test.csv`.
 
@@ -87,6 +95,7 @@ Static site, no build. On [Render](https://render.com): connect the repo, choose
 | `01_METRICS_DICTIONARY.md` | Every metric and its exact formula |
 | `06_CSV_SCHEMA.md` | The CSV contract (including optional `<metric>_target` goal columns) |
 | `DATA_IMPORT_GUIDE.md` | Monthly import workflow and realistic native-platform connection options |
+| `DATA_ACCURACY_AND_ACCESS.md` | Metric-governance rules and the CNO staff/client access roadmap |
 | `sync-service/` | Private OAuth, encrypted token storage, scheduled native-platform sync, and one-use report imports |
 
 ## Brand
